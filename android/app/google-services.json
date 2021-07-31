@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "397492701622",
+    "project_id": "coba-218009",
+    "storage_bucket": "coba-218009.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:397492701622:android:5ca5a1eef8f021b73bd917",
+        "android_client_info": {
+          "package_name": "com.use.mbc_mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "397492701622-0bt3eqg8d8rr86gf7nhkn2a10vllb814.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3jKHQ_znLa_U0-6OgRXNsYlbc_qHN5_g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "397492701622-0bt3eqg8d8rr86gf7nhkn2a10vllb814.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
