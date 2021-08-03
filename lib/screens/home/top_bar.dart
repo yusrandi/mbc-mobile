@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mbc_mobile/screens/home/body.dart';
 import 'package:mbc_mobile/screens/home/home_topbar_menu.dart';
 import 'package:mbc_mobile/screens/home/screen/home_screen_home.dart';
 import 'package:mbc_mobile/screens/home/screen/home_screen_todo.dart';
@@ -26,7 +25,7 @@ class _HomeTopbarState extends State<HomeTopbar> {
      children: [
        Container(
          decoration: BoxDecoration(color: kBackgroundColor),
-         height: SizeConfig.screenHeight/2.5,
+         height: getProportionateScreenHeight(350),
          child: Stack(
             children: [
               Positioned(child: Container(
@@ -59,17 +58,17 @@ class _HomeTopbarState extends State<HomeTopbar> {
                top: 0,
                left: 0,
                right: 0,
-               bottom: 60,
+               bottom: 50,
                child: Container(
                  padding: EdgeInsets.only(top: getProportionateScreenHeight(16)),
                  decoration: BoxDecoration(
                      color: kPrimaryColor,
                      borderRadius:
-                     BorderRadius.vertical(bottom: Radius.circular(25))),
+                     BorderRadius.vertical(bottom: Radius.circular(20))),
                  child: Stack(
                    children: [
                       TopbarSetting(),
-                      Center(child: Text('What your focus main \ntoday ?', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold))),
+                      Center(child: Text('109', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold))),
                       Positioned(
                         bottom: 30,
                         left: 0,
@@ -86,7 +85,7 @@ class _HomeTopbarState extends State<HomeTopbar> {
                                      color: Colors.white,
                                      borderRadius: BorderRadius.circular(35)
                                  ),
-                                 child: Center(child: Text('hahahhaha')),
+                                 child: Center(child: Text('your performa')),
                                ),
                              ),
                              SizedBox(width: 16,),

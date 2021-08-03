@@ -35,6 +35,14 @@ dependencies:
   firebase_analytics: ^7.0.1
   flutter_local_notifications: ^8.0.0
 
+  http: ^0.13.3
+  flutter_bloc: ^7.0.1
+  equatable: ^2.0.3
+  shared_preferences: ^2.0.6
+
+  art_sweetalert: ^0.0.2
+
+
 
 dev_dependencies:
   flutter_test:

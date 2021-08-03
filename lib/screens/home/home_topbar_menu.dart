@@ -16,7 +16,7 @@ class HomeTopbarMenu extends StatelessWidget {
       padding: EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
           color: state == currentState ? kSecondaryColor : Colors.white,
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(25))
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(20))
       ),
       child: Align(
           alignment: Alignment.bottomCenter,

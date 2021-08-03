@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:mbc_mobile/components/custom_surfix_icon.dart';
 import 'package:mbc_mobile/utils/images.dart';
 
 class TopbarSetting extends StatelessWidget {

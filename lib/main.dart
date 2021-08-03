@@ -1,8 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:mbc_mobile/firebase/fcm/notification_helper.dart';
-import 'package:mbc_mobile/firebase/services/local_notification_services.dart';
 import 'package:mbc_mobile/screens/splash/splash_screen.dart';
 import 'package:mbc_mobile/utils/routes.dart';
 import 'package:mbc_mobile/utils/theme.dart';

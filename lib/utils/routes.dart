@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:mbc_mobile/screens/auth/auth_screen.dart';
 import 'package:mbc_mobile/screens/home/home_screen.dart';
+import 'package:mbc_mobile/screens/peternak/form/peternak_form_screen.dart';
+import 'package:mbc_mobile/screens/peternak/peternak_screen.dart';
 import 'package:mbc_mobile/screens/splash/splash_screen.dart';
 
 // We use name route
@@ -9,5 +11,7 @@ final Map<String, WidgetBuilder> routes = {
   SplashScreen.routeName: (context) => SplashScreen(),
   AuthScreen.routeName: (context) => AuthScreen(),
   HomeScreen.routeName: (context) => HomeScreen(),
+  PeternakScreen.routeName: (context) => PeternakScreen(),
+  
 
 };

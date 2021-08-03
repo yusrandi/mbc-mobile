@@ -1,12 +1,9 @@
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+
 import 'package:flutter/material.dart';
 import 'package:mbc_mobile/components/default_button.dart';
 import 'package:mbc_mobile/firebase/fcm/notification_helper.dart';
 import 'package:mbc_mobile/firebase/services/local_notification_services.dart';
-import 'package:mbc_mobile/screens/auth/auth_screen.dart';
 import 'package:mbc_mobile/screens/home/home_screen.dart';
-import 'package:mbc_mobile/screens/splash/splash_screen.dart';
 import 'package:mbc_mobile/utils/images.dart';
 import 'package:mbc_mobile/utils/size_config.dart';
 
@@ -16,8 +13,6 @@ class Body extends StatefulWidget {
 }
 
 class _BodyState extends State<Body> {
-  static const String TAG = "SPLASHSCREEN";
-
   @override
   void initState() {
     super.initState();
@@ -66,7 +61,7 @@ class _BodyState extends State<Body> {
           SizedBox(height: getProportionateScreenHeight(16)),
           GestureDetector(
             onTap: () {
-              Navigator.pushNamed(context, HomeScreen.routeName);
+              Navigator.popAndPushNamed(context, HomeScreen.routeName);
             },
             child: DefaultButton(
               text: "Get Started",
