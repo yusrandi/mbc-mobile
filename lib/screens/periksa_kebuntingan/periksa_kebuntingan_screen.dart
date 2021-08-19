@@ -30,16 +30,7 @@ class PeriksaKebuntinganScreen extends StatelessWidget {
         child: Container(
             padding: EdgeInsets.all(16), child: PeriksaKebuntinganBody()),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => PeriksaKebuntinganFormScreen(periksaKebuntingan: PeriksaKebuntingan(id: 0, sapiId: 0, waktuPk: "", metode: "", hasil: ""))));
-        },
-        backgroundColor: kSecondaryColor,
-        child: Icon(Icons.add),
-      ),
+      
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:art_sweetalert/art_sweetalert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:mbc_mobile/bloc/peternak_bloc/peternak_bloc.dart';
 import 'package:mbc_mobile/bloc/peternak_bloc/peternak_event.dart';
 import 'package:mbc_mobile/bloc/peternak_bloc/peternak_state.dart';
@@ -23,11 +24,11 @@ class _PeternakBodyState extends State<PeternakBody> {
     super.initState();
 
     _bloc = BlocProvider.of<PeternakBloc>(context);
-    _bloc.add(PeternakFetchDataEvent());
   }
 
   @override
   Widget build(BuildContext context) {
+    _bloc.add(PeternakFetchDataEvent());
     return _pageBody();
   }
 
@@ -35,16 +36,19 @@ class _PeternakBodyState extends State<PeternakBody> {
     return BlocListener<PeternakBloc, PeternakState>(
       listener: (context, state) {
         if (state is PeternakInitialState || state is PeternakLoadingState) {
-          _alertLoading();
+            EasyLoading.show(status: 'loading');
         } else if (state is PeternakErrorState) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(state.msg)));
+          EasyLoading.showError(state.msg);
+          EasyLoading.dismiss();
         } else if (state is PeternakSuccessState) {
-          _alertSuccess(state.msg);
+          EasyLoading.showSuccess(state.msg);
+          EasyLoading.dismiss();
+          Navigator.pop(context, true);
         }
       },
       child: BlocBuilder<PeternakBloc, PeternakState>(
         builder: (context, state) {
+          EasyLoading.dismiss();
           print("state $state");
           if (state is PeternakLoadedState) {
             return _buildPeternak(state.datas);
@@ -66,95 +70,132 @@ class _PeternakBodyState extends State<PeternakBody> {
         child: Text("Peternak not Found"),
       );
     }
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: SingleChildScrollView(
-        child: DataTable(
-            columnSpacing: 10,
-            columns: [
-              DataColumn(
-                  label: Text("Aksi",
-                      style: Theme.of(context).textTheme.subtitle1)),
-              DataColumn(
-                  label:
-                      Text("NO", style: Theme.of(context).textTheme.subtitle1)),
-              DataColumn(
-                  label: Text("Kode Peternak",
-                      style: Theme.of(context).textTheme.subtitle1)),
-              DataColumn(
-                  label: Text("Nama Peternak",
-                      style: Theme.of(context).textTheme.subtitle1)),
-              DataColumn(
-                  label: Text("No Hp",
-                      style: Theme.of(context).textTheme.subtitle1)),
-              DataColumn(
-                  label: Text("Tgl Lahir",
-                      style: Theme.of(context).textTheme.subtitle1)),
-              DataColumn(
-                  label: Text("J. Anggota",
-                      style: Theme.of(context).textTheme.subtitle1)),
-              DataColumn(
-                  label: Text("Luas Lahan",
-                      style: Theme.of(context).textTheme.subtitle1)),
-              DataColumn(
-                  label: Text("Kelompok",
-                      style: Theme.of(context).textTheme.subtitle1)),
-              DataColumn(
-                  label: Text("Kabupaten",
-                      style: Theme.of(context).textTheme.subtitle1)),
-              DataColumn(
-                  label: Text("Kecamatan",
-                      style: Theme.of(context).textTheme.subtitle1)),
-              DataColumn(
-                  label: Text("Desa",
-                      style: Theme.of(context).textTheme.subtitle1)),
-            ],
-            rows: list
-                .map((e) => DataRow(cells: [
-                      DataCell(Row(
-                        children: [
-                          GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            PeternakFormScreen(peternak: e)));
-                              },
-                              child: Icon(Icons.edit, color: kSecondaryColor)),
-                          SizedBox(width: 8),
-                          GestureDetector(
-                              onTap: () {
-                                alertConfirm(e);
-                              },
-                              child: Icon(Icons.delete, color: Colors.red))
-                        ],
-                      )),
-                      DataCell(Text((list.indexOf(e) + 1).toString(),
-                          style: Theme.of(context).textTheme.caption)),
-                      DataCell(Text(e.kodePeternak,
-                          style: Theme.of(context).textTheme.caption)),
-                      DataCell(Text(e.namaPeternak,
-                          style: Theme.of(context).textTheme.caption)),
-                      DataCell(Text(e.noHp,
-                          style: Theme.of(context).textTheme.caption)),
-                      DataCell(Text(e.tglLahir,
-                          style: Theme.of(context).textTheme.caption)),
-                      DataCell(Text(e.jumlahAnggota,
-                          style: Theme.of(context).textTheme.caption)),
-                      DataCell(Text(e.luasLahan,
-                          style: Theme.of(context).textTheme.caption)),
-                      DataCell(Text(e.kelompok,
-                          style: Theme.of(context).textTheme.caption)),
-                      DataCell(Text(e.desa!.kecamatan!.kabupaten!.name,
-                          style: Theme.of(context).textTheme.caption)),
-                      DataCell(Text(e.desa!.kecamatan!.name,
-                          style: Theme.of(context).textTheme.caption)),
-                      DataCell(Text(e.desa!.name,
-                          style: Theme.of(context).textTheme.caption)),
-                    ]))
-                .toList()),
-      ),
+    return Stack(
+      children: [
+        Positioned(
+          right: 0,
+          bottom: 0,
+            child: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => PeternakFormScreen(
+                        peternak: Peternak(
+                            id: 0,
+                            kodePeternak: "",
+                            namaPeternak: "",
+                            tglLahir: "",
+                            jumlahAnggota: "",
+                            kelompok: "",
+                            luasLahan: "",
+                            noHp: "",
+                            desaId: 0,
+                            userId: 0)))).then((value) => setState(() {}));
+          },
+          backgroundColor: kSecondaryColor,
+          child: Icon(Icons.add),
+        )),
+        Positioned(
+          bottom : 0,
+          left: 0,
+          right: 0,
+          top: 0,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SingleChildScrollView(
+              child: DataTable(
+                  columnSpacing: 10,
+                  columns: [
+                    DataColumn(
+                        label: Text("Aksi",
+                            style: Theme.of(context).textTheme.subtitle1)),
+                    DataColumn(
+                        label: Text("NO",
+                            style: Theme.of(context).textTheme.subtitle1)),
+                    DataColumn(
+                        label: Text("Kode Peternak",
+                            style: Theme.of(context).textTheme.subtitle1)),
+                    DataColumn(
+                        label: Text("Nama Peternak",
+                            style: Theme.of(context).textTheme.subtitle1)),
+                    DataColumn(
+                        label: Text("No Hp",
+                            style: Theme.of(context).textTheme.subtitle1)),
+                    DataColumn(
+                        label: Text("Tgl Lahir",
+                            style: Theme.of(context).textTheme.subtitle1)),
+                    DataColumn(
+                        label: Text("J. Anggota",
+                            style: Theme.of(context).textTheme.subtitle1)),
+                    DataColumn(
+                        label: Text("Luas Lahan",
+                            style: Theme.of(context).textTheme.subtitle1)),
+                    DataColumn(
+                        label: Text("Kelompok",
+                            style: Theme.of(context).textTheme.subtitle1)),
+                    DataColumn(
+                        label: Text("Kabupaten",
+                            style: Theme.of(context).textTheme.subtitle1)),
+                    DataColumn(
+                        label: Text("Kecamatan",
+                            style: Theme.of(context).textTheme.subtitle1)),
+                    DataColumn(
+                        label: Text("Desa",
+                            style: Theme.of(context).textTheme.subtitle1)),
+                  ],
+                  rows: list
+                      .map((e) => DataRow(cells: [
+                            DataCell(Row(
+                              children: [
+                                GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      PeternakFormScreen(
+                                                          peternak: e)))
+                                          .then((value) => setState(() {}));
+                                    },
+                                    child:
+                                        Icon(Icons.edit, color: kSecondaryColor)),
+                                SizedBox(width: 8),
+                                GestureDetector(
+                                    onTap: () {
+                                      alertConfirm(e);
+                                    },
+                                    child: Icon(Icons.delete, color: Colors.red))
+                              ],
+                            )),
+                            DataCell(Text((list.indexOf(e) + 1).toString(),
+                                style: Theme.of(context).textTheme.caption)),
+                            DataCell(Text(e.kodePeternak,
+                                style: Theme.of(context).textTheme.caption)),
+                            DataCell(Text(e.namaPeternak,
+                                style: Theme.of(context).textTheme.caption)),
+                            DataCell(Text(e.noHp,
+                                style: Theme.of(context).textTheme.caption)),
+                            DataCell(Text(e.tglLahir,
+                                style: Theme.of(context).textTheme.caption)),
+                            DataCell(Text(e.jumlahAnggota,
+                                style: Theme.of(context).textTheme.caption)),
+                            DataCell(Text(e.luasLahan,
+                                style: Theme.of(context).textTheme.caption)),
+                            DataCell(Text(e.kelompok,
+                                style: Theme.of(context).textTheme.caption)),
+                            DataCell(Text(e.desa!.kecamatan!.kabupaten!.name,
+                                style: Theme.of(context).textTheme.caption)),
+                            DataCell(Text(e.desa!.kecamatan!.name,
+                                style: Theme.of(context).textTheme.caption)),
+                            DataCell(Text(e.desa!.name,
+                                style: Theme.of(context).textTheme.caption)),
+                          ]))
+                      .toList()),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -167,8 +208,6 @@ class _PeternakBodyState extends State<PeternakBody> {
       child: CircularProgressIndicator(),
     );
   }
-
- 
 
   void alertConfirm(Peternak peternak) async {
     ArtDialogResponse response = await ArtSweetAlert.show(

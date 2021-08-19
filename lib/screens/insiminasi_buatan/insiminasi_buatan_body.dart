@@ -62,6 +62,7 @@ class _InsiminasiBuatanBodyState extends State<InsiminasiBuatanBody> {
         child: Text("Data not yet"),
       );
     }
+    
     return Stack(
       children: [
         Positioned(

@@ -19,8 +19,9 @@ class AuthGetSuccess extends AuthenticationState {
 
 class AuthLoggedInState extends AuthenticationState {
   final String userEmail;
+  final int userId;
 
-  AuthLoggedInState({required this.userEmail});
+  AuthLoggedInState({required this.userId,required this.userEmail});
   
 }
 

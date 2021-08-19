@@ -33,10 +33,11 @@ class AuthenticationBloc
       }
     } else if (event is CheckLoginEvent) {
       sharedpref = await SharedPreferences.getInstance();
-      var data = sharedpref.get("email");
+      var data = sharedpref.get("name");
+      var userId = sharedpref.get("id");
       print("data $data");
       if (data != null)
-        yield AuthLoggedInState(userEmail: data.toString());
+        yield AuthLoggedInState(userId: int.parse(userId.toString()) ,userEmail: data.toString());
       else
         yield AuthLoggedOutState();
     } else if (event is LogOutEvent) {

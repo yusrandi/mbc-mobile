@@ -153,7 +153,7 @@ class _PerlakuanBodyState extends State<PerlakuanBody> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => PerlakuanFormScreen(perlakuan: Perlakuan(id: 0, sapiId: 0, tglPerlakuan: "", jenisObat: "", dosisObat: 0, vaksin: "", dosisVaksin: 0, vitamin: "", dosisVitamin: 0, hormon: "", dosisHormon: 0, ketPerlakuan: ""))));
+                  builder: (context) => PerlakuanFormScreen(perlakuan: Perlakuan(id: 0, sapiId: 0, tglPerlakuan: "", jenisObat: "", dosisObat: 0, vaksin: "", dosisVaksin: 0, vitamin: "", dosisVitamin: 0, hormon: "", dosisHormon: 0, ketPerlakuan: "")))).then((value) => setState(() {}));
         },
         backgroundColor: kSecondaryColor,
         child: Icon(Icons.add),

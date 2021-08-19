@@ -13,6 +13,10 @@ import 'package:mbc_mobile/utils/constants.dart';
 import 'package:mbc_mobile/utils/size_config.dart';
 
 class SignForm extends StatefulWidget {
+  final AuthenticationBloc authenticationBloc;
+
+  const SignForm({Key? key, required this.authenticationBloc}) : super(key: key);
+
   @override
   _SignFormState createState() => _SignFormState();
 }
@@ -38,7 +42,6 @@ class _SignFormState extends State<SignForm> {
       });
   }
 
-  late AuthenticationBloc _bloc;
   late SharedInfo _sharedInfo;
 
   String resToken = "";
@@ -46,7 +49,6 @@ class _SignFormState extends State<SignForm> {
   @override
   void initState() {
     super.initState();
-    _bloc = BlocProvider.of<AuthenticationBloc>(context);
     _sharedInfo = SharedInfo();
 
     FirebaseMessaging.instance.getInitialMessage();
@@ -71,14 +73,14 @@ class _SignFormState extends State<SignForm> {
             EasyLoading.showSuccess("Welcome");
             _sharedInfo.sharedLoginInfo(
                 state.user.user!.id, state.user.user!.email, state.user.user!.name);
-            gotoHomePage();
+            gotoAnotherPage(HomeScreen(authenticationBloc: widget.authenticationBloc, email: state.user.user!.name, id: state.user.user!.id));
           } else {
             EasyLoading.showError(state.user.responsemsg);
           }
         } else if (state is AuthLoadingState ||
             state is AuthenticationInitialState) {
           EasyLoading.show(status: 'wait a second');
-        } else if (state is AuthLoggedInState) gotoHomePage();
+        } else if (state is AuthLoggedInState) gotoAnotherPage(HomeScreen(authenticationBloc: widget.authenticationBloc, email: state.userEmail, id: state.userId));
       },
       child: Form(
         key: _formKey,
@@ -98,7 +100,7 @@ class _SignFormState extends State<SignForm> {
                   KeyboardUtil.hideKeyboard(context);
 
                   if (resToken != "") {
-                    _bloc.add(LoginEvent(
+                    widget.authenticationBloc.add(LoginEvent(
                         email: email, password: password, token: resToken));
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -185,11 +187,12 @@ class _SignFormState extends State<SignForm> {
     );
   }
 
-  
 
-  void gotoHomePage() {
-    Navigator.popAndPushNamed(context, HomeScreen.routeName);
+
+  void gotoAnotherPage(Widget widget) {
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+      return widget;
+    }));
   }
-
 
 }

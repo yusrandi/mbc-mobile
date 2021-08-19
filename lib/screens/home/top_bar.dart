@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mbc_mobile/bloc/auth_bloc/authentication_bloc.dart';
 import 'package:mbc_mobile/screens/home/home_topbar_menu.dart';
 import 'package:mbc_mobile/screens/home/screen/home_screen_home.dart';
 import 'package:mbc_mobile/screens/home/screen/home_screen_todo.dart';
@@ -8,8 +9,10 @@ import 'package:mbc_mobile/utils/size_config.dart';
 
 class HomeTopbar extends StatefulWidget {
   final String userName;
+  final int id;
+  final AuthenticationBloc authenticationBloc;
 
-  const HomeTopbar({Key? key, required this.userName}) : super(key: key);
+  const HomeTopbar({Key? key, required this.id, required this.userName, required this.authenticationBloc}) : super(key: key);
   @override
   _HomeTopbarState createState() => _HomeTopbarState();
 }
@@ -24,7 +27,7 @@ class _HomeTopbarState extends State<HomeTopbar> {
       children: [
         Container(
           decoration: BoxDecoration(color: kBackgroundColor),
-          height: getProportionateScreenHeight(350),
+          height: getProportionateScreenHeight(300),
           child: Stack(
             children: [
               Positioned(
@@ -77,14 +80,21 @@ class _HomeTopbarState extends State<HomeTopbar> {
                           BorderRadius.vertical(bottom: Radius.circular(20))),
                   child: Stack(
                     children: [
-                      TopbarSetting(userName: widget.userName),
-                      Center(
+                      // TopbarSetting(userName: widget.userName, authenticationBloc: widget.authenticationBloc),
+                      Positioned(
+                        top: 0,
+                        right: 0,
+                        bottom: 80,
+                        left: 0,
+                        child: Center(
                           child: Text('109',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 26,
-                                  fontWeight: FontWeight.bold))),
+                                  fontWeight: FontWeight.bold)),
+                        ),
+                      ),
                       Positioned(
                         bottom: 30,
                         left: 0,
@@ -130,8 +140,9 @@ class _HomeTopbarState extends State<HomeTopbar> {
           ),
         ),
         Container(
+          height: SizeConfig.screenHeight,
           margin: EdgeInsets.all(16),
-          child: _currentIndex == 0 ? HomeScreenHome() : HomeScreenTodo(),
+          child: _currentIndex == 0 ? HomeScreenHome() : HomeScreenTodo(id: widget.id),
         ),
       ],
     );

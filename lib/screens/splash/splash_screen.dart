@@ -13,9 +13,7 @@ class SplashScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     return Scaffold(
-      body: BlocProvider(
-        create: (context) => AuthenticationBloc(UserRepositoryImpl()),
-        child: Body()),
+      body: Body(),
     );
   }
 }

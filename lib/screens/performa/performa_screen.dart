@@ -31,16 +31,7 @@ class PerformaScreen extends StatelessWidget {
         child: Container(
             padding: EdgeInsets.all(16), child: PerformaBody()),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => PerformaFormScreen(performa: Performa(id: 0, sapiId: 0, tanggalPerforma: "tanggalPerforma", tinggiBadan: 0, beratBadan: 0, panjangBadan: 0, lingkarDada: 0, bsc: 0))));
-        },
-        backgroundColor: kSecondaryColor,
-        child: Icon(Icons.add),
-      ),
+      
     );
   }
 }

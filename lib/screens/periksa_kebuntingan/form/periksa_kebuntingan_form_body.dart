@@ -81,7 +81,6 @@ class _PeriksaKebuntinganFormBodyState
         } else if (state is PeriksaKebuntinganSuccessState) {
           EasyLoading.showSuccess(state.msg);
           EasyLoading.dismiss();
-
           Navigator.pop(context);
         }
 

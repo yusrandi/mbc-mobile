@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mbc_mobile/bloc/auth_bloc/authentication_bloc.dart';
 import 'package:mbc_mobile/firebase/fcm/notification_helper.dart';
 import 'package:mbc_mobile/firebase/services/local_notification_services.dart';
 import 'package:mbc_mobile/screens/home/top_bar.dart';
@@ -6,12 +8,18 @@ import 'package:mbc_mobile/utils/size_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Body extends StatefulWidget {
+
+  final AuthenticationBloc authenticationBloc;
+  final String name;
+  final int id;
+
+  const Body({Key? key, required this.authenticationBloc, required this.name, required this.id}) : super(key: key);
+
   @override
   _BodyState createState() => _BodyState();
 }
 
 class _BodyState extends State<Body> {
-  String name = ". . .";
   late SharedPreferences sharedpref;
 
   @override
@@ -22,7 +30,6 @@ class _BodyState extends State<Body> {
     LocalNotificationServices.initialize(context);
     NotificationHelper.init(context);
 
-    getFromSharedPreferences();
   }
 
   @override
@@ -32,17 +39,9 @@ class _BodyState extends State<Body> {
       width: SizeConfig.screenWidth,
       height: SizeConfig.screenHeight,
       child: SingleChildScrollView(
-        child: HomeTopbar(userName: name),
+        child: HomeTopbar(id: widget.id, userName: widget.name, authenticationBloc: widget.authenticationBloc),
       ),
     );
   }
 
-  void getFromSharedPreferences() async {
-    sharedpref = await SharedPreferences.getInstance();
-
-    setState(() {
-      name = sharedpref.getString("name")!;
-      print("Body Home "+name);
-    });
-  }
 }

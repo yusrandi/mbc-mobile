@@ -6,7 +6,6 @@ ThemeData theme() {
   return ThemeData(
     scaffoldBackgroundColor: kBackgroundColor,
     fontFamily: "Muli",
-
     appBarTheme: appBarTheme(),
     textTheme: textTheme(),
     inputDecorationTheme: inputDecorationTheme(),
@@ -43,7 +42,7 @@ TextTheme textTheme() {
 
 AppBarTheme appBarTheme() {
   return AppBarTheme(
-    color: kSecondaryColor,
+    color: kPrimaryColor,
     elevation: 0,
     brightness: Brightness.light,
     iconTheme: IconThemeData(color: Colors.white),

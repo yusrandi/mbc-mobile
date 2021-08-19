@@ -27,24 +27,7 @@ class PeternakScreen extends StatelessWidget {
         create: (context) => PeternakBloc(PeternakRepositoryImpl()),
         child: Container(padding: EdgeInsets.all(16), child: PeternakBody()),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => PeternakFormScreen(peternak: Peternak(
-            id: 0,
-            kodePeternak: "",
-            namaPeternak: "",
-            tglLahir: "",
-            jumlahAnggota: "",
-            kelompok: "",
-            luasLahan: "",
-            noHp: "",
-            desaId: 0,
-            userId: 0
-          ))));
-        },
-        backgroundColor: kSecondaryColor,
-        child: Icon(Icons.add),
-      ),
+     
     );
   }
 }

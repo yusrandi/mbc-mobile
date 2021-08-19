@@ -21,11 +21,13 @@ class _PerformaBodyState extends State<PerformaBody> {
     super.initState();
 
     performaBloc = BlocProvider.of<PerformaBloc>(context);
-    performaBloc.add(PerformaFetchDataEvent());
   }
 
   @override
   Widget build(BuildContext context) {
+
+    performaBloc.add(PerformaFetchDataEvent());
+
     return BlocListener<PerformaBloc, PerformaState>(
       listener: (context, state) {
         if (state is PerformaErrorState) {
@@ -61,76 +63,98 @@ class _PerformaBodyState extends State<PerformaBody> {
         child: Text("Data not yet"),
       );
     }
-    return Container(
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
+    return Stack(
+      children: [
+
+        Positioned(
+          top: 0, bottom: 0, left: 0, right: 0,
+          child: Container(
         child: SingleChildScrollView(
-          child: DataTable(
-            columnSpacing: 10,
-            columns: [
-              DataColumn(
-                  label: Text("Aksi",
-                      style: Theme.of(context).textTheme.subtitle1)),
-              DataColumn(
-                  label: Text("Tanggal Performa",
-                      style: Theme.of(context).textTheme.subtitle1)),
-              DataColumn(
-                  label: Text("Nama Sapi",
-                      style: Theme.of(context).textTheme.subtitle1)),
-              DataColumn(
-                  label: Text("Tinggi Badan",
-                      style: Theme.of(context).textTheme.subtitle1)),
-              DataColumn(
-                  label: Text("Berat Badan",
-                      style: Theme.of(context).textTheme.subtitle1)),
-              DataColumn(
-                  label: Text("Panjang Badan",
-                      style: Theme.of(context).textTheme.subtitle1)),
-              DataColumn(
-                  label: Text("Lingkar Dada",
-                      style: Theme.of(context).textTheme.subtitle1)),
-              DataColumn(
-                  label: Text("BSC",
-                      style: Theme.of(context).textTheme.subtitle1)),
-            ], 
-            rows: list.map((e) => DataRow(cells: [
-              DataCell(Row(
-                        children: [
-                          GestureDetector(
-                              onTap: () {
-                                Navigator.push(
+          scrollDirection: Axis.horizontal,
+          child: SingleChildScrollView(
+            child: DataTable(
+              columnSpacing: 10,
+              columns: [
+                DataColumn(
+                    label: Text("Aksi",
+                        style: Theme.of(context).textTheme.subtitle1)),
+                DataColumn(
+                    label: Text("Tanggal Performa",
+                        style: Theme.of(context).textTheme.subtitle1)),
+                DataColumn(
+                    label: Text("Nama Sapi",
+                        style: Theme.of(context).textTheme.subtitle1)),
+                DataColumn(
+                    label: Text("Tinggi Badan",
+                        style: Theme.of(context).textTheme.subtitle1)),
+                DataColumn(
+                    label: Text("Berat Badan",
+                        style: Theme.of(context).textTheme.subtitle1)),
+                DataColumn(
+                    label: Text("Panjang Badan",
+                        style: Theme.of(context).textTheme.subtitle1)),
+                DataColumn(
+                    label: Text("Lingkar Dada",
+                        style: Theme.of(context).textTheme.subtitle1)),
+                DataColumn(
+                    label: Text("BSC",
+                        style: Theme.of(context).textTheme.subtitle1)),
+              ], 
+              rows: list.map((e) => DataRow(cells: [
+                DataCell(Row(
+                          children: [
+                            GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => PerformaFormScreen(performa: e))).then((value) => setState(() {}));
+                  
+                                
+                                },
+                                child: Icon(Icons.edit, color: kSecondaryColor)),
+                            SizedBox(width: 8),
+                            GestureDetector(
+                                onTap: () {
+                                  alertConfirm(e);
+                                },
+                                child: Icon(Icons.delete, color: Colors.red))
+                          ],
+                )),
+                DataCell(Text(e.tanggalPerforma,
+                            style: Theme.of(context).textTheme.caption)),
+                DataCell(Text(e.sapi!.namaSapi,
+                            style: Theme.of(context).textTheme.caption)),
+                DataCell(Text(e.tinggiBadan.toString()+" cm",
+                            style: Theme.of(context).textTheme.caption)),
+                DataCell(Text(e.beratBadan.toString()+" cm",
+                            style: Theme.of(context).textTheme.caption)),
+                DataCell(Text(e.panjangBadan.toString()+" cm",
+                            style: Theme.of(context).textTheme.caption)),
+                DataCell(Text(e.lingkarDada.toString()+" cm",
+                            style: Theme.of(context).textTheme.caption)),
+                DataCell(Text(e.bsc.toString()+" cm",
+                            style: Theme.of(context).textTheme.caption)),
+    
+              ])).toList()),
+          ),
+    
+        ),
+      ),),
+        Positioned(
+          right: 0, bottom: 0,
+          child: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => PerformaFormScreen(performa: e)));
-                              },
-                              child: Icon(Icons.edit, color: kSecondaryColor)),
-                          SizedBox(width: 8),
-                          GestureDetector(
-                              onTap: () {
-                                alertConfirm(e);
-                              },
-                              child: Icon(Icons.delete, color: Colors.red))
-                        ],
-              )),
-              DataCell(Text(e.tanggalPerforma,
-                          style: Theme.of(context).textTheme.caption)),
-              DataCell(Text(e.sapi!.namaSapi,
-                          style: Theme.of(context).textTheme.caption)),
-              DataCell(Text(e.tinggiBadan.toString()+" cm",
-                          style: Theme.of(context).textTheme.caption)),
-              DataCell(Text(e.beratBadan.toString()+" cm",
-                          style: Theme.of(context).textTheme.caption)),
-              DataCell(Text(e.panjangBadan.toString()+" cm",
-                          style: Theme.of(context).textTheme.caption)),
-              DataCell(Text(e.lingkarDada.toString()+" cm",
-                          style: Theme.of(context).textTheme.caption)),
-              DataCell(Text(e.bsc.toString()+" cm",
-                          style: Theme.of(context).textTheme.caption)),
-
-            ])).toList()),
-        ),
-
-      ),
+                  builder: (context) => PerformaFormScreen(performa: Performa(id: 0, sapiId: 0, tanggalPerforma: "tanggalPerforma", tinggiBadan: 0, beratBadan: 0, panjangBadan: 0, lingkarDada: 0, bsc: 0)))).then((value) => setState(() {}));
+        },
+        backgroundColor: kSecondaryColor,
+        child: Icon(Icons.add),
+      )),
+      ],
+       
     );
   }
 

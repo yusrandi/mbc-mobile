@@ -20,13 +20,12 @@ class _PeriksaKebuntinganBodyState extends State<PeriksaKebuntinganBody> {
     super.initState();
 
     periksaKebuntinganBloc = BlocProvider.of<PeriksaKebuntinganBloc>(context);
-    periksaKebuntinganBloc.add(PeriksaKebuntinganFetchDataEvent());
-
-    
   }
 
   @override
   Widget build(BuildContext context) {
+    periksaKebuntinganBloc.add(PeriksaKebuntinganFetchDataEvent());
+
     return BlocListener<PeriksaKebuntinganBloc, PeriksaKebuntinganState>(
       listener: (context, state) {
         if (state is PeriksaKebuntinganErrorState) {
@@ -63,66 +62,102 @@ class _PeriksaKebuntinganBodyState extends State<PeriksaKebuntinganBody> {
         child: Text("Data not yet"),
       );
     }
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: SingleChildScrollView(
-        child: DataTable(
-            columnSpacing: 10,
-            columns: [
-              DataColumn(
-                  label: Text("Aksi",
-                      style: Theme.of(context).textTheme.subtitle1)),
-              DataColumn(
-                  label:
-                      Text("NO", style: Theme.of(context).textTheme.subtitle1)),
-              DataColumn(
-                  label: Text("Waktu PK",
-                      style: Theme.of(context).textTheme.subtitle1)),
-              DataColumn(
-                  label: Text("Ertag Sapi",
-                      style: Theme.of(context).textTheme.subtitle1)),
-              DataColumn(
-                  label: Text("Metode",
-                      style: Theme.of(context).textTheme.subtitle1)),
-              DataColumn(
-                  label: Text("Hasil",
-                      style: Theme.of(context).textTheme.subtitle1)),
-            ],
-            rows: listKebuntingan
-                .map((e) => DataRow(cells: [
-                      DataCell(Row(
-                        children: [
-                          GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            PeriksaKebuntinganFormScreen(
-                                                periksaKebuntingan: e)));
-                              },
-                              child: Icon(Icons.edit, color: kSecondaryColor)),
-                          SizedBox(width: 8),
-                          GestureDetector(
-                              onTap: () {
-                                alertConfirm(e);
-                              },
-                              child: Icon(Icons.delete, color: Colors.red))
-                        ],
-                      )),
-                      DataCell(Text((listKebuntingan.indexOf(e) + 1).toString(),
-                          style: Theme.of(context).textTheme.caption)),
-                      DataCell(Text(e.waktuPk,
-                          style: Theme.of(context).textTheme.caption)),
-                      DataCell(Text(e.sapi!.ertag,
-                          style: Theme.of(context).textTheme.caption)),
-                      DataCell(Text(e.metode,
-                          style: Theme.of(context).textTheme.caption)),
-                      DataCell(Text(e.hasil,
-                          style: Theme.of(context).textTheme.caption)),
-                    ]))
-                .toList()),
-      ),
+    return Stack(
+      children: [
+        
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SingleChildScrollView(
+              child: DataTable(
+                  columnSpacing: 10,
+                  columns: [
+                    DataColumn(
+                        label: Text("Aksi",
+                            style: Theme.of(context).textTheme.subtitle1)),
+                    DataColumn(
+                        label: Text("NO",
+                            style: Theme.of(context).textTheme.subtitle1)),
+                    DataColumn(
+                        label: Text("Waktu PK",
+                            style: Theme.of(context).textTheme.subtitle1)),
+                    DataColumn(
+                        label: Text("Ertag Sapi",
+                            style: Theme.of(context).textTheme.subtitle1)),
+                    DataColumn(
+                        label: Text("Metode",
+                            style: Theme.of(context).textTheme.subtitle1)),
+                    DataColumn(
+                        label: Text("Hasil",
+                            style: Theme.of(context).textTheme.subtitle1)),
+                  ],
+                  rows: listKebuntingan
+                      .map((e) => DataRow(cells: [
+                            DataCell(Row(
+                              children: [
+                                GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  PeriksaKebuntinganFormScreen(
+                                                      periksaKebuntingan:
+                                                          e))).then(
+                                          (value) => setState(() {}));
+                                    },
+                                    child: Icon(Icons.edit,
+                                        color: kSecondaryColor)),
+                                SizedBox(width: 8),
+                                GestureDetector(
+                                    onTap: () {
+                                      alertConfirm(e);
+                                    },
+                                    child:
+                                        Icon(Icons.delete, color: Colors.red))
+                              ],
+                            )),
+                            DataCell(Text(
+                                (listKebuntingan.indexOf(e) + 1).toString(),
+                                style: Theme.of(context).textTheme.caption)),
+                            DataCell(Text(e.waktuPk,
+                                style: Theme.of(context).textTheme.caption)),
+                            DataCell(Text(e.sapi!.ertag,
+                                style: Theme.of(context).textTheme.caption)),
+                            DataCell(Text(e.metode,
+                                style: Theme.of(context).textTheme.caption)),
+                            DataCell(Text(e.hasil,
+                                style: Theme.of(context).textTheme.caption)),
+                          ]))
+                      .toList()),
+            ),
+          ),
+        ),
+        Positioned(
+            right: 0,
+            bottom: 0,
+            child: FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => PeriksaKebuntinganFormScreen(
+                            periksaKebuntingan: PeriksaKebuntingan(
+                                id: 0,
+                                sapiId: 0,
+                                waktuPk: "",
+                                metode: "",
+                                hasil: "")))).then(
+                                          (value) => setState(() {}));
+              },
+              backgroundColor: kSecondaryColor,
+              child: Icon(Icons.add),
+            )),
+      ],
     );
   }
 

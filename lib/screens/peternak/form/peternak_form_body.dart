@@ -1,6 +1,7 @@
 import 'package:art_sweetalert/art_sweetalert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:mbc_mobile/bloc/kabupaten_bloc/kabupaten_bloc.dart';
 import 'package:mbc_mobile/bloc/kabupaten_bloc/kabupaten_event.dart';
 import 'package:mbc_mobile/bloc/kabupaten_bloc/kabupaten_state.dart';
@@ -98,11 +99,14 @@ class _PeternakFormBodyState extends State<PeternakFormBody> {
     return BlocListener<PeternakBloc, PeternakState>(
       listener: (context, state) {
         if (state is PeternakInitialState || state is PeternakLoadingState) {
-          _alertLoading();
+          EasyLoading.show(status: 'loading');
         } else if (state is PeternakErrorState) {
-          _alertError(state.msg);
+          EasyLoading.showError(state.msg);
+          EasyLoading.dismiss();
         } else if (state is PeternakSuccessState) {
-          _alertSuccess(state.msg);
+          EasyLoading.showSuccess(state.msg);
+          EasyLoading.dismiss();
+          Navigator.pop(context, true);
         }
       },
       child: SingleChildScrollView(
@@ -143,6 +147,7 @@ class _PeternakFormBodyState extends State<PeternakFormBody> {
                 onTap: () {
                   KeyboardUtil.hideKeyboard(context);
                   if (_formKey.currentState!.validate()) {
+                    _formKey.currentState!.save();
                     if (resDesaId == 0) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Harap Memilih Desa')),

@@ -28,7 +28,7 @@ class _BodyState extends State<Body> {
   Widget build(BuildContext context) {
     return BlocListener<AuthenticationBloc, AuthenticationState>(
       listener: (context, state) {
-        print("State $state");
+
         loginAction(state);
       },
       child: Container(
@@ -86,10 +86,15 @@ class _BodyState extends State<Body> {
     await new Future.delayed(const Duration(seconds: 2));
 
     if (state is AuthLoggedOutState) {
-      Navigator.pushReplacementNamed(context, AuthScreen.routeName);
+      gotoAnotherPage(AuthScreen(authenticationBloc: _bloc,));
     } else if (state is AuthLoggedInState) {
-      Navigator.pushReplacementNamed(context, HomeScreen.routeName);
-      Body.userEmail = state.userEmail.toString();
+      gotoAnotherPage(HomeScreen(authenticationBloc: _bloc, email: state.userEmail.toString(), id: state.userId));
     }
+  }
+
+  void gotoAnotherPage(Widget widget) {
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+      return widget;
+    }));
   }
 }

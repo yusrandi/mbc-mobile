@@ -6,16 +6,16 @@ import 'package:mbc_mobile/screens/auth/body.dart';
 
 class AuthScreen extends StatelessWidget {
   static String routeName = "auth";
+  final AuthenticationBloc authenticationBloc;
+
+  const AuthScreen({Key? key, required this.authenticationBloc}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("Sign In", style: TextStyle(color: Colors.white))),
-      body: BlocProvider(
-        create: (context) => AuthenticationBloc(UserRepositoryImpl()),
-        child: Container(
-            child: Body()),
-      ),
+      body: Container(
+          child: Body(authenticationBloc: authenticationBloc)),
     );
   }
 }

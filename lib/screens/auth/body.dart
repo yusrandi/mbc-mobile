@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:mbc_mobile/bloc/auth_bloc/authentication_bloc.dart';
 import 'package:mbc_mobile/screens/auth/sign_form.dart';
 import 'package:mbc_mobile/utils/size_config.dart';
 
 class Body extends StatefulWidget {
+
+  final AuthenticationBloc authenticationBloc;
+
+  const Body({Key? key, required this.authenticationBloc}) : super(key: key);
 
   @override
   _BodyState createState() => _BodyState();
@@ -34,7 +39,7 @@ class _BodyState extends State<Body> {
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: SizeConfig.screenHeight * 0.08),
-                SignForm(),
+                SignForm(authenticationBloc: widget.authenticationBloc),
                 SizedBox(height: SizeConfig.screenHeight * 0.08),
                 // Row(
                 //   mainAxisAlignment: MainAxisAlignment.center,
