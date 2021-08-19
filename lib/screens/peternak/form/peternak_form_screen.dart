@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:mbc_mobile/bloc/kabupaten_bloc/kabupaten_bloc.dart';
 import 'package:mbc_mobile/bloc/peternak_bloc/peternak_bloc.dart';
 import 'package:mbc_mobile/models/peternak_model.dart' as PeternakModel;

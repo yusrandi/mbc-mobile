@@ -1,3 +1,5 @@
+import 'package:mbc_mobile/models/user_model.dart';
+
 class PeternakModel {
   String responsecode = "";
   String responsemsg = "";
@@ -36,19 +38,23 @@ class Peternak {
   String luasLahan = "";
   String kelompok = "";
   int desaId = 0;
+  int userId = 0;
   Desa? desa;
+  User? user;
 
   Peternak(
       {required this.id,
-      required this.kodePeternak,
-      required this.namaPeternak,
-      required this.noHp,
-      required this.tglLahir,
-      required this.jumlahAnggota,
-      required this.luasLahan,
-      required this.kelompok,
-      required this.desaId,
-      this.desa});
+        required this.kodePeternak,
+        required this.namaPeternak,
+        required this.noHp,
+        required this.tglLahir,
+        required this.jumlahAnggota,
+        required this.luasLahan,
+        required this.kelompok,
+        required this.desaId,
+        required this.userId,
+        this.desa,
+        this.user});
 
   Peternak.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -60,7 +66,9 @@ class Peternak {
     luasLahan = json['luas_lahan'];
     kelompok = json['kelompok'];
     desaId = json['desa_id'];
+    userId = json['user_id'];
     desa = json['desa'] != null ? new Desa.fromJson(json['desa']) : null;
+    user = json['user'] != null ? new User.fromJson(json['user']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -74,8 +82,12 @@ class Peternak {
     data['luas_lahan'] = this.luasLahan;
     data['kelompok'] = this.kelompok;
     data['desa_id'] = this.desaId;
+    data['user_id'] = this.userId;
     if (this.desa != null) {
       data['desa'] = this.desa!.toJson();
+    }
+    if (this.user != null) {
+      data['user'] = this.user!.toJson();
     }
     return data;
   }
@@ -89,9 +101,9 @@ class Desa {
 
   Desa(
       {required this.id,
-      required this.kecamatanId,
-      required this.name,
-      this.kecamatan});
+        required this.kecamatanId,
+        required this.name,
+        this.kecamatan});
 
   Desa.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -122,9 +134,9 @@ class Kecamatan {
 
   Kecamatan(
       {required this.id,
-      required this.kabupatenId,
-      required this.name,
-      this.kabupaten});
+        required this.kabupatenId,
+        required this.name,
+        this.kabupaten});
 
   Kecamatan.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -165,4 +177,5 @@ class Kabupaten {
     return data;
   }
 }
+
 

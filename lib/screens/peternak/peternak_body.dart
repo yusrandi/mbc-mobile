@@ -1,7 +1,6 @@
 import 'package:art_sweetalert/art_sweetalert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mbc_mobile/bloc/peternak_bloc/peternak_bloc.dart';
 import 'package:mbc_mobile/bloc/peternak_bloc/peternak_event.dart';
 import 'package:mbc_mobile/bloc/peternak_bloc/peternak_state.dart';
@@ -35,7 +34,9 @@ class _PeternakBodyState extends State<PeternakBody> {
   Widget _pageBody() {
     return BlocListener<PeternakBloc, PeternakState>(
       listener: (context, state) {
-        if (state is PeternakErrorState) {
+        if (state is PeternakInitialState || state is PeternakLoadingState) {
+          _alertLoading();
+        } else if (state is PeternakErrorState) {
           ScaffoldMessenger.of(context)
               .showSnackBar(SnackBar(content: Text(state.msg)));
         } else if (state is PeternakSuccessState) {
@@ -45,9 +46,7 @@ class _PeternakBodyState extends State<PeternakBody> {
       child: BlocBuilder<PeternakBloc, PeternakState>(
         builder: (context, state) {
           print("state $state");
-          if (state is PeternakInitialState || state is PeternakLoadingState) {
-            return _buildLoading();
-          } else if (state is PeternakLoadedState) {
+          if (state is PeternakLoadedState) {
             return _buildPeternak(state.datas);
           } else if (state is PeternakSuccessState) {
             return _buildPeternak(state.datas);
@@ -116,8 +115,11 @@ class _PeternakBodyState extends State<PeternakBody> {
                         children: [
                           GestureDetector(
                               onTap: () {
-                                          Navigator.push(context, MaterialPageRoute(builder: (context) => PeternakFormScreen(peternak: e)));
-
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            PeternakFormScreen(peternak: e)));
                               },
                               child: Icon(Icons.edit, color: kSecondaryColor)),
                           SizedBox(width: 8),
@@ -156,18 +158,17 @@ class _PeternakBodyState extends State<PeternakBody> {
     );
   }
 
+  void _alertLoading() {
+    Center(child: CircularProgressIndicator());
+  }
+
   Widget _buildLoading() {
     return Center(
       child: CircularProgressIndicator(),
     );
   }
 
-  Widget _buildError(String msg) {
-    return Center(
-      child: Text(msg,
-          style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
-    );
-  }
+ 
 
   void alertConfirm(Peternak peternak) async {
     ArtDialogResponse response = await ArtSweetAlert.show(
@@ -180,6 +181,7 @@ class _PeternakBodyState extends State<PeternakBody> {
             confirmButtonText: "Yes, delete it",
             type: ArtSweetAlertType.warning));
 
+    // ignore: unnecessary_null_comparison
     if (response == null) {
       return;
     }

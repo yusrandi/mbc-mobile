@@ -7,118 +7,133 @@ import 'package:mbc_mobile/utils/constants.dart';
 import 'package:mbc_mobile/utils/size_config.dart';
 
 class HomeTopbar extends StatefulWidget {
-  const HomeTopbar({Key? key}) : super(key: key);
+  final String userName;
 
+  const HomeTopbar({Key? key, required this.userName}) : super(key: key);
   @override
   _HomeTopbarState createState() => _HomeTopbarState();
 }
 
 class _HomeTopbarState extends State<HomeTopbar> {
-
   int _currentIndex = 0;
   int getIndex() => this._currentIndex;
 
   @override
   Widget build(BuildContext context) {
-
-   return Column(
-     children: [
-       Container(
-         decoration: BoxDecoration(color: kBackgroundColor),
-         height: getProportionateScreenHeight(350),
-         child: Stack(
+    return Column(
+      children: [
+        Container(
+          decoration: BoxDecoration(color: kBackgroundColor),
+          height: getProportionateScreenHeight(350),
+          child: Stack(
             children: [
-              Positioned(child: Container(
+              Positioned(
+                  child: Container(
                 margin: EdgeInsets.symmetric(horizontal: 26),
                 decoration: BoxDecoration(color: Colors.white),
               )),
-             Row(
-               crossAxisAlignment: CrossAxisAlignment.center,
-               children: [
-                 Expanded(
-                     flex: 1,
-                     child: GestureDetector(onTap: (){
-                       setState(() {
-                         _currentIndex = 0;
-
-                       });
-                     }, child: HomeTopbarMenu(state: 0, currentState: _currentIndex, title: 'Home',))
-                 ),
-                 Expanded(
-                     flex: 1,
-                     child: GestureDetector(onTap: (){
-                       setState(() {
-                         _currentIndex = 1;
-                       });
-                     }, child: HomeTopbarMenu(state: 1, currentState: _currentIndex, title: 'Todo',))
-                 ),
-               ],
-             ),
-             Positioned(
-               top: 0,
-               left: 0,
-               right: 0,
-               bottom: 50,
-               child: Container(
-                 padding: EdgeInsets.only(top: getProportionateScreenHeight(16)),
-                 decoration: BoxDecoration(
-                     color: kPrimaryColor,
-                     borderRadius:
-                     BorderRadius.vertical(bottom: Radius.circular(20))),
-                 child: Stack(
-                   children: [
-                      TopbarSetting(),
-                      Center(child: Text('109', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold))),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                      flex: 1,
+                      child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _currentIndex = 0;
+                            });
+                          },
+                          child: HomeTopbarMenu(
+                            state: 0,
+                            currentState: _currentIndex,
+                            title: 'Home',
+                          ))),
+                  Expanded(
+                      flex: 1,
+                      child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _currentIndex = 1;
+                            });
+                          },
+                          child: HomeTopbarMenu(
+                            state: 1,
+                            currentState: _currentIndex,
+                            title: 'Todo',
+                          ))),
+                ],
+              ),
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 50,
+                child: Container(
+                  padding:
+                      EdgeInsets.only(top: getProportionateScreenHeight(16)),
+                  decoration: BoxDecoration(
+                      color: kPrimaryColor,
+                      borderRadius:
+                          BorderRadius.vertical(bottom: Radius.circular(20))),
+                  child: Stack(
+                    children: [
+                      TopbarSetting(userName: widget.userName),
+                      Center(
+                          child: Text('109',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.bold))),
                       Positioned(
                         bottom: 30,
                         left: 0,
                         right: 0,
                         child: Container(
-                         padding: EdgeInsets.only(left: 36),
-                         child: Row(
-                           children: [
-                             Expanded(
-                               flex: 3,
-                               child: Container(
-                                 height: 50,
-                                 decoration: BoxDecoration(
-                                     color: Colors.white,
-                                     borderRadius: BorderRadius.circular(35)
-                                 ),
-                                 child: Center(child: Text('your performa')),
-                               ),
-                             ),
-                             SizedBox(width: 16,),
-                             Expanded(
-                               flex: 1,
-                               child: Container(
-                                 height: 50,
-                                 decoration: BoxDecoration(
-                                     color: Colors.black,
-                                     borderRadius: BorderRadius.horizontal(left: Radius.circular(35))
-                                 ),
-                                 child: Icon(Icons.settings, color: Colors.white),
-
-                               ),
-                             )
-                           ],
-                         ),
-                     ),
+                          padding: EdgeInsets.only(left: 36),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                flex: 3,
+                                child: Container(
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(35)),
+                                  child: Center(child: Text('your performa')),
+                                ),
+                              ),
+                              SizedBox(
+                                width: 16,
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: Container(
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                      color: Colors.black,
+                                      borderRadius: BorderRadius.horizontal(
+                                          left: Radius.circular(35))),
+                                  child:
+                                      Icon(Icons.settings, color: Colors.white),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
                       ),
-                   ],
-                 ),
-
-               ),
-             ),
-           ],
-         ),
-       ),
-
-       Container(
-         margin: EdgeInsets.all(16),
-         child: _currentIndex == 0 ? HomeScreenHome() : HomeScreenTodo(),
-       ),
-     ],
-   );
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Container(
+          margin: EdgeInsets.all(16),
+          child: _currentIndex == 0 ? HomeScreenHome() : HomeScreenTodo(),
+        ),
+      ],
+    );
   }
 }

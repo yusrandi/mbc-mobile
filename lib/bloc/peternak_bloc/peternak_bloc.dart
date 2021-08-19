@@ -14,7 +14,7 @@ class PeternakBloc extends Bloc<PeternakEvent, PeternakState> {
       try {
         yield PeternakLoadingState();
         await Future.delayed(const Duration(milliseconds: 30));
-        final data = await repository.PeternakFetchData();
+        final data = await repository.peternakFetchData();
         yield PeternakLoadedState(data.peternak);
       } catch (e) {}
     }else if (event is PeternakStoreEvent) {

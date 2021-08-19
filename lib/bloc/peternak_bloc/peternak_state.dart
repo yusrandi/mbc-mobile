@@ -15,7 +15,7 @@ class PeternakLoadingState extends PeternakState {
 
 class PeternakSuccessState extends PeternakState {
   final String msg;
-  List<Peternak> datas;
+  final List<Peternak> datas;
   PeternakSuccessState(this.msg, this.datas);
 
   @override
@@ -23,7 +23,7 @@ class PeternakSuccessState extends PeternakState {
 }
 class PeternakErrorState extends PeternakState {
   final String msg;
-  List<Peternak> datas;
+  final List<Peternak> datas;
   PeternakErrorState(this.msg, this.datas);
 
   @override

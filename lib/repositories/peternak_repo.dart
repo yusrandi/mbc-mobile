@@ -3,10 +3,9 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mbc_mobile/config/api.dart';
 import 'package:mbc_mobile/models/peternak_model.dart';
-import 'package:mbc_mobile/models/response_model.dart';
 
 abstract class PeternakRepository {
-  Future<PeternakModel> PeternakFetchData();
+  Future<PeternakModel> peternakFetchData();
   Future<PeternakModel> peternakStore(Peternak peternak);
   Future<PeternakModel> peternakUpdate(Peternak peternak);
   Future<PeternakModel> peternakDelete(Peternak peternak);
@@ -18,7 +17,7 @@ class PeternakRepositoryImpl implements PeternakRepository {
   static const String TAG = "PeternakRepositoryImpl";
 
   @override
-  Future<PeternakModel> PeternakFetchData() async{
+  Future<PeternakModel> peternakFetchData() async{
     var _response = await http.get(Uri.parse(Api.instance.peternakURL));
     print("$TAG, PeternakFetchData ${_response.statusCode}");
     if (_response.statusCode == 201) {

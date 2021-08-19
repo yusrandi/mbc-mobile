@@ -19,9 +19,7 @@ class KabupatenModel {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['responsecode'] = this.responsecode;
     data['responsemsg'] = this.responsemsg;
-    if (this.kabupaten != null) {
-      data['kabupaten'] = this.kabupaten.map((v) => v.toJson()).toList();
-    }
+    data['kabupaten'] = this.kabupaten.map((v) => v.toJson()).toList();
     return data;
   }
 }
@@ -48,9 +46,7 @@ class Kabupaten {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
     data['name'] = this.name;
-    if (this.kecamatans != null) {
-      data['kecamatans'] = this.kecamatans.map((v) => v.toJson()).toList();
-    }
+    data['kecamatans'] = this.kecamatans.map((v) => v.toJson()).toList();
     return data;
   }
 }
@@ -83,9 +79,7 @@ class Kecamatans {
     data['id'] = this.id;
     data['kabupaten_id'] = this.kabupatenId;
     data['name'] = this.name;
-    if (this.desas != null) {
-      data['desas'] = this.desas.map((v) => v.toJson()).toList();
-    }
+    data['desas'] = this.desas.map((v) => v.toJson()).toList();
     return data;
   }
 }

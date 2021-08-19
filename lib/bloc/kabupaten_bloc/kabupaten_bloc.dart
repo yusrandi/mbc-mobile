@@ -1,7 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mbc_mobile/bloc/kabupaten_bloc/kabupaten_event.dart';
 import 'package:mbc_mobile/bloc/kabupaten_bloc/kabupaten_state.dart';
-import 'package:mbc_mobile/config/api.dart';
 import 'package:mbc_mobile/repositories/kabupaten_repo.dart';
 
 class KabupatenBloc extends Bloc<KabupatenEvent, KabupatenState> {

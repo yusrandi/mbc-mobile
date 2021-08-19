@@ -1,9 +1,14 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:mbc_mobile/bloc/auth_bloc/authentication_bloc.dart';
 import 'package:mbc_mobile/components/custom_surfix_icon.dart';
 import 'package:mbc_mobile/components/default_button.dart';
 import 'package:mbc_mobile/components/form_error.dart';
+import 'package:mbc_mobile/config/shared_info.dart';
 import 'package:mbc_mobile/helper/keyboard.dart';
-import 'package:mbc_mobile/screens/splash/splash_screen.dart';
+import 'package:mbc_mobile/screens/home/home_screen.dart';
 import 'package:mbc_mobile/utils/constants.dart';
 import 'package:mbc_mobile/utils/size_config.dart';
 
@@ -33,51 +38,83 @@ class _SignFormState extends State<SignForm> {
       });
   }
 
+  late AuthenticationBloc _bloc;
+  late SharedInfo _sharedInfo;
+
+  String resToken = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _bloc = BlocProvider.of<AuthenticationBloc>(context);
+    _sharedInfo = SharedInfo();
+
+    FirebaseMessaging.instance.getInitialMessage();
+
+    FirebaseMessaging.instance.getToken().then((value) => resToken = value!);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        children: [
-          buildEmailFormField(),
-          SizedBox(height: getProportionateScreenHeight(16)),
-          buildPasswordFormField(),
-          SizedBox(height: getProportionateScreenHeight(30)),
-          Row(
-            children: [
-              Checkbox(
-                value: remember,
-                activeColor: kPrimaryColor,
-                onChanged: (value) {
-                  setState(() {
-                    remember = value!;
-                  });
-                },
+    return BlocListener<AuthenticationBloc, AuthenticationState>(
+      listener: (context, state) {
+        print("State $state");
+        if (state is AuthGetFailureState) {
+          print("State ${state.error}");
+          EasyLoading.dismiss();
+          EasyLoading.showError(state.error);
+        } else if (state is AuthGetSuccess) {
+          EasyLoading.dismiss();
+          print("State ${state.user.responsecode}");
+          // ignore: unrelated_type_equality_checks
+          if (state.user.responsecode == "1") {
+            EasyLoading.showSuccess("Welcome");
+            _sharedInfo.sharedLoginInfo(
+                state.user.user!.id, state.user.user!.email, state.user.user!.name);
+            gotoHomePage();
+          } else {
+            EasyLoading.showError(state.user.responsemsg);
+          }
+        } else if (state is AuthLoadingState ||
+            state is AuthenticationInitialState) {
+          EasyLoading.show(status: 'wait a second');
+        } else if (state is AuthLoggedInState) gotoHomePage();
+      },
+      child: Form(
+        key: _formKey,
+        child: Column(
+          children: [
+            buildEmailFormField(),
+            SizedBox(height: getProportionateScreenHeight(16)),
+            buildPasswordFormField(),
+            SizedBox(height: getProportionateScreenHeight(30)),
+            FormError(errors: errors),
+            SizedBox(height: getProportionateScreenHeight(20)),
+            GestureDetector(
+              onTap: () {
+                if (_formKey.currentState!.validate()) {
+                  _formKey.currentState!.save();
+                  // if all are valid then go to success screen
+                  KeyboardUtil.hideKeyboard(context);
+
+                  if (resToken != "") {
+                    _bloc.add(LoginEvent(
+                        email: email, password: password, token: resToken));
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('Wait until token generate')),
+                    );
+                  }
+                  print("Email $email, Password $password, token $resToken");
+                }
+              },
+              child: DefaultButton(
+                text: "Continue",
               ),
-              Text("Remember me"),
-              Spacer(),
-              Text(
-                "Forgot Password",
-                style: TextStyle(decoration: TextDecoration.underline),
-              )
-            ],
-          ),
-          FormError(errors: errors),
-          SizedBox(height: getProportionateScreenHeight(20)),
-          GestureDetector(
-            onTap: (){
-              if (_formKey.currentState!.validate()) {
-                _formKey.currentState!.save();
-                // if all are valid then go to success screen
-                KeyboardUtil.hideKeyboard(context);
-                Navigator.pushNamed(context, SplashScreen.routeName);
-              }
-            },
-            child: DefaultButton(
-              text: "Continue",
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -138,7 +175,6 @@ class _SignFormState extends State<SignForm> {
         return null;
       },
       decoration: InputDecoration(
-        
         labelText: "Email",
         hintText: "Enter your email",
         // If  you are using latest version of flutter then lable text and hint text shown like this
@@ -148,4 +184,12 @@ class _SignFormState extends State<SignForm> {
       ),
     );
   }
+
+  
+
+  void gotoHomePage() {
+    Navigator.popAndPushNamed(context, HomeScreen.routeName);
+  }
+
+
 }

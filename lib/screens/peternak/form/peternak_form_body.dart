@@ -1,3 +1,4 @@
+import 'package:art_sweetalert/art_sweetalert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mbc_mobile/bloc/kabupaten_bloc/kabupaten_bloc.dart';
@@ -5,6 +6,7 @@ import 'package:mbc_mobile/bloc/kabupaten_bloc/kabupaten_event.dart';
 import 'package:mbc_mobile/bloc/kabupaten_bloc/kabupaten_state.dart';
 import 'package:mbc_mobile/bloc/peternak_bloc/peternak_bloc.dart';
 import 'package:mbc_mobile/bloc/peternak_bloc/peternak_event.dart';
+import 'package:mbc_mobile/bloc/peternak_bloc/peternak_state.dart';
 import 'package:mbc_mobile/components/default_button.dart';
 import 'package:mbc_mobile/helper/keyboard.dart';
 import 'package:mbc_mobile/models/kabupaten_model.dart';
@@ -23,7 +25,6 @@ class PeternakFormBody extends StatefulWidget {
 }
 
 class _PeternakFormBodyState extends State<PeternakFormBody> {
-  static const String TAG = "_PeternakBodyState";
   final _formKey = GlobalKey<FormState>();
 
   String _name = "",
@@ -63,21 +64,21 @@ class _PeternakFormBodyState extends State<PeternakFormBody> {
 
     kabupatenBloc.add(KabupatenFetchDataEvent());
 
-
-
-    if(widget.peternak.id != 0){
+    if (widget.peternak.id != 0) {
       listKec
           .add(Kecamatans(id: 0, kabupatenId: 0, name: "Kecamatan", desas: []));
 
       PeternakModel.Kecamatan kec = widget.peternak.desa!.kecamatan!;
 
-      listKec.add(Kecamatans(id: kec.id, kabupatenId: kec.kabupatenId, name: kec.name, desas: []));
+      listKec.add(Kecamatans(
+          id: kec.id, kabupatenId: kec.kabupatenId, name: kec.name, desas: []));
       kabDropDownValue = widget.peternak.desa!.kecamatan!.kabupatenId;
       kecDropDownValue = widget.peternak.desa!.kecamatanId;
 
       listDesa.add(Desas(id: 0, kecamatanId: 0, name: "Desa"));
       PeternakModel.Desa desa = widget.peternak.desa!;
-      listDesa.add(Desas(id: desa.id, kecamatanId: desa.kecamatanId, name: desa.name));
+      listDesa.add(
+          Desas(id: desa.id, kecamatanId: desa.kecamatanId, name: desa.name));
       desaDropDownValue = widget.peternak.desaId;
 
       resDesaId = desa.id;
@@ -89,91 +90,92 @@ class _PeternakFormBodyState extends State<PeternakFormBody> {
       _resJumlahAnggota.text = widget.peternak.jumlahAnggota;
       _resLuasLahan.text = widget.peternak.luasLahan;
       _resKelompok.text = widget.peternak.kelompok;
-
     }
-
   }
 
   @override
   Widget build(BuildContext context) {
+    return BlocListener<PeternakBloc, PeternakState>(
+      listener: (context, state) {
+        if (state is PeternakInitialState || state is PeternakLoadingState) {
+          _alertLoading();
+        } else if (state is PeternakErrorState) {
+          _alertError(state.msg);
+        } else if (state is PeternakSuccessState) {
+          _alertSuccess(state.msg);
+        }
+      },
+      child: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Kabupaten"),
+              loadKabupaten(),
+              SizedBox(height: getProportionateScreenHeight(16)),
+              SizedBox(height: getProportionateScreenHeight(16)),
+              Text("Kode Peternak "),
+              buildFormField('Input Kode Peternak', _kode, _resKode),
+              SizedBox(height: getProportionateScreenHeight(16)),
+              Text("Nama Peternak "),
+              buildFormField('Input Kode Peternak', _name, _resName),
+              SizedBox(height: getProportionateScreenHeight(16)),
+              Text("Nomor HP "),
+              buildFormField('0880 999 xxxx', _noHp, _resNoHp),
+              SizedBox(height: getProportionateScreenHeight(16)),
+              Text("Tanggal Lahir "),
+              buildFormField('ex: 21/12/2021 format : dd/mm/yyyy', _tglLahir,
+                  _resTglLahir),
+              SizedBox(height: getProportionateScreenHeight(16)),
+              Text("Jumlah Anggota "),
+              buildFormField('ex: 21 jiwa', _jumlahAnggota, _resJumlahAnggota),
+              SizedBox(height: getProportionateScreenHeight(16)),
+              Text("Luas Lahan "),
+              buildFormField('ex: 21 Ha', _luasLahan, _resLuasLahan),
+              SizedBox(height: getProportionateScreenHeight(16)),
+              Text("Kelompok "),
+              buildFormField('Input Kelompok', _kelompok, _resKelompok),
+              SizedBox(height: getProportionateScreenHeight(16)),
+              SizedBox(height: getProportionateScreenHeight(16)),
+              GestureDetector(
+                onTap: () {
+                  KeyboardUtil.hideKeyboard(context);
+                  if (_formKey.currentState!.validate()) {
+                    if (resDesaId == 0) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Harap Memilih Desa')),
+                      );
+                    } else {
+                      PeternakModel.Peternak peternak = PeternakModel.Peternak(
+                          id: widget.peternak.id,
+                          kodePeternak: _resKode.text.trim(),
+                          namaPeternak: _resName.text.trim(),
+                          noHp: _resNoHp.text.trim(),
+                          tglLahir: _resTglLahir.text.trim(),
+                          jumlahAnggota: _resJumlahAnggota.text.trim(),
+                          luasLahan: _resLuasLahan.text.trim(),
+                          kelompok: _resKelompok.text.trim(),
+                          desaId: resDesaId,
+                          userId: 0
+                      );
 
-    return SingleChildScrollView(
-      child: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Kabupaten"),
-            loadKabupaten(),
-            SizedBox(height: getProportionateScreenHeight(16)),
-
-            SizedBox(height: getProportionateScreenHeight(16)),
-            Text("Kode Peternak "),
-            buildFormField(
-                'Input Kode Peternak', _kode, _resKode),
-            SizedBox(height: getProportionateScreenHeight(16)),
-            Text("Nama Peternak "),
-            buildFormField(
-                'Input Kode Peternak', _name, _resName),
-            SizedBox(height: getProportionateScreenHeight(16)),
-            Text("Nomor HP "),
-            buildFormField('0880 999 xxxx', _noHp, _resNoHp),
-            SizedBox(height: getProportionateScreenHeight(16)),
-            Text("Tanggal Lahir "),
-            buildFormField('ex: 21/12/2021 format : dd/mm/yyyy', _tglLahir,
-                _resTglLahir),
-            SizedBox(height: getProportionateScreenHeight(16)),
-            Text("Jumlah Anggota "),
-            buildFormField(
-                'ex: 21 jiwa', _jumlahAnggota, _resJumlahAnggota),
-            SizedBox(height: getProportionateScreenHeight(16)),
-            Text("Luas Lahan "),
-            buildFormField('ex: 21 Ha', _luasLahan, _resLuasLahan),
-            SizedBox(height: getProportionateScreenHeight(16)),
-            Text("Kelompok "),
-            buildFormField(
-                'Input Kelompok', _kelompok, _resKelompok),
-            SizedBox(height: getProportionateScreenHeight(16)),
-            SizedBox(height: getProportionateScreenHeight(16)),
-            GestureDetector(
-              onTap: () {
-                KeyboardUtil.hideKeyboard(context);
-                if (_formKey.currentState!.validate()) {
-                  if (resDesaId == 0) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Harap Memilih Desa')),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Processing Data')),
-                    );
-
-                    PeternakModel.Peternak peternak = PeternakModel.Peternak(
-                        id: widget.peternak.id,
-                        kodePeternak: _resKode.text.trim(),
-                        namaPeternak: _resName.text.trim(),
-                        noHp: _resNoHp.text.trim(),
-                        tglLahir: _resTglLahir.text.trim(),
-                        jumlahAnggota: _resJumlahAnggota.text.trim(),
-                        luasLahan: _resLuasLahan.text.trim(),
-                        kelompok: _resKelompok.text.trim(),
-                        desaId: resDesaId);
-
-                    print("result ${_resName.text.trim()}");
-                    widget.peternak.id == 0
-                        ? peternakBloc
-                            .add(PeternakStoreEvent(peternak: peternak))
-                        : peternakBloc
-                            .add(PeternakUpdateEvent(peternak: peternak));
+                      print("result ${_resName.text.trim()}");
+                      widget.peternak.id == 0
+                          ? peternakBloc
+                              .add(PeternakStoreEvent(peternak: peternak))
+                          : peternakBloc
+                              .add(PeternakUpdateEvent(peternak: peternak));
+                    }
                   }
-                }
-              },
-              child: DefaultButton(
-                text: "Submit",
+                },
+                child: DefaultButton(
+                  text: "Submit",
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -191,13 +193,11 @@ class _PeternakFormBodyState extends State<PeternakFormBody> {
         builder: (context, state) {
           print("state $state");
           if (state is KabupatenLoadedState) {
-
             List<Kabupaten> itemList = [];
             itemList.add(Kabupaten(id: 0, name: "Kabupaten", kecamatans: []));
             itemList.addAll(state.datas);
 
             return _buildKabupaten(itemList);
-
           } else if (state is KabupatenInitialState ||
               state is KabupatenLoadingState) {
             return _buildLoading();
@@ -210,7 +210,6 @@ class _PeternakFormBodyState extends State<PeternakFormBody> {
   }
 
   Widget _buildKabupaten(List<Kabupaten> list) {
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -232,27 +231,25 @@ class _PeternakFormBodyState extends State<PeternakFormBody> {
             onChanged: (newValue) {
               print(newValue);
 
-
               setState(() {
                 kabDropDownValue = newValue!;
 
                 listKec.clear();
 
-                listKec
-                    .add(Kecamatans(id: 0, kabupatenId: 0, name: "Kecamatan", desas: []));
+                listKec.add(Kecamatans(
+                    id: 0, kabupatenId: 0, name: "Kecamatan", desas: []));
 
                 kecDropDownValue = 0;
 
-                if(kabDropDownValue != 0){
+                if (kabDropDownValue != 0) {
                   list.forEach((element) {
                     print("list  ${element.id}, value $kabDropDownValue");
 
-                    if(element.id == kabDropDownValue){
+                    if (element.id == kabDropDownValue) {
                       listKec.addAll(element.kecamatans);
                     }
                   });
                 }
-
               });
             },
           ),
@@ -335,9 +332,10 @@ class _PeternakFormBodyState extends State<PeternakFormBody> {
     );
   }
 
-  TextFormField buildFormField(String hint, String result, TextEditingController controller) {
+  TextFormField buildFormField(
+      String hint, String result, TextEditingController controller) {
     return TextFormField(
-      controller: controller,
+        controller: controller,
         onSaved: (newValue) => result = newValue!,
         validator: (value) {
           if (value!.isEmpty) {
@@ -348,17 +346,28 @@ class _PeternakFormBodyState extends State<PeternakFormBody> {
         decoration: inputForm(hint, hint));
   }
 
+  void _alertLoading() {
+    Center(child: CircularProgressIndicator());
+  }
+
   Widget _buildLoading() {
     return Center(
       child: CircularProgressIndicator(),
     );
   }
 
-  Widget _buildError(String msg) {
-    return Center(
-      child: Text(msg,
-          style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
-    );
+
+  void _alertSuccess(String msg) {
+    ArtSweetAlert.show(
+        context: context,
+        artDialogArgs:
+            ArtDialogArgs(type: ArtSweetAlertType.success, title: msg));
   }
 
+  void _alertError(String msg) {
+    ArtSweetAlert.show(
+        context: context,
+        artDialogArgs: ArtDialogArgs(
+            type: ArtSweetAlertType.danger, title: "Oops...", text: msg));
+  }
 }

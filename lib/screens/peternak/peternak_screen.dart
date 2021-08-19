@@ -39,6 +39,7 @@ class PeternakScreen extends StatelessWidget {
             luasLahan: "",
             noHp: "",
             desaId: 0,
+            userId: 0
           ))));
         },
         backgroundColor: kSecondaryColor,

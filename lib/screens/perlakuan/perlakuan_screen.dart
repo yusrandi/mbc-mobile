@@ -1,0 +1,36 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mbc_mobile/bloc/perlakuan_bloc/perlakuan_bloc.dart';
+import 'package:mbc_mobile/models/perlakuan_model.dart';
+import 'package:mbc_mobile/repositories/perlakuan_repo.dart';
+import 'package:mbc_mobile/screens/perlakuan/perlakuan_body.dart';
+import 'package:mbc_mobile/screens/perlakuan/perlakuan_form_screen.dart';
+import 'package:mbc_mobile/utils/constants.dart';
+
+class PerlakuanScreen extends StatelessWidget {
+  static String routeName = "perlakuan";
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Data Perlakuan",
+            style: TextStyle(color: Colors.white)),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+              gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: <Color>[kSecondaryColor, kPrimaryColor])),
+        ),
+      ),
+      body: BlocProvider(
+        create: (context) =>
+            PerlakuanBloc(PerlakuanRepositoryImpl()),
+        child: Container(
+            padding: EdgeInsets.all(16), child: PerlakuanBody()),
+      ),
+      
+    );
+  }
+}
