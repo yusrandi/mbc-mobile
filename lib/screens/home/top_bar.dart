@@ -142,7 +142,7 @@ class _HomeTopbarState extends State<HomeTopbar> {
         Container(
           height: SizeConfig.screenHeight,
           margin: EdgeInsets.all(16),
-          child: _currentIndex == 0 ? HomeScreenHome() : HomeScreenTodo(id: widget.id),
+          child: _currentIndex == 0 ? HomeScreenHome(userId: widget.id) : HomeScreenTodo(id: widget.id),
         ),
       ],
     );

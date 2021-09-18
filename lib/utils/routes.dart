@@ -14,7 +14,7 @@ import 'package:mbc_mobile/screens/strow/strow_screen.dart';
 // All our routes will be available here
 final Map<String, WidgetBuilder> routes = {
   SplashScreen.routeName: (context) => SplashScreen(),
-  PeternakScreen.routeName: (context) => PeternakScreen(),
+  // PeternakScreen.routeName: (context) => PeternakScreen(),
   PeriksaKebuntinganScreen.routeName: (context) => PeriksaKebuntinganScreen(),
   PerformaScreen.routeName: (context) => PerformaScreen(),
   StrowScreen.routeName: (context) => StrowScreen(),

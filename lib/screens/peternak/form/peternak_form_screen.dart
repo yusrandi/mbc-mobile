@@ -9,38 +9,33 @@ import 'package:mbc_mobile/screens/peternak/form/peternak_form_body.dart';
 import 'package:mbc_mobile/utils/constants.dart';
 
 class PeternakFormScreen extends StatelessWidget {
-
   static String routeName = "peternak_form";
   final PeternakModel.Peternak peternak;
-  
+  final int userId;
 
-  PeternakFormScreen({ required this.peternak });
-
+  PeternakFormScreen({required this.peternak, required this.userId});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Form Peternak", style: TextStyle(color: Colors.white)),
-        
         flexibleSpace: Container(
           decoration: BoxDecoration(
               gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: <Color>[
-                kSecondaryColor,
-                    kPrimaryColor
-              ])),
+                  colors: <Color>[kSecondaryColor, kPrimaryColor])),
         ),
       ),
       body: BlocProvider(
-      create: (context) => KabupatenBloc(KabupatenRepositoryImpl()),
-      child: BlocProvider(
-        create: (context) => PeternakBloc(PeternakRepositoryImpl()),
-        child: Container(padding: EdgeInsets.all(16), child: PeternakFormBody(peternak: peternak))),
-    ),
-      
+        create: (context) => KabupatenBloc(KabupatenRepositoryImpl()),
+        child: BlocProvider(
+            create: (context) => PeternakBloc(PeternakRepositoryImpl()),
+            child: Container(
+                padding: EdgeInsets.all(16),
+                child: PeternakFormBody(peternak: peternak, userId: userId,))),
+      ),
     );
   }
 }

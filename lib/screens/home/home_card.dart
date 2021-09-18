@@ -10,18 +10,23 @@ import 'package:mbc_mobile/utils/constants.dart';
 import 'package:mbc_mobile/utils/images.dart';
 
 class CardHomePeternak extends StatelessWidget {
-  const CardHomePeternak({Key? key}) : super(key: key);
+  final int userId;
+  const CardHomePeternak({Key? key, required this.userId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
         create: (BuildContext context) =>
             PeternakBloc(PeternakRepositoryImpl()),
-        child: CardHomePeternakBody());
+        child: CardHomePeternakBody(userId: userId));
   }
 }
 
 class CardHomePeternakBody extends StatefulWidget {
+  final int userId;
+
+  const CardHomePeternakBody({Key? key, required this.userId}) : super(key: key);
+
   @override
   _CardHomePeternakBodyState createState() => _CardHomePeternakBodyState();
 }
@@ -34,7 +39,7 @@ class _CardHomePeternakBodyState extends State<CardHomePeternakBody> {
     super.initState();
 
     peternakBloc = BlocProvider.of(context);
-    peternakBloc.add(PeternakFetchDataEvent());
+    peternakBloc.add(PeternakFetchDataEvent(userId: widget.userId));
 
   }
 

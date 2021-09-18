@@ -9,6 +9,9 @@ import 'package:mbc_mobile/utils/constants.dart';
 
 class PeternakScreen extends StatelessWidget {
   static String routeName = "peternak";
+  final int userId;
+
+  const PeternakScreen({Key? key, required this.userId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +28,7 @@ class PeternakScreen extends StatelessWidget {
       ),
       body: BlocProvider(
         create: (context) => PeternakBloc(PeternakRepositoryImpl()),
-        child: Container(padding: EdgeInsets.all(16), child: PeternakBody()),
+        child: Container(padding: EdgeInsets.all(16), child: PeternakBody(userId: userId)),
       ),
      
     );

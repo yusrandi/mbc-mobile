@@ -10,7 +10,8 @@ import 'package:mbc_mobile/screens/peternak/form/peternak_form_screen.dart';
 import 'package:mbc_mobile/utils/constants.dart';
 
 class PeternakBody extends StatefulWidget {
-  const PeternakBody({Key? key}) : super(key: key);
+  final int userId;
+  const PeternakBody({Key? key, required this.userId}) : super(key: key);
 
   @override
   _PeternakBodyState createState() => _PeternakBodyState();
@@ -28,7 +29,8 @@ class _PeternakBodyState extends State<PeternakBody> {
 
   @override
   Widget build(BuildContext context) {
-    _bloc.add(PeternakFetchDataEvent());
+    print("build");
+    _bloc.add(PeternakFetchDataEvent(userId: widget.userId));
     return _pageBody();
   }
 
@@ -36,14 +38,14 @@ class _PeternakBodyState extends State<PeternakBody> {
     return BlocListener<PeternakBloc, PeternakState>(
       listener: (context, state) {
         if (state is PeternakInitialState || state is PeternakLoadingState) {
-            EasyLoading.show(status: 'loading');
+          EasyLoading.show(status: 'loading');
         } else if (state is PeternakErrorState) {
           EasyLoading.showError(state.msg);
           EasyLoading.dismiss();
         } else if (state is PeternakSuccessState) {
           EasyLoading.showSuccess(state.msg);
           EasyLoading.dismiss();
-          Navigator.pop(context, true);
+          // Navigator.pop(context, true);
         }
       },
       child: BlocBuilder<PeternakBloc, PeternakState>(
@@ -65,6 +67,7 @@ class _PeternakBodyState extends State<PeternakBody> {
   }
 
   Widget _buildPeternak(List<Peternak> list) {
+    
     if (list.length == 0) {
       return Center(
         child: Text("Peternak not Found"),
@@ -73,31 +76,7 @@ class _PeternakBodyState extends State<PeternakBody> {
     return Stack(
       children: [
         Positioned(
-          right: 0,
           bottom: 0,
-            child: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => PeternakFormScreen(
-                        peternak: Peternak(
-                            id: 0,
-                            kodePeternak: "",
-                            namaPeternak: "",
-                            tglLahir: "",
-                            jumlahAnggota: "",
-                            kelompok: "",
-                            luasLahan: "",
-                            noHp: "",
-                            desaId: 0,
-                            userId: 0)))).then((value) => setState(() {}));
-          },
-          backgroundColor: kSecondaryColor,
-          child: Icon(Icons.add),
-        )),
-        Positioned(
-          bottom : 0,
           left: 0,
           right: 0,
           top: 0,
@@ -155,17 +134,20 @@ class _PeternakBodyState extends State<PeternakBody> {
                                               MaterialPageRoute(
                                                   builder: (context) =>
                                                       PeternakFormScreen(
-                                                          peternak: e)))
+                                                          peternak: e,
+                                                          userId:
+                                                              widget.userId)))
                                           .then((value) => setState(() {}));
                                     },
-                                    child:
-                                        Icon(Icons.edit, color: kSecondaryColor)),
+                                    child: Icon(Icons.edit,
+                                        color: kSecondaryColor)),
                                 SizedBox(width: 8),
                                 GestureDetector(
                                     onTap: () {
                                       alertConfirm(e);
                                     },
-                                    child: Icon(Icons.delete, color: Colors.red))
+                                    child:
+                                        Icon(Icons.delete, color: Colors.red))
                               ],
                             )),
                             DataCell(Text((list.indexOf(e) + 1).toString(),
@@ -195,6 +177,32 @@ class _PeternakBodyState extends State<PeternakBody> {
             ),
           ),
         ),
+        Positioned(
+            right: 0,
+            bottom: 0,
+            child: FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PeternakFormScreen(
+                                peternak: Peternak(
+                                    id: 0,
+                                    kodePeternak: "",
+                                    namaPeternak: "",
+                                    tglLahir: "",
+                                    jumlahAnggota: "",
+                                    kelompok: "",
+                                    luasLahan: "",
+                                    noHp: "",
+                                    desaId: 0,
+                                    userId: widget.userId),
+                                userId: widget.userId)))
+                    .then((value) => setState(() {}));
+              },
+              backgroundColor: kSecondaryColor,
+              child: Icon(Icons.add),
+            )),
       ],
     );
   }

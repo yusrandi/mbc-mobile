@@ -52,7 +52,6 @@ class _SignFormState extends State<SignForm> {
     _sharedInfo = SharedInfo();
 
     FirebaseMessaging.instance.getInitialMessage();
-
     FirebaseMessaging.instance.getToken().then((value) => resToken = value!);
   }
 
@@ -99,6 +98,8 @@ class _SignFormState extends State<SignForm> {
                   // if all are valid then go to success screen
                   KeyboardUtil.hideKeyboard(context);
 
+                  print("Email $email, Password $password, token $resToken");
+
                   if (resToken != "") {
                     widget.authenticationBloc.add(LoginEvent(
                         email: email, password: password, token: resToken));
@@ -108,7 +109,6 @@ class _SignFormState extends State<SignForm> {
                           content: Text('Wait until token generate')),
                     );
                   }
-                  print("Email $email, Password $password, token $resToken");
                 }
               },
               child: DefaultButton(

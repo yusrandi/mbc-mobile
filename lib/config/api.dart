@@ -2,10 +2,10 @@ class Api {
   //* Creating instance constructor;
   static Api instance = Api();
   //* Base API URL
-  static const domain = "http://192.168.1.4/mbc";
-  static const baseURL = domain+"/public/api";
-  static const imageURL =
-      domain+"/storage/app/public/produk_photo";
+  // static const domain = "http://192.168.1.4/mbc";
+  // static const baseURL = domain+"/public/api";
+  static const baseURL = "http://mbc.lp2muniprima.ac.id/api";
+  static const imageURL = "http://mbc.lp2muniprima.ac.id/storage/app/public/produk_photo";
 
   String getKabupatens = "$baseURL/kabupaten";
   String peternakURL = "$baseURL/peternak";

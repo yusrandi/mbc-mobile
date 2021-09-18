@@ -4,6 +4,10 @@ import 'package:mbc_mobile/models/peternak_model.dart';
 abstract class PeternakEvent extends Equatable {}
 
 class PeternakFetchDataEvent extends PeternakEvent {
+  final int userId;
+
+  PeternakFetchDataEvent({required this.userId});
+
   @override
   List<Object> get props => [];
 }
@@ -16,6 +20,7 @@ class PeternakStoreEvent extends PeternakEvent {
   @override
   List<Object> get props => [];
 }
+
 class PeternakUpdateEvent extends PeternakEvent {
   final Peternak peternak;
 
@@ -24,6 +29,7 @@ class PeternakUpdateEvent extends PeternakEvent {
   @override
   List<Object> get props => [];
 }
+
 class PeternakDeleteEvent extends PeternakEvent {
   final Peternak peternak;
 

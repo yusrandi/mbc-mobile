@@ -18,8 +18,9 @@ import 'package:mbc_mobile/utils/theme.dart';
 
 class PeternakFormBody extends StatefulWidget {
   final PeternakModel.Peternak peternak;
+  final int userId;
 
-  PeternakFormBody({required this.peternak});
+  PeternakFormBody({required this.peternak, required this.userId});
 
   @override
   _PeternakFormBodyState createState() => _PeternakFormBodyState();
@@ -37,6 +38,7 @@ class _PeternakFormBodyState extends State<PeternakFormBody> {
       _kelompok = "";
 
   int resDesaId = 0;
+  int resUserId = 0;
 
   late KabupatenBloc kabupatenBloc;
   late PeternakBloc peternakBloc;
@@ -65,6 +67,7 @@ class _PeternakFormBodyState extends State<PeternakFormBody> {
 
     kabupatenBloc.add(KabupatenFetchDataEvent());
 
+    resUserId = widget.userId;
     if (widget.peternak.id != 0) {
       listKec
           .add(Kecamatans(id: 0, kabupatenId: 0, name: "Kecamatan", desas: []));
@@ -163,8 +166,7 @@ class _PeternakFormBodyState extends State<PeternakFormBody> {
                           luasLahan: _resLuasLahan.text.trim(),
                           kelompok: _resKelompok.text.trim(),
                           desaId: resDesaId,
-                          userId: 0
-                      );
+                          userId: resUserId);
 
                       print("result ${_resName.text.trim()}");
                       widget.peternak.id == 0
@@ -360,7 +362,6 @@ class _PeternakFormBodyState extends State<PeternakFormBody> {
       child: CircularProgressIndicator(),
     );
   }
-
 
   void _alertSuccess(String msg) {
     ArtSweetAlert.show(

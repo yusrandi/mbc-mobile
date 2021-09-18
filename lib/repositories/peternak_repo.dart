@@ -5,7 +5,7 @@ import 'package:mbc_mobile/config/api.dart';
 import 'package:mbc_mobile/models/peternak_model.dart';
 
 abstract class PeternakRepository {
-  Future<PeternakModel> peternakFetchData();
+  Future<PeternakModel> peternakFetchData(int id);
   Future<PeternakModel> peternakStore(Peternak peternak);
   Future<PeternakModel> peternakUpdate(Peternak peternak);
   Future<PeternakModel> peternakDelete(Peternak peternak);
@@ -17,8 +17,8 @@ class PeternakRepositoryImpl implements PeternakRepository {
   static const String TAG = "PeternakRepositoryImpl";
 
   @override
-  Future<PeternakModel> peternakFetchData() async{
-    var _response = await http.get(Uri.parse(Api.instance.peternakURL));
+  Future<PeternakModel> peternakFetchData(int id) async{
+    var _response = await http.get(Uri.parse(Api.instance.peternakURL+"/"+id.toString()));
     print("$TAG, PeternakFetchData ${_response.statusCode}");
     if (_response.statusCode == 201) {
       var data = json.decode(_response.body);
@@ -34,6 +34,7 @@ class PeternakRepositoryImpl implements PeternakRepository {
   Future<PeternakModel> peternakStore(Peternak peternak) async {
     var _response = await http.post(Uri.parse(Api.instance.peternakURL), body: {
       "desa_id": peternak.desaId.toString(),
+      "user_id": peternak.userId.toString(),
       "kode_peternak" : peternak.kodePeternak,
       "nama_peternak" : peternak.namaPeternak,
       "no_hp" : peternak.noHp,
@@ -59,6 +60,7 @@ class PeternakRepositoryImpl implements PeternakRepository {
 
     var _response = await http.put(Uri.parse(url), body: {
       "desa_id": peternak.desaId.toString(),
+      "user_id": peternak.userId.toString(),
       "kode_peternak" : peternak.kodePeternak,
       "nama_peternak" : peternak.namaPeternak,
       "no_hp" : peternak.noHp,
@@ -80,7 +82,7 @@ class PeternakRepositoryImpl implements PeternakRepository {
 
   @override
   Future<PeternakModel> peternakDelete(Peternak peternak) async{
-    var _response = await http.delete(Uri.parse(Api.instance.peternakURL+"/"+peternak.id.toString()));
+    var _response = await http.delete(Uri.parse(Api.instance.peternakURL+"/"+peternak.id.toString()+"/"+peternak.userId.toString()));
     print("$TAG, peternakDelete ${_response.statusCode}");
     if (_response.statusCode == 201) {
       var data = json.decode(_response.body);
