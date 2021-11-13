@@ -2,13 +2,22 @@ import 'package:art_sweetalert/art_sweetalert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mbc_mobile/bloc/performa_bloc/performa_bloc.dart';
+import 'package:mbc_mobile/config/api.dart';
 import 'package:mbc_mobile/models/performa_model.dart';
 import 'package:mbc_mobile/screens/performa/performa_form_body.dart';
 import 'package:mbc_mobile/screens/performa/performa_form_screen.dart';
 import 'package:mbc_mobile/utils/constants.dart';
+import 'package:mbc_mobile/utils/size_config.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PerformaBody extends StatefulWidget {
+  final String userId;
+
+  const PerformaBody({Key? key, required this.userId}) : super(key: key);
+
   @override
   _PerformaBodyState createState() => _PerformaBodyState();
 }
@@ -25,35 +34,54 @@ class _PerformaBodyState extends State<PerformaBody> {
 
   @override
   Widget build(BuildContext context) {
+    performaBloc.add(PerformaFetchDataEvent(id: widget.userId));
 
-    performaBloc.add(PerformaFetchDataEvent());
+    return Stack(
+      children: [
+        BlocListener<PerformaBloc, PerformaState>(
+          listener: (context, state) {
+            print(state);
+            if (state is PerformaErrorState) {
+              EasyLoading.showError(state.msg);
+              EasyLoading.dismiss();
+            } else if (state is PerformaSuccessState) {
+              EasyLoading.showSuccess(state.msg);
+              EasyLoading.dismiss();
+            }
+          },
+          child: BlocBuilder<PerformaBloc, PerformaState>(
+              builder: (context, state) {
+            EasyLoading.dismiss();
 
-    return BlocListener<PerformaBloc, PerformaState>(
-      listener: (context, state) {
-        if (state is PerformaErrorState) {
-          EasyLoading.showError(state.msg);
-          EasyLoading.dismiss();
-        } else if (state is PerformaSuccessState) {
-          EasyLoading.showSuccess(state.msg);
-          EasyLoading.dismiss();
-        }
-      },
-      child:
-          BlocBuilder<PerformaBloc, PerformaState>(builder: (context, state) {
-        EasyLoading.dismiss();
-
-        if (state is PerformaInitialState || state is PerformaLoadingState) {
-          return _buildLoading();
-        } else if (state is PerformaLoadedState) {
-          return body(state.datas);
-        } else if (state is PerformaSuccessState) {
-          return body(state.datas);
-        } else if (state is PerformaErrorState) {
-          return body(state.datas);
-        } else {
-          return _buildLoading();
-        }
-      }),
+            if (state is PerformaInitialState ||
+                state is PerformaLoadingState) {
+              return _buildLoading();
+            } else if (state is PerformaLoadedState) {
+              return body(state.datas);
+            } else if (state is PerformaErrorState) {
+              return Center(
+                  child: Text(state.msg, style: TextStyle(color: Colors.red)));
+            } else {
+              return Container(child: Center(child: Text(state.toString())));
+            }
+          }),
+        ),
+        Positioned(
+            right: 0,
+            bottom: 0,
+            child: FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PerformaFormScreen(
+                                null, widget.userId, null, null)))
+                    .then((value) => setState(() {}));
+              },
+              backgroundColor: kSecondaryColor,
+              child: Icon(Icons.add),
+            )),
+      ],
     );
   }
 
@@ -63,98 +91,133 @@ class _PerformaBodyState extends State<PerformaBody> {
         child: Text("Data not yet"),
       );
     }
-    return Stack(
-      children: [
-
-        Positioned(
-          top: 0, bottom: 0, left: 0, right: 0,
-          child: Container(
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: SingleChildScrollView(
-            child: DataTable(
-              columnSpacing: 10,
-              columns: [
-                DataColumn(
-                    label: Text("Aksi",
-                        style: Theme.of(context).textTheme.subtitle1)),
-                DataColumn(
-                    label: Text("Tanggal Performa",
-                        style: Theme.of(context).textTheme.subtitle1)),
-                DataColumn(
-                    label: Text("Nama Sapi",
-                        style: Theme.of(context).textTheme.subtitle1)),
-                DataColumn(
-                    label: Text("Tinggi Badan",
-                        style: Theme.of(context).textTheme.subtitle1)),
-                DataColumn(
-                    label: Text("Berat Badan",
-                        style: Theme.of(context).textTheme.subtitle1)),
-                DataColumn(
-                    label: Text("Panjang Badan",
-                        style: Theme.of(context).textTheme.subtitle1)),
-                DataColumn(
-                    label: Text("Lingkar Dada",
-                        style: Theme.of(context).textTheme.subtitle1)),
-                DataColumn(
-                    label: Text("BSC",
-                        style: Theme.of(context).textTheme.subtitle1)),
-              ], 
-              rows: list.map((e) => DataRow(cells: [
-                DataCell(Row(
+    return Container(
+      child: ListView.builder(
+          itemCount: list.length,
+          itemBuilder: (context, index) {
+            var data = list[index];
+            return Slidable(
+              actionPane: SlidableDrawerActionPane(),
+              actions: [
+                IconSlideAction(
+                  caption: 'Print',
+                  icon: FontAwesomeIcons.fileExport,
+                  foregroundColor: Colors.blueAccent,
+                  color: Colors.transparent,
+                  onTap: () {
+                    _launchURL(Api().exportURL + "/2/" + data.id.toString());
+                  },
+                ),
+              ],
+              child: Container(
+                height: 350,
+                margin: EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10)),
+                child: Stack(
+                  children: [
+                    Positioned(
+                      top: 0,
+                      bottom: 200,
+                      right: 0,
+                      left: 0,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                              fit: BoxFit.cover,
+                              image: NetworkImage(
+                                  Api.imageURL + '/' + list[index].foto)),
+                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      left: 0,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => PerformaFormScreen(performa: e))).then((value) => setState(() {}));
-                  
-                                
-                                },
-                                child: Icon(Icons.edit, color: kSecondaryColor)),
-                            SizedBox(width: 8),
-                            GestureDetector(
-                                onTap: () {
-                                  alertConfirm(e);
-                                },
-                                child: Icon(Icons.delete, color: Colors.red))
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  data.sapi!.eartag,
+                                  style: TextStyle(
+                                      fontSize: 18, color: kSecondaryColor),
+                                ),
+                                Text(data.tanggalPerforma,
+                                    style: TextStyle(
+                                        fontSize: 14, color: kHintTextColor)),
+                              ],
+                            ),
+                            SizedBox(height: getProportionateScreenHeight(8)),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("Tinggi Badan",
+                                    style: TextStyle(fontSize: 14)),
+                                Text("${data.tinggiBadan} cm",
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.red)),
+                              ],
+                            ),
+                            Divider(),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("Berat Badan",
+                                    style: TextStyle(fontSize: 14)),
+                                Text("${data.beratBadan} kg",
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.red)),
+                              ],
+                            ),
+                            Divider(),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("Panjang Badan",
+                                    style: TextStyle(fontSize: 14)),
+                                Text("${data.panjangBadan} cm",
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.red)),
+                              ],
+                            ),
+                            Divider(),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("Lingkar Dada",
+                                    style: TextStyle(fontSize: 14)),
+                                Text("${data.lingkarDada} cm",
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.red)),
+                              ],
+                            ),
+                            Divider(),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("BCS", style: TextStyle(fontSize: 14)),
+                                Text("${data.bsc}",
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.red)),
+                              ],
+                            ),
                           ],
-                )),
-                DataCell(Text(e.tanggalPerforma,
-                            style: Theme.of(context).textTheme.caption)),
-                DataCell(Text(e.sapi!.namaSapi,
-                            style: Theme.of(context).textTheme.caption)),
-                DataCell(Text(e.tinggiBadan.toString()+" cm",
-                            style: Theme.of(context).textTheme.caption)),
-                DataCell(Text(e.beratBadan.toString()+" cm",
-                            style: Theme.of(context).textTheme.caption)),
-                DataCell(Text(e.panjangBadan.toString()+" cm",
-                            style: Theme.of(context).textTheme.caption)),
-                DataCell(Text(e.lingkarDada.toString()+" cm",
-                            style: Theme.of(context).textTheme.caption)),
-                DataCell(Text(e.bsc.toString()+" cm",
-                            style: Theme.of(context).textTheme.caption)),
-    
-              ])).toList()),
-          ),
-    
-        ),
-      ),),
-        Positioned(
-          right: 0, bottom: 0,
-          child: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => PerformaFormScreen(performa: Performa(id: 0, sapiId: 0, tanggalPerforma: "tanggalPerforma", tinggiBadan: 0, beratBadan: 0, panjangBadan: 0, lingkarDada: 0, bsc: 0)))).then((value) => setState(() {}));
-        },
-        backgroundColor: kSecondaryColor,
-        child: Icon(Icons.add),
-      )),
-      ],
-       
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }),
     );
   }
 
@@ -185,4 +248,8 @@ class _PerformaBodyState extends State<PerformaBody> {
       child: CircularProgressIndicator(),
     );
   }
+
+  void _launchURL(String _url) async => await canLaunch(_url)
+      ? await launch(_url)
+      : throw 'Could not launch $_url';
 }

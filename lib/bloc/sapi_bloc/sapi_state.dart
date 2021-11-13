@@ -14,20 +14,20 @@ class SapiLoadingState extends SapiState {
 
 class SapiSuccessState extends SapiState {
   final String msg;
-  final List<Sapi> datas;
-  SapiSuccessState(this.msg, this.datas);
+  SapiSuccessState(this.msg);
 
   @override
   List<Object> get props => [];
 }
+
 class SapiErrorState extends SapiState {
   final String msg;
-  final List<Sapi> datas;
-  SapiErrorState(this.msg, this.datas);
+  SapiErrorState(this.msg);
 
   @override
   List<Object> get props => [];
 }
+
 // ignore: must_be_immutable
 class SapiLoadedState extends SapiState {
   List<Sapi> datas;

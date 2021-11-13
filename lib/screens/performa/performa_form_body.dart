@@ -1,6 +1,12 @@
+import 'dart:io';
+
+import 'package:art_sweetalert/art_sweetalert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:mbc_mobile/bloc/performa_bloc/performa_bloc.dart';
 import 'package:mbc_mobile/bloc/sapi_bloc/sapi_bloc.dart';
@@ -8,15 +14,20 @@ import 'package:mbc_mobile/components/default_button.dart';
 import 'package:mbc_mobile/helper/keyboard.dart';
 import 'package:mbc_mobile/models/performa_model.dart';
 import 'package:mbc_mobile/models/sapi_model.dart';
-import 'package:mbc_mobile/screens/performa/performa_screen.dart';
+import 'package:mbc_mobile/screens/new_home_page/home_page.dart';
+import 'package:mbc_mobile/screens/sapi/data_result_sapi.dart';
 import 'package:mbc_mobile/utils/constants.dart';
+import 'package:mbc_mobile/utils/images.dart';
 import 'package:mbc_mobile/utils/size_config.dart';
 import 'package:mbc_mobile/utils/theme.dart';
 
 class PerformaFormBody extends StatefulWidget {
-  final Performa performa;
+  final String userId;
+  final DataResultSapi? resultSapi;
+  final Sapi? sapi;
 
-  const PerformaFormBody({Key? key, required this.performa}) : super(key: key);
+  const PerformaFormBody(Key? key, this.userId, this.resultSapi, this.sapi)
+      : super(key: key);
 
   @override
   _PerformaFormBodyState createState() => _PerformaFormBodyState();
@@ -24,7 +35,6 @@ class PerformaFormBody extends StatefulWidget {
 
 class _PerformaFormBodyState extends State<PerformaFormBody> {
   final _formKey = GlobalKey<FormState>();
-
   late SapiBloc sapiBloc;
   late PerformaBloc performaBloc;
 
@@ -32,6 +42,9 @@ class _PerformaFormBodyState extends State<PerformaFormBody> {
   int sapiDropdownValue = 0;
 
   int resSapiId = 0;
+  String resSapi = "Pilih Eartag Sapi";
+  String resBSC = "Pilih BCS";
+
   int resId = 0;
   String resTgl = "";
 
@@ -41,7 +54,10 @@ class _PerformaFormBodyState extends State<PerformaFormBody> {
   final _resBerat = new TextEditingController();
   final _resPanjang = new TextEditingController();
   final _resLingkar = new TextEditingController();
-  final _resBSC = new TextEditingController();
+
+  late File? _imageFile = null;
+  final ImagePicker _picker = ImagePicker();
+  late File? resFile = null;
 
   @override
   void initState() {
@@ -50,31 +66,24 @@ class _PerformaFormBodyState extends State<PerformaFormBody> {
     sapiBloc = BlocProvider.of<SapiBloc>(context);
     performaBloc = BlocProvider.of<PerformaBloc>(context);
 
-    sapiBloc.add(SapiFetchDataEvent());
+    sapiBloc.add(SapiFetchDataEvent(widget.userId));
 
-    if (widget.performa.id != 0) {
-      resId = widget.performa.id;
-
-      resSapiId = widget.performa.sapiId;
-      sapiDropdownValue = resSapiId;
-
-      resTgl = widget.performa.tanggalPerforma;
-
-      _resTinggi.text = widget.performa.tinggiBadan.toString();
-      _resBerat.text = widget.performa.beratBadan.toString();
-      _resPanjang.text = widget.performa.panjangBadan.toString();
-      _resLingkar.text = widget.performa.lingkarDada.toString();
-      _resBSC.text = widget.performa.bsc.toString();
+    if (widget.resultSapi != null) {
+      resSapiId = 10000;
+    }
+    if (widget.sapi != null) {
+      print(widget.sapi!.eartag);
+      resSapi = widget.sapi!.eartag;
+      resSapiId = widget.sapi!.id;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocListener<PerformaBloc, PerformaState>(
-      listener: (context, state){
-         print(state);
-        if (state is PerformaInitialState ||
-            state is PerformaLoadingState) {
+      listener: (context, state) {
+        print(state);
+        if (state is PerformaInitialState || state is PerformaLoadingState) {
           EasyLoading.show(status: 'loading');
         } else if (state is PerformaErrorState) {
           EasyLoading.showError(state.msg);
@@ -84,9 +93,8 @@ class _PerformaFormBodyState extends State<PerformaFormBody> {
           EasyLoading.dismiss();
 
           Navigator.pop(context);
-
         }
-    },
+      },
       child: Container(
         padding: EdgeInsets.all(16),
         child: SingleChildScrollView(
@@ -95,65 +103,82 @@ class _PerformaFormBodyState extends State<PerformaFormBody> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Pilih Sapi"),
-                loadSapi(),
-                SizedBox(height: getProportionateScreenHeight(16)),
-                Text("Tanggal Pemeriksaan "),
                 GestureDetector(
                   onTap: () {
-                    pickDate(context);
+                    showModalBottomSheet(
+                        context: context,
+                        builder: ((builder) => _bottomSheet()));
                   },
                   child: Container(
-                    width: double.infinity,
-                    height: getProportionateScreenHeight(50),
+                    height: 200,
+                    width: SizeConfig.screenWidth,
                     decoration: BoxDecoration(
-                        border: Border.all(color: kSecondaryColor, width: 1),
-                        borderRadius: BorderRadius.circular(10)),
-                    padding: EdgeInsets.symmetric(horizontal: 8),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        resTgl == "" ? "Silahkan Pilih Tanggal " : resTgl,
-                        style: TextStyle(fontSize: 16),
-                      ),
+                      color: kHintTextColor,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: _imageFile == null
+                          ? Image.asset(Images.plaeholderImage,
+                              fit: BoxFit.cover)
+                          : Image.file(File(_imageFile!.path)),
                     ),
                   ),
                 ),
                 SizedBox(height: getProportionateScreenHeight(16)),
+                Divider(),
+                loadSapi(),
+                SizedBox(height: getProportionateScreenHeight(8)),
+                GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute<bool>(
+                        builder: (BuildContext context) {
+                          return Scaffold(
+                            appBar: AppBar(
+                              title: Text("Pilih BCS"),
+                            ),
+                            body: WillPopScope(
+                              onWillPop: () async {
+                                Navigator.pop(context, false);
+                                return false;
+                              },
+                              child: listBCS(),
+                            ),
+                          );
+                        },
+                      ));
+                    },
+                    child: bcsField()),
+                SizedBox(height: getProportionateScreenHeight(16)),
+                Divider(),
                 Text("Tinggi Badan "),
                 Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
                   Expanded(child: buildFormField('ex : 100', _resTinggi)),
                   SizedBox(width: getProportionateScreenWidth(16)),
-                  Text("cm", style: TextStyle(fontSize: 20)),
+                  Text("CM", style: TextStyle(fontSize: 20)),
                 ]),
                 SizedBox(height: getProportionateScreenHeight(16)),
                 Text("Berat Badan "),
                 Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
                   Expanded(child: buildFormField('ex : 100', _resBerat)),
                   SizedBox(width: getProportionateScreenWidth(16)),
-                  Text("cm", style: TextStyle(fontSize: 20)),
+                  Text("KG", style: TextStyle(fontSize: 20)),
                 ]),
                 SizedBox(height: getProportionateScreenHeight(16)),
                 Text("Panjang Badan "),
                 Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
                   Expanded(child: buildFormField('ex : 100', _resPanjang)),
                   SizedBox(width: getProportionateScreenWidth(16)),
-                  Text("cm", style: TextStyle(fontSize: 20)),
+                  Text("CM", style: TextStyle(fontSize: 20)),
                 ]),
                 SizedBox(height: getProportionateScreenHeight(16)),
                 Text("Lingkar Dada "),
                 Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
                   Expanded(child: buildFormField('ex : 100', _resLingkar)),
                   SizedBox(width: getProportionateScreenWidth(16)),
-                  Text("cm", style: TextStyle(fontSize: 20)),
+                  Text("CM", style: TextStyle(fontSize: 20)),
                 ]),
                 SizedBox(height: getProportionateScreenHeight(16)),
-                Text("BSC "),
-                Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-                  Expanded(child: buildFormField('ex : 100', _resBSC)),
-                  SizedBox(width: getProportionateScreenWidth(16)),
-                  Text("cm", style: TextStyle(fontSize: 20)),
-                ]),
                 SizedBox(height: getProportionateScreenHeight(32)),
                 GestureDetector(
                   onTap: () {
@@ -161,31 +186,32 @@ class _PerformaFormBodyState extends State<PerformaFormBody> {
                       _formKey.currentState!.save();
                       // if all are valid then go to success screen
                       KeyboardUtil.hideKeyboard(context);
-                      if (resSapiId != 0) {
-                        if (resTgl != "") {
-                          Performa performa = Performa(
+                      if (resFile != null) {
+                        if (resSapiId != 0) {
+                          var data = Performa(
                               id: resId,
                               sapiId: resSapiId,
+                              peternakId: 0,
+                              pendampingId: 0,
+                              tsrId: 0,
                               tanggalPerforma: resTgl,
                               tinggiBadan: int.parse(_resTinggi.text.trim()),
                               beratBadan: int.parse(_resBerat.text.trim()),
                               panjangBadan: int.parse(_resPanjang.text.trim()),
                               lingkarDada: int.parse(_resLingkar.text.trim()),
-                              bsc: int.parse(_resBSC.text.trim()));
-    
-                          resId == 0
-                              ? performaBloc
-                                  .add(PerformaStoreEvent(performa: performa))
-                              : performaBloc
-                                  .add(PerformaUpdateEvent(performa: performa));
+                              bsc: int.parse(resBSC),
+                              foto: "");
+
+                          alertConfirm(data);
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text('Pilih Tanggal dulu')));
+                              const SnackBar(content: Text('Pilih sapi dulu')));
                         }
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Pilih sapi dulu')));
+                            const SnackBar(
+                                content:
+                                    Text('Pilih Foto Dokumentasi Kegiatan')));
                       }
                     }
                   },
@@ -202,33 +228,183 @@ class _PerformaFormBodyState extends State<PerformaFormBody> {
   }
 
   Widget loadSapi() {
-    return BlocBuilder<SapiBloc, SapiState>(builder: (context, state) {
-      if (state is SapiInitialState || state is SapiLoadingState) {
-        return buildLoading();
-      } else if (state is SapiLoadedState) {
-        listSapi = [];
-        listSapi.add(Sapi(
-            id: 0,
-            jenisSapiId: 0,
-            peternakId: 0,
-            ertag: "ertag",
-            ertagInduk: "ertagInduk",
-            namaSapi: "Nama Sapi",
-            tanggalLahir: "tglLahir",
-            kelamin: "kelamin",
-            kondisiLahir: "kondisiLahir",
-            anakKe: "anakKe",
-            fotoDepan: "photoDepan",
-            fotoBelakang: "photoBelakang",
-            fotoKanan: "photoKanan",
-            fotoKiri: "photoKiri"));
+    return BlocListener<SapiBloc, SapiState>(
+      listener: (context, state) {
+        if (state is SapiInitialState || state is SapiLoadingState) {
+          EasyLoading.show(status: 'loading');
+        } else if (state is SapiSuccessState) {
+          EasyLoading.showSuccess(state.msg);
+          EasyLoading.dismiss();
 
-        listSapi.addAll(state.datas);
-        return buildSapi(listSapi);
-      } else {
-        return buildError(state.toString());
-      }
-    });
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => HomePage(userId: widget.userId)));
+        } else {
+          EasyLoading.dismiss();
+        }
+      },
+      child: Visibility(
+        visible: widget.resultSapi != null ? false : true,
+        child: BlocBuilder<SapiBloc, SapiState>(builder: (context, state) {
+          if (state is SapiLoadedState) {
+            EasyLoading.dismiss();
+
+            return GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute<bool>(
+                    builder: (BuildContext context) {
+                      return Scaffold(
+                        appBar: AppBar(
+                          title: Text("Pilih Eartag Sapi"),
+                        ),
+                        body: WillPopScope(
+                          onWillPop: () async {
+                            Navigator.pop(context, false);
+                            return false;
+                          },
+                          child: listSapiNew(state.datas),
+                        ),
+                      );
+                    },
+                  ));
+                },
+                child: sapiField());
+          } else if (state is SapiErrorState) {
+            EasyLoading.dismiss();
+
+            return buildError(state.msg);
+          } else {
+            return buildLoading();
+          }
+        }),
+      ),
+    );
+  }
+
+  Container listSapiNew(List<Sapi> list) {
+    return Container(
+      child: ListView.builder(
+          itemCount: list.length,
+          itemBuilder: (context, index) {
+            var data = list[index];
+            return Container(
+              padding: EdgeInsets.only(left: 16, right: 16, top: 16),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    resSapiId = data.id;
+                    resSapi = data.eartag;
+                  });
+                  Navigator.pop(context, false);
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      data.eartag,
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    Divider(),
+                  ],
+                ),
+              ),
+            );
+          }),
+    );
+  }
+
+  Container listBCS() {
+    return Container(
+      child: ListView.builder(
+          itemCount: 5,
+          itemBuilder: (context, index) {
+            return Container(
+              padding: EdgeInsets.only(left: 16, right: 16, top: 16),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    resBSC = (index + 1).toString();
+                  });
+                  Navigator.pop(context, false);
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      (index + 1).toString(),
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    Divider(),
+                  ],
+                ),
+              ),
+            );
+          }),
+    );
+  }
+
+  Container sapiField() {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: kHintTextColor, width: 1),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            FontAwesomeIcons.list,
+            color: kHintTextColor,
+            size: 16,
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+              child: Text(
+            '$resSapi',
+            style: const TextStyle(fontSize: 16),
+          )),
+          const Icon(
+            Icons.arrow_forward_ios,
+            color: kHintTextColor,
+            size: 16,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Container bcsField() {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: kHintTextColor, width: 1),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            FontAwesomeIcons.list,
+            color: kHintTextColor,
+            size: 16,
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+              child: Text(
+            '$resBSC',
+            style: const TextStyle(fontSize: 16),
+          )),
+          const Icon(
+            Icons.arrow_forward_ios,
+            color: kHintTextColor,
+            size: 16,
+          ),
+        ],
+      ),
+    );
   }
 
   Container buildSapi(List<Sapi> list) {
@@ -244,7 +420,7 @@ class _PerformaFormBodyState extends State<PerformaFormBody> {
         items: list.map((Sapi value) {
           return DropdownMenuItem<int>(
             value: value.id,
-            child: new Text(value.namaSapi),
+            child: new Text(value.eartag),
           );
         }).toList(),
         onChanged: (newValue) {
@@ -300,5 +476,86 @@ class _PerformaFormBodyState extends State<PerformaFormBody> {
       resTgl = DateFormat('yyyy/MM/dd').format(date);
       print(date);
     });
+  }
+
+  Widget _bottomSheet() {
+    return Container(
+      height: 100,
+      margin: EdgeInsets.all(16),
+      child: Column(
+        children: [
+          Text("Choose Profile Photo"),
+          SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              FlatButton.icon(
+                  onPressed: () {
+                    _takePhotos(ImageSource.camera);
+                  },
+                  icon: Icon(Icons.camera),
+                  label: Text("Camera")),
+              FlatButton.icon(
+                  onPressed: () {
+                    _takePhotos(ImageSource.gallery);
+                  },
+                  icon: Icon(Icons.image),
+                  label: Text("Galery")),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _takePhotos(ImageSource source) async {
+    final pickedFile = await _picker.getImage(source: source);
+    if (pickedFile != null) {
+      File? cropped = await ImageCropper.cropImage(
+          sourcePath: pickedFile.path,
+          aspectRatio: CropAspectRatio(ratioX: 2, ratioY: 1),
+          compressQuality: 70,
+          compressFormat: ImageCompressFormat.jpg);
+
+      setState(() {
+        _imageFile = cropped!;
+        resFile = _imageFile!;
+      });
+    }
+  }
+
+  void alertConfirm(Performa data) async {
+    ArtDialogResponse response = await ArtSweetAlert.show(
+        barrierDismissible: false,
+        context: context,
+        artDialogArgs: ArtDialogArgs(
+            denyButtonText: "Cancel",
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            confirmButtonText: "Yes, Submit",
+            type: ArtSweetAlertType.warning));
+
+    // ignore: unnecessary_null_comparison
+    if (response == null) {
+      return;
+    }
+
+    if (response.isTapConfirmButton) {
+      if (widget.resultSapi != null) {
+        sapiBloc.add(SapiStoreEvent(
+            fotoDepan: widget.resultSapi!.fotoDepan,
+            fotoSamping: widget.resultSapi!.fotoSamping,
+            fotoPeternak: widget.resultSapi!.fotoPeternak,
+            fotoRumah: widget.resultSapi!.fotoRumah,
+            sapi: widget.resultSapi!.sapi,
+            fotoPerforma: resFile,
+            performa: data));
+      } else {
+        performaBloc.add(PerformaStoreEvent(
+            file: _imageFile == null ? null : _imageFile!, performa: data));
+      }
+
+      return;
+    }
   }
 }

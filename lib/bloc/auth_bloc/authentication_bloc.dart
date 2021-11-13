@@ -11,7 +11,6 @@ part 'authentication_state.dart';
 
 class AuthenticationBloc
     extends Bloc<AuthenticationEvent, AuthenticationState> {
-      
   UserRepository repository;
 
   AuthenticationBloc(this.repository) : super(AuthenticationInitialState());
@@ -26,9 +25,11 @@ class AuthenticationBloc
       try {
         yield AuthLoadingState();
         await Future.delayed(const Duration(milliseconds: 30));
-        final data = await repository.userLogin(event.email, event.password, event.token);
+        final data = await repository.userLogin(
+            event.email, event.password, event.token);
         yield AuthGetSuccess(user: data);
       } catch (e) {
+        print(e.toString());
         yield AuthGetFailureState(error: e.toString());
       }
     } else if (event is CheckLoginEvent) {
@@ -37,7 +38,8 @@ class AuthenticationBloc
       var userId = sharedpref.get("id");
       print("data $data");
       if (data != null)
-        yield AuthLoggedInState(userId: int.parse(userId.toString()) ,userEmail: data.toString());
+        yield AuthLoggedInState(
+            userId: int.parse(userId.toString()), userEmail: data.toString());
       else
         yield AuthLoggedOutState();
     } else if (event is LogOutEvent) {

@@ -15,8 +15,10 @@ import 'package:mbc_mobile/utils/theme.dart';
 
 class StrowFormBody extends StatefulWidget {
   final Strow strow;
+  final String userId;
 
-  const StrowFormBody({Key? key, required this.strow}) : super(key: key);
+  const StrowFormBody({Key? key, required this.strow, required this.userId})
+      : super(key: key);
 
   @override
   _StrowFormBodyState createState() => _StrowFormBodyState();
@@ -44,7 +46,7 @@ class _StrowFormBodyState extends State<StrowFormBody> {
     sapiBloc = BlocProvider.of<SapiBloc>(context);
     strowBloc = BlocProvider.of<StrowBloc>(context);
 
-    sapiBloc.add(SapiFetchDataEvent());
+    sapiBloc.add(SapiFetchDataEvent(widget.userId));
 
     if (widget.strow.id != 0) {
       resId = widget.strow.id;
@@ -132,20 +134,22 @@ class _StrowFormBodyState extends State<StrowFormBody> {
       } else if (state is SapiLoadedState) {
         listSapi = [];
         listSapi.add(Sapi(
-            id: 0,
-            jenisSapiId: 0,
-            peternakId: 0,
-            ertag: "ertag",
-            ertagInduk: "ertagInduk",
-            namaSapi: "Nama Sapi",
-            tanggalLahir: "tglLahir",
-            kelamin: "kelamin",
-            kondisiLahir: "kondisiLahir",
-            anakKe: "anakKe",
-            fotoDepan: "photoDepan",
-            fotoBelakang: "photoBelakang",
-            fotoKanan: "photoKanan",
-            fotoKiri: "photoKiri"));
+          id: 0,
+          jenisSapiId: 0,
+          statusSapiId: 0,
+          eartag: "ertag",
+          eartagInduk: "ertagInduk",
+          namaSapi: "Nama Sapi",
+          tanggalLahir: "tglLahir",
+          kelamin: "kelamin",
+          kondisiLahir: "kondisiLahir",
+          anakKe: "anakKe",
+          fotoDepan: "photoDepan",
+          fotoSamping: "photoBelakang",
+          fotoPeternak: "photoKanan",
+          fotoRumah: "photoKiri",
+          peternakId: 0,
+        ));
 
         listSapi.addAll(state.datas);
         return buildSapi(listSapi);

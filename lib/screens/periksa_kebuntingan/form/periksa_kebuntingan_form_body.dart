@@ -1,22 +1,36 @@
+import 'package:art_sweetalert/art_sweetalert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:mbc_mobile/bloc/hasil_bloc/hasil_bloc.dart';
+import 'package:mbc_mobile/bloc/metode_bloc/metode_bloc.dart';
 import 'package:mbc_mobile/bloc/periksa_kebuntingan_bloc/periksa_kebuntingan_bloc.dart';
+import 'package:mbc_mobile/bloc/peternak_sapi_bloc/peternaksapi_bloc.dart';
 import 'package:mbc_mobile/bloc/sapi_bloc/sapi_bloc.dart';
 import 'package:mbc_mobile/components/default_button.dart';
 import 'package:mbc_mobile/helper/keyboard.dart';
+import 'package:mbc_mobile/models/hasil_model.dart';
+import 'package:mbc_mobile/models/metode_model.dart';
 import 'package:mbc_mobile/models/periksa_kebuntingan_model.dart';
 import 'package:mbc_mobile/models/sapi_model.dart';
-import 'package:mbc_mobile/screens/periksa_kebuntingan/periksa_kebuntingan_screen.dart';
 import 'package:mbc_mobile/utils/constants.dart';
+import 'package:mbc_mobile/utils/images.dart';
 import 'package:mbc_mobile/utils/size_config.dart';
 import 'package:mbc_mobile/utils/theme.dart';
 
-class PeriksaKebuntinganFormBody extends StatefulWidget {
-  final PeriksaKebuntingan periksaKebuntingan;
+import 'dart:io';
 
-  const PeriksaKebuntinganFormBody({Key? key, required this.periksaKebuntingan})
+class PeriksaKebuntinganFormBody extends StatefulWidget {
+  final String userId;
+  final String notifId;
+  final Sapi? sapi;
+
+  const PeriksaKebuntinganFormBody(
+      Key? key, this.userId, this.sapi, this.notifId)
       : super(key: key);
 
   @override
@@ -30,14 +44,19 @@ class _PeriksaKebuntinganFormBodyState
 
   late SapiBloc sapiBloc;
   late PeriksaKebuntinganBloc periksaKebuntinganBloc;
-
-  List<Sapi> listSapi = [];
-  int sapiDropdownValue = 0;
+  late MetodeBloc metodeBloc;
+  late HasilBloc hasilBloc;
 
   String resTgl = "";
-  String resMetode = "";
-  String resHasil = "";
+  String resFoto = "";
+
+  String resSapi = "Pilih Eartag Sapi";
+  String resMetode = "Pilih Jenis Metode";
+  String resHasil = "Pilih Hasil";
+
   int resSapiId = 0;
+  int resMetodeId = 0;
+  int resHasilId = 0;
   int resId = 0;
 
   late DateTime date;
@@ -45,25 +64,27 @@ class _PeriksaKebuntinganFormBodyState
   final _resMetode = new TextEditingController();
   final _resHasil = new TextEditingController();
 
+  late File? _imageFile = null;
+  final ImagePicker _picker = ImagePicker();
+  late File? resFile = null;
+
   @override
   void initState() {
     super.initState();
 
+    metodeBloc = BlocProvider.of(context);
+    hasilBloc = BlocProvider.of(context);
     sapiBloc = BlocProvider.of(context);
     periksaKebuntinganBloc = BlocProvider.of<PeriksaKebuntinganBloc>(context);
 
-    sapiBloc.add(SapiFetchDataEvent());
+    sapiBloc.add(SapiFetchDataEvent(widget.userId));
+    metodeBloc.add(MetodeFetchDataEvent());
+    hasilBloc.add(HasilFetchDataEvent());
 
-    if (widget.periksaKebuntingan.id != 0) {
-      resId = widget.periksaKebuntingan.id;
-
-      resSapiId = widget.periksaKebuntingan.sapiId;
-      sapiDropdownValue = resSapiId;
-
-      resTgl = widget.periksaKebuntingan.waktuPk;
-
-      _resMetode.text = widget.periksaKebuntingan.metode;
-      _resHasil.text = widget.periksaKebuntingan.hasil;
+    if (widget.sapi != null) {
+      print(widget.sapi!.eartag);
+      resSapi = widget.sapi!.eartag;
+      resSapiId = widget.sapi!.id;
     }
   }
 
@@ -94,67 +115,80 @@ class _PeriksaKebuntinganFormBodyState
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Pilih Sapi"),
-                  loadSapi(),
-                  SizedBox(height: getProportionateScreenHeight(16)),
-                  Text("Tanggal Pemeriksaan "),
                   GestureDetector(
                     onTap: () {
-                      pickDate(context);
+                      showModalBottomSheet(
+                          context: context,
+                          builder: ((builder) => _bottomSheet()));
                     },
                     child: Container(
-                      width: double.infinity,
-                      height: getProportionateScreenHeight(50),
+                      height: 200,
+                      width: SizeConfig.screenWidth,
                       decoration: BoxDecoration(
-                          border: Border.all(color: kSecondaryColor, width: 1),
-                          borderRadius: BorderRadius.circular(10)),
-                      padding: EdgeInsets.symmetric(horizontal: 8),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          resTgl == "" ? "Silahkan Pilih Tanggal " : resTgl,
-                          style: TextStyle(fontSize: 16),
-                        ),
+                        color: kHintTextColor,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: _imageFile == null
+                            ? Image.asset(Images.plaeholderImage,
+                                fit: BoxFit.cover)
+                            : Image.file(File(_imageFile!.path)),
                       ),
                     ),
                   ),
                   SizedBox(height: getProportionateScreenHeight(16)),
-                  Text("Metode Pemeriksaan "),
-                  buildFormFieldMetode('Input Metode'),
+                  Divider(),
+                  loadSapi(),
+                  SizedBox(height: getProportionateScreenHeight(8)),
+                  loadMetode(),
+                  SizedBox(height: getProportionateScreenHeight(8)),
+                  loadHasil(),
                   SizedBox(height: getProportionateScreenHeight(16)),
-                  Text("Hasil Pemeriksaan "),
-                  buildFormFieldHasil('Input Hasil'),
-                  SizedBox(height: getProportionateScreenHeight(26)),
                   GestureDetector(
                     onTap: () {
                       KeyboardUtil.hideKeyboard(context);
                       if (_formKey.currentState!.validate()) {
                         _formKey.currentState!.save();
-                        if (resSapiId != 0) {
-                          if (resTgl != "") {
-                            PeriksaKebuntingan pk = PeriksaKebuntingan(
-                                id: resId,
-                                sapiId: resSapiId,
-                                waktuPk: resTgl,
-                                metode: resMetode,
-                                hasil: resHasil);
+                        if (resFile != null) {
+                          if (resSapiId != 0) {
+                            if (resMetodeId != 0) {
+                              if (resHasilId != 0) {
+                                var data = PeriksaKebuntingan(
+                                    id: resId,
+                                    sapiId: resSapiId,
+                                    peternakId: 0,
+                                    pendampingId: 0,
+                                    tsrId: 0,
+                                    waktuPk: "",
+                                    metodeId: resMetodeId,
+                                    hasilId: resHasilId,
+                                    foto: resFoto);
 
-                            resId == 0
-                                ? periksaKebuntinganBloc.add(
-                                    PeriksaKebuntinganStoreEvent(
-                                        periksaKebuntingan: pk))
-                                : periksaKebuntinganBloc.add(
-                                    PeriksaKebuntinganUpdateEvent(
-                                        periksaKebuntingan: pk));
+                                alertConfirm(data);
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text('Harap Memilih Hasil')),
+                                );
+                              }
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('Harap Memilih Metode')),
+                              );
+                            }
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text(
-                                        'Harap Memilih Waktu Pemeriksaan')));
+                              const SnackBar(
+                                  content: Text('Harap Memilih Sapi')),
+                            );
                           }
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Harap Memilih Sapi')),
+                            const SnackBar(
+                                content:
+                                    Text('Pilih Foto Dokumentasi Kegiatan')),
                           );
                         }
                       }
@@ -170,60 +204,289 @@ class _PeriksaKebuntinganFormBodyState
     );
   }
 
-  Widget loadSapi() {
-    return BlocBuilder<SapiBloc, SapiState>(builder: (context, state) {
-      if (state is SapiInitialState || state is SapiLoadingState) {
+  Widget loadMetode() {
+    return BlocBuilder<MetodeBloc, MetodeState>(builder: (context, state) {
+      print(state);
+      if (state is MetodeInitialState || state is MetodeLoadingState) {
         return buildLoading();
-      } else if (state is SapiLoadedState) {
-        listSapi = [];
-        listSapi.add(Sapi(
-            id: 0,
-            jenisSapiId: 0,
-            peternakId: 0,
-            ertag: "ertag",
-            ertagInduk: "ertagInduk",
-            namaSapi: "Nama Sapi",
-            tanggalLahir: "tglLahir",
-            kelamin: "kelamin",
-            kondisiLahir: "kondisiLahir",
-            anakKe: "anakKe",
-            fotoDepan: "photoDepan",
-            fotoBelakang: "photoBelakang",
-            fotoKanan: "photoKanan",
-            fotoKiri: "photoKiri"));
-
-        listSapi.addAll(state.datas);
-        return buildSapi(listSapi);
+      } else if (state is MetodeLoadedState) {
+        return GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute<bool>(
+                builder: (BuildContext context) {
+                  return Scaffold(
+                    appBar: AppBar(
+                      title: Text("Pilih Jenis Metode"),
+                    ),
+                    body: WillPopScope(
+                      onWillPop: () async {
+                        Navigator.pop(context, false);
+                        return false;
+                      },
+                      child: listMetodeNew(state.metodeModel.metode),
+                    ),
+                  );
+                },
+              ));
+            },
+            child: metodeField());
       } else {
         return buildError(state.toString());
       }
     });
   }
 
-  Container buildSapi(List<Sapi> list) {
+  Container listMetodeNew(List<Metode> list) {
     return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-          border: Border.all(color: kSecondaryColor, width: 1),
-          borderRadius: BorderRadius.circular(10)),
-      padding: EdgeInsets.symmetric(horizontal: 8),
-      child: DropdownButton<int>(
-        value: sapiDropdownValue,
-        hint: Text("Pilih Sapi"),
-        items: list.map((Sapi value) {
-          return DropdownMenuItem<int>(
-            value: value.id,
-            child: new Text(value.namaSapi),
-          );
-        }).toList(),
-        onChanged: (newValue) {
-          print(newValue);
+      child: ListView.builder(
+          itemCount: list.length,
+          itemBuilder: (context, index) {
+            var data = list[index];
+            return Container(
+              decoration: BoxDecoration(),
+              padding: EdgeInsets.only(left: 16, right: 16, top: 16),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    resMetodeId = data.id;
+                    resMetode = data.metode;
+                  });
+                  Navigator.pop(context, false);
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      data.metode,
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    Divider(),
+                  ],
+                ),
+              ),
+            );
+          }),
+    );
+  }
 
-          setState(() {
-            sapiDropdownValue = newValue!;
-            resSapiId = newValue;
-          });
-        },
+  Container metodeField() {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: kHintTextColor, width: 1),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            FontAwesomeIcons.list,
+            color: kHintTextColor,
+            size: 16,
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+              child: Text(
+            '$resMetode',
+            style: const TextStyle(fontSize: 16),
+          )),
+          const Icon(
+            Icons.arrow_forward_ios,
+            color: kHintTextColor,
+            size: 16,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget loadHasil() {
+    return BlocBuilder<HasilBloc, HasilState>(builder: (context, state) {
+      print(state);
+      if (state is HasilInitialState || state is HasilLoadingState) {
+        return buildLoading();
+      } else if (state is HasilLoadedState) {
+        return GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute<bool>(
+                builder: (BuildContext context) {
+                  return Scaffold(
+                    appBar: AppBar(
+                      title: Text("Pilih Jenis Metode"),
+                    ),
+                    body: WillPopScope(
+                      onWillPop: () async {
+                        Navigator.pop(context, false);
+                        return false;
+                      },
+                      child: listHasilNew(state.hasilModel.hasil),
+                    ),
+                  );
+                },
+              ));
+            },
+            child: hasilField());
+      } else {
+        return buildError(state.toString());
+      }
+    });
+  }
+
+  Container listHasilNew(List<Hasil> list) {
+    return Container(
+      child: ListView.builder(
+          itemCount: list.length,
+          itemBuilder: (context, index) {
+            var data = list[index];
+            return Container(
+              decoration: BoxDecoration(),
+              padding: EdgeInsets.only(left: 16, right: 16, top: 16),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    resHasilId = data.id;
+                    resHasil = data.hasil;
+                  });
+                  Navigator.pop(context, false);
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      data.hasil,
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    Divider(),
+                  ],
+                ),
+              ),
+            );
+          }),
+    );
+  }
+
+  Container hasilField() {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: kHintTextColor, width: 1),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            FontAwesomeIcons.list,
+            color: kHintTextColor,
+            size: 16,
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+              child: Text(
+            '$resHasil',
+            style: const TextStyle(fontSize: 16),
+          )),
+          const Icon(
+            Icons.arrow_forward_ios,
+            color: kHintTextColor,
+            size: 16,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget loadSapi() {
+    return BlocBuilder<SapiBloc, SapiState>(builder: (context, state) {
+      if (state is SapiInitialState || state is SapiLoadingState) {
+        return buildLoading();
+      } else if (state is SapiLoadedState) {
+        return GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute<bool>(
+                builder: (BuildContext context) {
+                  return Scaffold(
+                    appBar: AppBar(
+                      title: Text("Pilih Eartag Sapi"),
+                    ),
+                    body: WillPopScope(
+                      onWillPop: () async {
+                        Navigator.pop(context, false);
+                        return false;
+                      },
+                      child: listSapiNew(state.datas),
+                    ),
+                  );
+                },
+              ));
+            },
+            child: sapiField());
+      } else {
+        return buildError(state.toString());
+      }
+    });
+  }
+
+  Container listSapiNew(List<Sapi> list) {
+    return Container(
+      child: ListView.builder(
+          itemCount: list.length,
+          itemBuilder: (context, index) {
+            var data = list[index];
+            return Container(
+              decoration: BoxDecoration(),
+              padding: EdgeInsets.only(left: 16, right: 16, top: 16),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    resSapiId = data.id;
+                    resSapi = data.eartag;
+                  });
+                  Navigator.pop(context, false);
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      data.eartag,
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    Divider(),
+                  ],
+                ),
+              ),
+            );
+          }),
+    );
+  }
+
+  Container sapiField() {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: kHintTextColor, width: 1),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            FontAwesomeIcons.list,
+            color: kHintTextColor,
+            size: 16,
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+              child: Text(
+            '$resSapi',
+            style: const TextStyle(fontSize: 16),
+          )),
+          const Icon(
+            Icons.arrow_forward_ios,
+            color: kHintTextColor,
+            size: 16,
+          ),
+        ],
       ),
     );
   }
@@ -252,6 +515,52 @@ class _PeriksaKebuntinganFormBodyState
           return null;
         },
         decoration: inputForm(hint, hint));
+  }
+
+  Widget _bottomSheet() {
+    return Container(
+      height: 100,
+      margin: EdgeInsets.all(16),
+      child: Column(
+        children: [
+          Text("Choose Profile Photo"),
+          SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              FlatButton.icon(
+                  onPressed: () {
+                    _takePhotos(ImageSource.camera);
+                  },
+                  icon: Icon(Icons.camera),
+                  label: Text("Camera")),
+              FlatButton.icon(
+                  onPressed: () {
+                    _takePhotos(ImageSource.gallery);
+                  },
+                  icon: Icon(Icons.image),
+                  label: Text("Galery")),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _takePhotos(ImageSource source) async {
+    final pickedFile = await _picker.getImage(source: source);
+    if (pickedFile != null) {
+      File? cropped = await ImageCropper.cropImage(
+          sourcePath: pickedFile.path,
+          aspectRatio: CropAspectRatio(ratioX: 2, ratioY: 1),
+          compressQuality: 70,
+          compressFormat: ImageCompressFormat.jpg);
+
+      setState(() {
+        _imageFile = cropped!;
+        resFile = _imageFile!;
+      });
+    }
   }
 
   Widget buildLoading() {
@@ -288,12 +597,38 @@ class _PeriksaKebuntinganFormBodyState
     setState(() {
       resId = 0;
       resSapiId = 0;
-      sapiDropdownValue = 0;
+      resMetodeId = 0;
+      resHasilId = 0;
       resHasil = "";
       resMetode = "";
       resTgl = "";
       _resMetode.text = "";
       _resHasil.text = "";
     });
+  }
+
+  void alertConfirm(PeriksaKebuntingan data) async {
+    ArtDialogResponse response = await ArtSweetAlert.show(
+        barrierDismissible: false,
+        context: context,
+        artDialogArgs: ArtDialogArgs(
+            denyButtonText: "Cancel",
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            confirmButtonText: "Yes, Submit",
+            type: ArtSweetAlertType.warning));
+
+    // ignore: unnecessary_null_comparison
+    if (response == null) {
+      return;
+    }
+
+    if (response.isTapConfirmButton) {
+      periksaKebuntinganBloc.add(PeriksaKebuntinganStoreEvent(
+          file: _imageFile == null ? null : _imageFile!,
+          periksaKebuntingan: data,
+          notifId: widget.notifId));
+      return;
+    }
   }
 }

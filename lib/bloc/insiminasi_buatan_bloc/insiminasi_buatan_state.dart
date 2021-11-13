@@ -14,22 +14,22 @@ class InsiminasiBuatanLoadingState extends InsiminasiBuatanState {
 
 class InsiminasiBuatanSuccessState extends InsiminasiBuatanState {
   final String msg;
-  final List<InsiminasiBuatan> datas;
 
-  InsiminasiBuatanSuccessState(this.msg, this.datas);
+  InsiminasiBuatanSuccessState(this.msg);
 
   @override
   List<Object> get props => [];
 }
+
 class InsiminasiBuatanErrorState extends InsiminasiBuatanState {
   final String msg;
-  final List<InsiminasiBuatan> datas;
 
-  InsiminasiBuatanErrorState(this.msg, this.datas);
+  InsiminasiBuatanErrorState(this.msg);
 
   @override
   List<Object> get props => [];
 }
+
 class InsiminasiBuatanLoadedState extends InsiminasiBuatanState {
   final List<InsiminasiBuatan> datas;
   InsiminasiBuatanLoadedState(this.datas);

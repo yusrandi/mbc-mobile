@@ -11,6 +11,7 @@ import 'package:mbc_mobile/utils/theme.dart';
 
 // receive msg when app in background
 Future<void> backGroundHandler(RemoteMessage msg) async {
+  print("main");
   print(msg.data.toString());
   print(msg.notification!.title);
 }
@@ -56,7 +57,8 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (BuildContext context) => AuthenticationBloc(UserRepositoryImpl()),
+      create: (BuildContext context) =>
+          AuthenticationBloc(UserRepositoryImpl()),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',

@@ -1,21 +1,39 @@
+import 'dart:io';
+
+import 'package:art_sweetalert/art_sweetalert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:mbc_mobile/bloc/hormon_bloc/hormon_bloc.dart';
+import 'package:mbc_mobile/bloc/obat_bloc/obat_bloc.dart';
 import 'package:mbc_mobile/bloc/perlakuan_bloc/perlakuan_bloc.dart';
 import 'package:mbc_mobile/bloc/sapi_bloc/sapi_bloc.dart';
+import 'package:mbc_mobile/bloc/vaksin_bloc/vaksin_bloc.dart';
+import 'package:mbc_mobile/bloc/vitamin_bloc/vitamin_bloc.dart';
 import 'package:mbc_mobile/components/default_button.dart';
 import 'package:mbc_mobile/helper/keyboard.dart';
+import 'package:mbc_mobile/models/hormon_model.dart';
+import 'package:mbc_mobile/models/obat_model.dart';
 import 'package:mbc_mobile/models/perlakuan_model.dart';
 import 'package:mbc_mobile/models/sapi_model.dart';
+import 'package:mbc_mobile/models/vaksin_model.dart';
+import 'package:mbc_mobile/models/vitamin_model.dart';
+import 'package:mbc_mobile/screens/new_home_page/home_page.dart';
 import 'package:mbc_mobile/utils/constants.dart';
+import 'package:mbc_mobile/utils/images.dart';
 import 'package:mbc_mobile/utils/size_config.dart';
 import 'package:mbc_mobile/utils/theme.dart';
 
 class PerlakuanFormBody extends StatefulWidget {
-  final Perlakuan perlakuan;
+  final String userId;
+  final String notifikasiId;
+  final Sapi? sapi;
 
-  const PerlakuanFormBody({Key? key, required this.perlakuan})
+  const PerlakuanFormBody(Key? key, this.userId, this.notifikasiId, this.sapi)
       : super(key: key);
 
   @override
@@ -27,25 +45,32 @@ class _PerlakuanFormBodyState extends State<PerlakuanFormBody> {
 
   late SapiBloc sapiBloc;
   late PerlakuanBloc perlakuanBloc;
-
-  List<Sapi> listSapi = [];
-  int sapiDropdownValue = 0;
+  late ObatBloc obatBloc;
+  late VitaminBloc vitaminBloc;
+  late VaksinBloc vaksinBloc;
+  late HormonBloc hormonBloc;
 
   int resSapiId = 0;
+  String resSapi = "Pilih Eartag Sapi";
+  int resObatId = 0;
+  String resObat = "Pilih Jenis Obat";
+  int resVitaminId = 0;
+  String resVitamin = "Pilih Jenis Vitamin";
+  int resVaksinId = 0;
+  String resVaksin = "Pilih Jenis Vaksin";
+  int resHormonId = 0;
+  String resHormon = "Pilih Jenis Hormon";
   int resId = 0;
-  String resTgl = "";
 
-  late DateTime date;
-
-  final _resObatJenis = new TextEditingController();
   final _resObatDosis = new TextEditingController();
-  final _resVaksin = new TextEditingController();
   final _resVaksinDosis = new TextEditingController();
-  final _resVitamin = new TextEditingController();
   final _resVitaminDosis = new TextEditingController();
-  final _resHormon = new TextEditingController();
   final _resHormonDosis = new TextEditingController();
   final _resKeterangan = new TextEditingController();
+
+  late File? _imageFile = null;
+  final ImagePicker _picker = ImagePicker();
+  late File? resFile = null;
 
   @override
   void initState() {
@@ -53,26 +78,21 @@ class _PerlakuanFormBodyState extends State<PerlakuanFormBody> {
 
     sapiBloc = BlocProvider.of<SapiBloc>(context);
     perlakuanBloc = BlocProvider.of<PerlakuanBloc>(context);
+    obatBloc = BlocProvider.of<ObatBloc>(context);
+    vitaminBloc = BlocProvider.of<VitaminBloc>(context);
+    vaksinBloc = BlocProvider.of<VaksinBloc>(context);
+    hormonBloc = BlocProvider.of<HormonBloc>(context);
 
-    sapiBloc.add(SapiFetchDataEvent());
+    sapiBloc.add(SapiFetchDataEvent(widget.userId));
+    obatBloc.add(ObatFetchDataEvent());
+    vitaminBloc.add(VitaminFetchDataEvent());
+    vaksinBloc.add(VaksinFetchDataEvent());
+    hormonBloc.add(HormonFetchDataEvent());
 
-    if (widget.perlakuan.id != 0) {
-      resId = widget.perlakuan.id;
-
-      resSapiId = widget.perlakuan.sapiId;
-      sapiDropdownValue = resSapiId;
-
-      resTgl = widget.perlakuan.tglPerlakuan;
-
-      _resObatJenis.text = widget.perlakuan.jenisObat.toString();
-      _resObatDosis.text = widget.perlakuan.dosisObat.toString();
-      _resVaksin.text = widget.perlakuan.vaksin.toString();
-      _resVaksinDosis.text = widget.perlakuan.dosisVaksin.toString();
-      _resVitamin.text = widget.perlakuan.vitamin.toString();
-      _resVitaminDosis.text = widget.perlakuan.dosisVitamin.toString();
-      _resHormon.text = widget.perlakuan.hormon.toString();
-      _resHormonDosis.text = widget.perlakuan.dosisHormon.toString();
-      _resKeterangan.text = widget.perlakuan.ketPerlakuan.toString();
+    if (widget.sapi != null) {
+      print(widget.sapi!.eartag);
+      resSapi = widget.sapi!.eartag;
+      resSapiId = widget.sapi!.id;
     }
   }
 
@@ -90,7 +110,10 @@ class _PerlakuanFormBodyState extends State<PerlakuanFormBody> {
           EasyLoading.showSuccess(state.msg);
           EasyLoading.dismiss();
 
-          Navigator.pop(context);
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) {
+            return HomePage(userId: widget.userId);
+          }));
         }
       },
       child: Container(
@@ -101,64 +124,69 @@ class _PerlakuanFormBodyState extends State<PerlakuanFormBody> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Pilih Sapi"),
-                loadSapi(),
-                SizedBox(height: getProportionateScreenHeight(16)),
-                Text("Tanggal Perlakuan "),
                 GestureDetector(
                   onTap: () {
-                    pickDate(context);
+                    showModalBottomSheet(
+                        context: context,
+                        builder: ((builder) => _bottomSheet()));
                   },
                   child: Container(
-                    width: double.infinity,
-                    height: getProportionateScreenHeight(50),
+                    height: 200,
+                    width: SizeConfig.screenWidth,
                     decoration: BoxDecoration(
-                        border: Border.all(color: kSecondaryColor, width: 1),
-                        borderRadius: BorderRadius.circular(10)),
-                    padding: EdgeInsets.symmetric(horizontal: 8),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        resTgl == "" ? "Silahkan Pilih Tanggal " : resTgl,
-                        style: TextStyle(fontSize: 16),
-                      ),
+                      color: kHintTextColor,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: _imageFile == null
+                          ? Image.asset(Images.plaeholderImage,
+                              fit: BoxFit.cover)
+                          : Image.file(File(_imageFile!.path)),
                     ),
                   ),
                 ),
+                Divider(),
                 SizedBox(height: getProportionateScreenHeight(16)),
-                Text("Jenis Obat "),
-                buildFormField(
-                    'ex : Paracetamol', _resObatJenis, TextInputType.text),
+                loadSapi(),
+                SizedBox(height: getProportionateScreenHeight(8)),
+                loadObat(),
+                SizedBox(height: getProportionateScreenHeight(8)),
+                loadVitamin(),
+                SizedBox(height: getProportionateScreenHeight(8)),
+                loadVaksin(),
+                SizedBox(height: getProportionateScreenHeight(8)),
+                loadHormon(),
                 SizedBox(height: getProportionateScreenHeight(16)),
-                Text("Dosis Obat "),
-                buildFormField('ex : 100', _resObatDosis, TextInputType.number),
+                Divider(),
                 SizedBox(height: getProportionateScreenHeight(16)),
+                cardDosis(),
                 SizedBox(height: getProportionateScreenHeight(16)),
-                Text("Jenis Vaksin "),
-                buildFormField('ex : Synopak', _resVaksin, TextInputType.text),
-                SizedBox(height: getProportionateScreenHeight(16)),
-                Text("Dosis Vaksin "),
-                buildFormField(
-                    'ex : 100', _resVaksinDosis, TextInputType.number),
-                SizedBox(height: getProportionateScreenHeight(16)),
-                Text("Jenis Vitamin "),
-                buildFormField('ex : A/B/C', _resVitamin, TextInputType.text),
-                SizedBox(height: getProportionateScreenHeight(16)),
-                Text("Dosis Vitamin "),
-                buildFormField(
-                    'ex : 100', _resVitaminDosis, TextInputType.number),
-                SizedBox(height: getProportionateScreenHeight(16)),
-                Text("Jenis Hormon "),
-                buildFormField('ex : Oxytoxin', _resHormon, TextInputType.text),
-                SizedBox(height: getProportionateScreenHeight(16)),
-                Text("Dosis Hormon "),
-                buildFormField(
-                    'ex : 100', _resHormonDosis, TextInputType.number),
-                SizedBox(height: getProportionateScreenHeight(16)),
-                Text("Keterangan Perlakuan "),
-                buildFormField('ex : Input Keterangan Perlakuan',
-                    _resKeterangan, TextInputType.text),
-                SizedBox(height: getProportionateScreenHeight(16)),
+                Divider(),
+                Text("Keterangan Perlakuan ", style: titleDarkStyle),
+                SizedBox(height: getProportionateScreenHeight(8)),
+                Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: kHintTextColor, width: 1),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: TextFormField(
+                        controller: _resKeterangan,
+                        maxLines: 4,
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return "gak boleh kosong bro";
+                          }
+                          return null;
+                        },
+                        decoration: inputForm("Input Keterangan Perlakuan",
+                            "Input Keterangan Perlakuan")),
+                  ),
+                ),
                 SizedBox(height: getProportionateScreenHeight(32)),
                 GestureDetector(
                   onTap: () {
@@ -166,38 +194,63 @@ class _PerlakuanFormBodyState extends State<PerlakuanFormBody> {
                       _formKey.currentState!.save();
                       // if all are valid then go to success screen
                       KeyboardUtil.hideKeyboard(context);
-                      if (resSapiId != 0) {
-                        if (resTgl != "") {
-                          Perlakuan perlakuan = Perlakuan(
-                              id: resId,
-                              sapiId: resSapiId,
-                              tglPerlakuan: resTgl,
-                              jenisObat: _resObatJenis.text.trim(),
-                              dosisObat: int.parse(_resObatDosis.text.trim()),
-                              vaksin: _resVaksin.text.trim(),
-                              dosisVaksin:
-                                  int.parse(_resVaksinDosis.text.trim()),
-                              vitamin: _resVitamin.text.trim(),
-                              dosisVitamin:
-                                  int.parse(_resVitaminDosis.text.trim()),
-                              hormon: _resHormon.text.trim(),
-                              dosisHormon:
-                                  int.parse(_resHormonDosis.text.trim()),
-                              ketPerlakuan: _resKeterangan.text.trim());
+                      if (resFile != null) {
+                        if (resSapiId != 0) {
+                          if (resObatId != 0) {
+                            if (resVitaminId != 0) {
+                              if (resVaksinId != 0) {
+                                if (resHormonId != 0) {
+                                  Perlakuan perlakuan = Perlakuan(
+                                      id: resId,
+                                      sapiId: resSapiId,
+                                      peternakId: 0,
+                                      pendampingId: 0,
+                                      tsrId: 0,
+                                      tglPerlakuan: "",
+                                      obatId: resObatId,
+                                      dosisObat:
+                                          int.parse(_resObatDosis.text.trim()),
+                                      vaksinId: resVaksinId,
+                                      dosisVaksin: int.parse(
+                                          _resVaksinDosis.text.trim()),
+                                      vitaminId: resVitaminId,
+                                      dosisVitamin: int.parse(
+                                          _resVitaminDosis.text.trim()),
+                                      hormonId: resHormonId,
+                                      dosisHormon: int.parse(
+                                          _resHormonDosis.text.trim()),
+                                      ketPerlakuan: _resKeterangan.text.trim(),
+                                      foto: "");
 
-                          resId == 0
-                              ? perlakuanBloc.add(
-                                  PerlakuanStoreEvent(perlakuan: perlakuan))
-                              : perlakuanBloc.add(
-                                  PerlakuanUpdateEvent(perlakuan: perlakuan));
+                                  alertConfirm(perlakuan);
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text('Pilih Hormon dulu')));
+                                }
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text('Pilih Vaksin dulu')));
+                              }
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text('Pilih Vitamin dulu')));
+                            }
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('Pilih Obat dulu')));
+                          }
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text('Pilih Tanggal dulu')));
+                              const SnackBar(content: Text('Pilih sapi dulu')));
                         }
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Pilih sapi dulu')));
+                            const SnackBar(
+                                content: Text('Pilih Foto Dokumentasi')));
                       }
                     }
                   },
@@ -213,60 +266,506 @@ class _PerlakuanFormBodyState extends State<PerlakuanFormBody> {
     );
   }
 
+  Container cardDosis() {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+          color: Colors.white, borderRadius: BorderRadius.circular(6)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Dosis Obat ", style: titleDarkStyle),
+          buildFormField('ex : 100', _resObatDosis, TextInputType.number),
+          SizedBox(height: getProportionateScreenHeight(16)),
+          Text("Dosis Vaksin ", style: titleDarkStyle),
+          buildFormField('ex : 100', _resVaksinDosis, TextInputType.number),
+          SizedBox(height: getProportionateScreenHeight(16)),
+          Text("Dosis Vitamin ", style: titleDarkStyle),
+          buildFormField('ex : 100', _resVitaminDosis, TextInputType.number),
+          SizedBox(height: getProportionateScreenHeight(16)),
+          Text("Dosis Hormon ", style: titleDarkStyle),
+          buildFormField('ex : 100', _resHormonDosis, TextInputType.number),
+          SizedBox(height: getProportionateScreenHeight(16)),
+        ],
+      ),
+    );
+  }
+
   Widget loadSapi() {
     return BlocBuilder<SapiBloc, SapiState>(builder: (context, state) {
-      if (state is SapiInitialState || state is SapiLoadingState) {
-        return buildLoading();
-      } else if (state is SapiLoadedState) {
-        listSapi = [];
-        listSapi.add(Sapi(
-            id: 0,
-            jenisSapiId: 0,
-            peternakId: 0,
-            ertag: "ertag",
-            ertagInduk: "ertagInduk",
-            namaSapi: "Nama Sapi",
-            tanggalLahir: "tglLahir",
-            kelamin: "kelamin",
-            kondisiLahir: "kondisiLahir",
-            anakKe: "anakKe",
-            fotoDepan: "photoDepan",
-            fotoBelakang: "photoBelakang",
-            fotoKanan: "photoKanan",
-            fotoKiri: "photoKiri"));
+      if (state is SapiLoadedState) {
+        EasyLoading.dismiss();
 
-        listSapi.addAll(state.datas);
-        return buildSapi(listSapi);
+        return GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute<bool>(
+                builder: (BuildContext context) {
+                  return Scaffold(
+                    appBar: AppBar(
+                      title: Text("Pilih Eartag Sapi"),
+                    ),
+                    body: WillPopScope(
+                      onWillPop: () async {
+                        Navigator.pop(context, false);
+                        return false;
+                      },
+                      child: listSapiNew(state.datas),
+                    ),
+                  );
+                },
+              ));
+            },
+            child: sapiField());
+      } else if (state is SapiErrorState) {
+        EasyLoading.dismiss();
+
+        return buildError(state.msg);
       } else {
-        return buildError(state.toString());
+        return buildLoading();
       }
     });
   }
 
-  Container buildSapi(List<Sapi> list) {
+  Container listSapiNew(List<Sapi> list) {
     return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-          border: Border.all(color: kSecondaryColor, width: 1),
-          borderRadius: BorderRadius.circular(10)),
-      padding: EdgeInsets.symmetric(horizontal: 8),
-      child: DropdownButton<int>(
-        value: sapiDropdownValue,
-        hint: Text("Pilih Sapi"),
-        items: list.map((Sapi value) {
-          return DropdownMenuItem<int>(
-            value: value.id,
-            child: new Text(value.namaSapi),
-          );
-        }).toList(),
-        onChanged: (newValue) {
-          print(newValue);
+      child: ListView.builder(
+          itemCount: list.length,
+          itemBuilder: (context, index) {
+            var data = list[index];
+            return Container(
+              decoration: BoxDecoration(),
+              padding: EdgeInsets.only(left: 16, right: 16, top: 16),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    resSapiId = data.id;
+                    resSapi = data.eartag;
+                  });
+                  Navigator.pop(context, false);
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      data.eartag,
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    Divider(),
+                  ],
+                ),
+              ),
+            );
+          }),
+    );
+  }
 
-          setState(() {
-            sapiDropdownValue = newValue!;
-            resSapiId = newValue;
-          });
-        },
+  Container sapiField() {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: kHintTextColor, width: 1),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            FontAwesomeIcons.list,
+            color: kHintTextColor,
+            size: 16,
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+              child: Text(
+            '$resSapi',
+            style: const TextStyle(fontSize: 16),
+          )),
+          const Icon(
+            Icons.arrow_forward_ios,
+            color: kHintTextColor,
+            size: 16,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget loadObat() {
+    return BlocBuilder<ObatBloc, ObatState>(builder: (context, state) {
+      if (state is ObatInitialState || state is ObatLoadingState) {
+        return buildLoading();
+      } else if (state is ObatLoadedState) {
+        return GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute<bool>(
+                builder: (BuildContext context) {
+                  return Scaffold(
+                    appBar: AppBar(
+                      title: Text("Pilih Jenis Obat"),
+                    ),
+                    body: WillPopScope(
+                      onWillPop: () async {
+                        Navigator.pop(context, false);
+                        return false;
+                      },
+                      child: listObatNew(state.model.obat),
+                    ),
+                  );
+                },
+              ));
+            },
+            child: obatField());
+      }
+
+      return buildLoading();
+    });
+  }
+
+  Container listObatNew(List<Obat> list) {
+    return Container(
+      child: ListView.builder(
+          itemCount: list.length,
+          itemBuilder: (context, index) {
+            var data = list[index];
+            return Container(
+              decoration: BoxDecoration(),
+              padding: EdgeInsets.only(left: 16, right: 16, top: 16),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    resObatId = data.id;
+                    resObat = data.name;
+                  });
+                  Navigator.pop(context, false);
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      data.name,
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    Divider(),
+                  ],
+                ),
+              ),
+            );
+          }),
+    );
+  }
+
+  Container obatField() {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: kHintTextColor, width: 1),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            FontAwesomeIcons.list,
+            color: kHintTextColor,
+            size: 16,
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+              child: Text(
+            '$resObat',
+            style: const TextStyle(fontSize: 16),
+          )),
+          const Icon(
+            Icons.arrow_forward_ios,
+            color: kHintTextColor,
+            size: 16,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget loadVitamin() {
+    return BlocBuilder<VitaminBloc, VitaminState>(builder: (context, state) {
+      if (state is VitaminInitialState || state is VitaminLoadingState) {
+        return buildLoading();
+      } else if (state is VitaminLoadedState) {
+        return GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute<bool>(
+                builder: (BuildContext context) {
+                  return Scaffold(
+                    appBar: AppBar(
+                      title: Text("Pilih Jenis Vitamin"),
+                    ),
+                    body: WillPopScope(
+                      onWillPop: () async {
+                        Navigator.pop(context, false);
+                        return false;
+                      },
+                      child: listVitaminNew(state.model.vitamin),
+                    ),
+                  );
+                },
+              ));
+            },
+            child: vitaminField());
+      }
+
+      return buildLoading();
+    });
+  }
+
+  Container listVitaminNew(List<Vitamin> list) {
+    return Container(
+      child: ListView.builder(
+          itemCount: list.length,
+          itemBuilder: (context, index) {
+            var data = list[index];
+            return Container(
+              decoration: BoxDecoration(),
+              padding: EdgeInsets.only(left: 16, right: 16, top: 16),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    resVitaminId = data.id;
+                    resVitamin = data.name;
+                  });
+                  Navigator.pop(context, false);
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      data.name,
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    Divider(),
+                  ],
+                ),
+              ),
+            );
+          }),
+    );
+  }
+
+  Container vitaminField() {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: kHintTextColor, width: 1),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            FontAwesomeIcons.list,
+            color: kHintTextColor,
+            size: 16,
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+              child: Text(
+            '$resVitamin',
+            style: const TextStyle(fontSize: 16),
+          )),
+          const Icon(
+            Icons.arrow_forward_ios,
+            color: kHintTextColor,
+            size: 16,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget loadVaksin() {
+    return BlocBuilder<VaksinBloc, VaksinState>(builder: (context, state) {
+      if (state is VaksinInitialState || state is VaksinLoadingState) {
+        return buildLoading();
+      } else if (state is VaksinLoadedState) {
+        return GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute<bool>(
+                builder: (BuildContext context) {
+                  return Scaffold(
+                    appBar: AppBar(
+                      title: Text("Pilih Jenis Vaksin"),
+                    ),
+                    body: WillPopScope(
+                      onWillPop: () async {
+                        Navigator.pop(context, false);
+                        return false;
+                      },
+                      child: listVaksinNew(state.model.vaksin),
+                    ),
+                  );
+                },
+              ));
+            },
+            child: vaksinField());
+      } else {
+        return buildLoading();
+      }
+    });
+  }
+
+  Container listVaksinNew(List<Vaksin> list) {
+    return Container(
+      child: ListView.builder(
+          itemCount: list.length,
+          itemBuilder: (context, index) {
+            var data = list[index];
+            return Container(
+              decoration: BoxDecoration(),
+              padding: EdgeInsets.only(left: 16, right: 16, top: 16),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    resVaksinId = data.id;
+                    resVaksin = data.name;
+                  });
+                  Navigator.pop(context, false);
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      data.name,
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    Divider(),
+                  ],
+                ),
+              ),
+            );
+          }),
+    );
+  }
+
+  Container vaksinField() {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: kHintTextColor, width: 1),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            FontAwesomeIcons.list,
+            color: kHintTextColor,
+            size: 16,
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+              child: Text(
+            '$resVaksin',
+            style: const TextStyle(fontSize: 16),
+          )),
+          const Icon(
+            Icons.arrow_forward_ios,
+            color: kHintTextColor,
+            size: 16,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget loadHormon() {
+    return BlocBuilder<HormonBloc, HormonState>(builder: (context, state) {
+      if (state is HormonInitialState || state is HormonLoadingState) {
+        return buildLoading();
+      } else if (state is HormonLoadedState) {
+        return GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute<bool>(
+                builder: (BuildContext context) {
+                  return Scaffold(
+                    appBar: AppBar(
+                      title: Text("Pilih Jenis Hormon"),
+                    ),
+                    body: WillPopScope(
+                      onWillPop: () async {
+                        Navigator.pop(context, false);
+                        return false;
+                      },
+                      child: listHormonNew(state.model.hormon),
+                    ),
+                  );
+                },
+              ));
+            },
+            child: hormonField());
+      } else {
+        return buildLoading();
+      }
+    });
+  }
+
+  Container listHormonNew(List<Hormon> list) {
+    return Container(
+      child: ListView.builder(
+          itemCount: list.length,
+          itemBuilder: (context, index) {
+            var data = list[index];
+            return Container(
+              decoration: BoxDecoration(),
+              padding: EdgeInsets.only(left: 16, right: 16, top: 16),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    resHormonId = data.id;
+                    resHormon = data.name;
+                  });
+                  Navigator.pop(context, false);
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      data.name,
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    Divider(),
+                  ],
+                ),
+              ),
+            );
+          }),
+    );
+  }
+
+  Container hormonField() {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: kHintTextColor, width: 1),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            FontAwesomeIcons.list,
+            color: kHintTextColor,
+            size: 16,
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+              child: Text(
+            '$resHormon',
+            style: const TextStyle(fontSize: 16),
+          )),
+          const Icon(
+            Icons.arrow_forward_ios,
+            color: kHintTextColor,
+            size: 16,
+          ),
+        ],
       ),
     );
   }
@@ -298,20 +797,74 @@ class _PerlakuanFormBodyState extends State<PerlakuanFormBody> {
     );
   }
 
-  Future pickDate(BuildContext context) async {
-    final initialDate = DateTime.now();
-    final newDate = await showDatePicker(
+  Widget _bottomSheet() {
+    return Container(
+      height: 100,
+      margin: EdgeInsets.all(16),
+      child: Column(
+        children: [
+          Text("Choose Profile Photo"),
+          SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              FlatButton.icon(
+                  onPressed: () {
+                    _takePhotos(ImageSource.camera);
+                  },
+                  icon: Icon(Icons.camera),
+                  label: Text("Camera")),
+              FlatButton.icon(
+                  onPressed: () {
+                    _takePhotos(ImageSource.gallery);
+                  },
+                  icon: Icon(Icons.image),
+                  label: Text("Galery")),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _takePhotos(ImageSource source) async {
+    final pickedFile = await _picker.getImage(source: source);
+    if (pickedFile != null) {
+      File? cropped = await ImageCropper.cropImage(
+          sourcePath: pickedFile.path,
+          aspectRatio: CropAspectRatio(ratioX: 2, ratioY: 1),
+          compressQuality: 70,
+          compressFormat: ImageCompressFormat.jpg);
+
+      setState(() {
+        _imageFile = cropped!;
+        resFile = _imageFile!;
+      });
+    }
+  }
+
+  void alertConfirm(Perlakuan perlakuan) async {
+    ArtDialogResponse response = await ArtSweetAlert.show(
+        barrierDismissible: false,
         context: context,
-        initialDate: initialDate,
-        firstDate: DateTime(DateTime.now().year - 5),
-        lastDate: DateTime(DateTime.now().year + 5));
+        artDialogArgs: ArtDialogArgs(
+            denyButtonText: "Cancel",
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            confirmButtonText: "Yes, submit it",
+            type: ArtSweetAlertType.warning));
 
-    if (newDate == null) return;
+    // ignore: unnecessary_null_comparison
+    if (response == null) {
+      return;
+    }
 
-    setState(() {
-      date = newDate;
-      resTgl = DateFormat('yyyy/MM/dd').format(date);
-      print(date);
-    });
+    if (response.isTapConfirmButton) {
+      perlakuanBloc.add(PerlakuanStoreEvent(
+          file: resFile,
+          perlakuan: perlakuan,
+          notifikasiId: widget.notifikasiId));
+      return;
+    }
   }
 }

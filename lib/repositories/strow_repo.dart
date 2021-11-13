@@ -9,21 +9,21 @@ abstract class StrowRepository {
   Future<StrowModel> strowStore(Strow strow);
   Future<StrowModel> strowUpdate(Strow strow);
   Future<StrowModel> strowDelete(Strow strow);
-  
 }
 
 class StrowRepositoryImpl implements StrowRepository {
-
   static const String TAG = "StrowRepositoryImpl";
 
   @override
-  Future<StrowModel> strowFetchData() async{
+  Future<StrowModel> strowFetchData() async {
     var _response = await http.get(Uri.parse(Api.instance.strowURL));
     print("$TAG, StrowFetchData ${_response.statusCode}");
     if (_response.statusCode == 201) {
       var data = json.decode(_response.body);
-      // print("StrowFetchData $data");
+      print("StrowFetchData $data");
       StrowModel model = StrowModel.fromJson(data);
+
+      print(model);
       return model;
     } else {
       throw Exception();
@@ -33,10 +33,10 @@ class StrowRepositoryImpl implements StrowRepository {
   @override
   Future<StrowModel> strowStore(Strow strow) async {
     var _response = await http.post(Uri.parse(Api.instance.strowURL), body: {
-          "sapiId" : strow.sapiId.toString(),
-          "kode" : strow.kodeBatch,
-          "batch" : strow.batch,
-      });
+      "sapiId": strow.sapiId.toString(),
+      "kode": strow.kodeBatch,
+      "batch": strow.batch,
+    });
     print("$TAG, StrowStore ${_response.statusCode}");
     if (_response.statusCode == 201) {
       var data = json.decode(_response.body);
@@ -50,12 +50,12 @@ class StrowRepositoryImpl implements StrowRepository {
 
   @override
   Future<StrowModel> strowUpdate(Strow strow) async {
-    var url = Api.instance.strowURL+"/"+strow.id.toString();
+    var url = Api.instance.strowURL + "/" + strow.id.toString();
 
     var _response = await http.put(Uri.parse(url), body: {
-          "sapiId" : strow.sapiId.toString(),
-          "kode" : strow.kodeBatch,
-          "batch" : strow.batch,
+      "sapiId": strow.sapiId.toString(),
+      "kode": strow.kodeBatch,
+      "batch": strow.batch,
     });
     print("$TAG, StrowUpdate ${_response.statusCode}");
     if (_response.statusCode == 201) {
@@ -69,8 +69,9 @@ class StrowRepositoryImpl implements StrowRepository {
   }
 
   @override
-  Future<StrowModel> strowDelete(Strow strow) async{
-    var _response = await http.delete(Uri.parse(Api.instance.strowURL+"/"+strow.id.toString()));
+  Future<StrowModel> strowDelete(Strow strow) async {
+    var _response = await http
+        .delete(Uri.parse(Api.instance.strowURL + "/" + strow.id.toString()));
     print("$TAG, StrowDelete ${_response.statusCode}");
     if (_response.statusCode == 201) {
       var data = json.decode(_response.body);
@@ -81,5 +82,4 @@ class StrowRepositoryImpl implements StrowRepository {
       throw Exception();
     }
   }
-  
 }

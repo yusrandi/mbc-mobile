@@ -2,12 +2,22 @@ import 'package:art_sweetalert/art_sweetalert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mbc_mobile/bloc/insiminasi_buatan_bloc/insiminasi_buatan_bloc.dart';
+import 'package:mbc_mobile/config/api.dart';
 import 'package:mbc_mobile/models/insiminasi_buatan_model.dart';
 import 'package:mbc_mobile/screens/insiminasi_buatan/insiminasi_buatan_form_screen.dart';
 import 'package:mbc_mobile/utils/constants.dart';
+import 'package:mbc_mobile/utils/size_config.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class InsiminasiBuatanBody extends StatefulWidget {
+  final String userId;
+
+  const InsiminasiBuatanBody({Key? key, required this.userId})
+      : super(key: key);
+
   @override
   _InsiminasiBuatanBodyState createState() => _InsiminasiBuatanBodyState();
 }
@@ -21,38 +31,58 @@ class _InsiminasiBuatanBodyState extends State<InsiminasiBuatanBody> {
 
     insiminasiBuatanBloc = BlocProvider.of<InsiminasiBuatanBloc>(context);
   }
-  
+
   @override
   Widget build(BuildContext context) {
-
-    insiminasiBuatanBloc.add(InsiminasiBuatanFetchDataEvent());
+    insiminasiBuatanBloc
+        .add(InsiminasiBuatanFetchDataEvent(userId: widget.userId));
 
     print("InsiminasiBuatanBody");
-    return BlocListener<InsiminasiBuatanBloc, InsiminasiBuatanState>(
-      listener: (context, state) {
-        if (state is InsiminasiBuatanErrorState) {
-          EasyLoading.showError(state.msg);
-          EasyLoading.dismiss();
-        } else if (state is InsiminasiBuatanSuccessState) {
-          EasyLoading.showSuccess(state.msg);
-          EasyLoading.dismiss();
-        }
-      },
-      child: BlocBuilder<InsiminasiBuatanBloc, InsiminasiBuatanState>(builder: (context, state) {
-        EasyLoading.dismiss();
+    return Stack(
+      children: [
+        BlocListener<InsiminasiBuatanBloc, InsiminasiBuatanState>(
+          listener: (context, state) {
+            if (state is InsiminasiBuatanErrorState) {
+              EasyLoading.showError(state.msg);
+              EasyLoading.dismiss();
+            } else if (state is InsiminasiBuatanSuccessState) {
+              EasyLoading.showSuccess(state.msg);
+              EasyLoading.dismiss();
+            }
+          },
+          child: BlocBuilder<InsiminasiBuatanBloc, InsiminasiBuatanState>(
+              builder: (context, state) {
+            EasyLoading.dismiss();
 
-        if (state is InsiminasiBuatanInitialState || state is InsiminasiBuatanLoadingState) {
-          return _buildLoading();
-        } else if (state is InsiminasiBuatanLoadedState) {
-          return body(state.datas);
-        } else if (state is InsiminasiBuatanSuccessState) {
-          return body(state.datas);
-        } else if (state is InsiminasiBuatanErrorState) {
-          return body(state.datas);
-        } else {
-          return _buildLoading();
-        }
-      }),
+            if (state is InsiminasiBuatanInitialState ||
+                state is InsiminasiBuatanLoadingState) {
+              return _buildLoading();
+            } else if (state is InsiminasiBuatanLoadedState) {
+              return body(state.datas);
+            } else if (state is InsiminasiBuatanErrorState) {
+              return buildError(state.msg);
+            } else {
+              return _buildLoading();
+            }
+          }),
+        ),
+        Positioned(
+          right: 0,
+          bottom: 0,
+          child: FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => InsiminasiBuatanFormScreen(
+                              null, widget.userId, "", null)))
+                  .then((value) => setState(() {}));
+            },
+            backgroundColor: kSecondaryColor,
+            child: Icon(Icons.add),
+          ),
+        ),
+      ],
     );
   }
 
@@ -62,88 +92,87 @@ class _InsiminasiBuatanBodyState extends State<InsiminasiBuatanBody> {
         child: Text("Data not yet"),
       );
     }
-    
-    return Stack(
-      children: [
-        Positioned(
-          top: 0,
-          bottom: 0,
-          right: 0,
-          left: 0,
-          child: Container(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: SingleChildScrollView(
-              child: DataTable(
-                  columnSpacing: 10,
-                  columns: [
-                    DataColumn(
-                        label: Text("Aksi",
-                            style: Theme.of(context).textTheme.subtitle1)),
-                    DataColumn(
-                        label: Text("Tanggal IB",
-                            style: Theme.of(context).textTheme.subtitle1)),
-                    DataColumn(
-                        label: Text("Nama Sapi",
-                            style: Theme.of(context).textTheme.subtitle1)),
-                    DataColumn(
-                        label: Text("Kode Batch Strow",
-                            style: Theme.of(context).textTheme.subtitle1)),
-                    DataColumn(
-                        label: Text("Dosis",
-                            style: Theme.of(context).textTheme.subtitle1)),
-                    
+
+    return Container(
+      child: ListView.builder(
+          itemCount: list.length,
+          itemBuilder: (context, index) {
+            var data = list[index];
+            return Slidable(
+              actionPane: SlidableDrawerActionPane(),
+              actions: [
+                IconSlideAction(
+                  caption: 'Print',
+                  icon: FontAwesomeIcons.fileExport,
+                  foregroundColor: Colors.blueAccent,
+                  color: Colors.transparent,
+                  onTap: () {
+                    _launchURL(Api().exportURL + "/3/" + data.id.toString());
+                  },
+                ),
+              ],
+              child: Container(
+                margin: EdgeInsets.only(bottom: 8),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10)),
+                child: Column(
+                  children: [
+                    Container(
+                      height: 150,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                            fit: BoxFit.cover,
+                            image: NetworkImage(
+                                Api.imageURL + '/' + list[index].foto)),
+                        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                data.sapi!.eartag,
+                                style: TextStyle(
+                                    fontSize: 18, color: kSecondaryColor),
+                              ),
+                              Text(data.waktuIb,
+                                  style: TextStyle(
+                                      fontSize: 14, color: kHintTextColor)),
+                            ],
+                          ),
+                          Text(
+                            "KODE BATCH ${data.strow!.kodeBatch}",
+                            style:
+                                TextStyle(fontSize: 14, color: kHintTextColor),
+                          ),
+                          SizedBox(height: getProportionateScreenHeight(8)),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("IB ke - ", style: titleDarkStyle),
+                              Text("${data.dosisIb}",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                          Divider(),
+                        ],
+                      ),
+                    ),
                   ],
-                  rows: list
-                      .map((e) => DataRow(cells: [
-                            DataCell(Row(
-                              children: [
-                                GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  InsiminasiBuatanFormScreen(insiminasiBuatan: e))).then((value) => setState(() {}));    
-                                    },
-                                    child:
-                                        Icon(Icons.edit, color: kSecondaryColor)),
-                                SizedBox(width: 8),
-                                GestureDetector(
-                                    onTap: () {
-                                      alertConfirm(e);
-                                    },
-                                    child: Icon(Icons.delete, color: Colors.red))
-                              ],
-                            )),
-                            DataCell(Text(e.waktuIb,
-                                style: Theme.of(context).textTheme.caption)),
-                            DataCell(Text(e.sapi!.namaSapi,
-                                style: Theme.of(context).textTheme.caption)),
-                            DataCell(Text(e.strow!.kodeBatch,
-                                style: Theme.of(context).textTheme.caption)),
-                            DataCell(Text(e.dosisIb.toString(),
-                                style: Theme.of(context).textTheme.caption)),
-                          ]))
-                      .toList()),
-            ),
-          ),
+                ),
               ),
-        ),
-      Positioned(
-        right: 0,
-        bottom: 0,
-        child: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => InsiminasiBuatanFormScreen(insiminasiBuatan: InsiminasiBuatan(id: 0, waktuIb: "", dosisIb: 0, strowId: 0, sapiId: 0)))).then((value) => setState(() {}));
-        },
-        backgroundColor: kSecondaryColor,
-        child: Icon(Icons.add),
-      ),),
-      ],
+            );
+          }),
     );
   }
 
@@ -164,7 +193,8 @@ class _InsiminasiBuatanBodyState extends State<InsiminasiBuatanBody> {
     }
 
     if (response.isTapConfirmButton) {
-      insiminasiBuatanBloc.add(InsiminasiBuatanDeleteEvent(insiminasiBuatan: insiminasiBuatan));
+      insiminasiBuatanBloc
+          .add(InsiminasiBuatanDeleteEvent(insiminasiBuatan: insiminasiBuatan));
       return;
     }
   }
@@ -174,4 +204,15 @@ class _InsiminasiBuatanBodyState extends State<InsiminasiBuatanBody> {
       child: CircularProgressIndicator(),
     );
   }
+
+  Widget buildError(String msg) {
+    return Center(
+      child: Text(msg,
+          style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+    );
+  }
+
+  void _launchURL(String _url) async => await canLaunch(_url)
+      ? await launch(_url)
+      : throw 'Could not launch $_url';
 }

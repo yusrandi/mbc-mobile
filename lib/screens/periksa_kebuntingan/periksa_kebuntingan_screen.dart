@@ -9,6 +9,10 @@ import 'package:mbc_mobile/utils/constants.dart';
 
 class PeriksaKebuntinganScreen extends StatelessWidget {
   static String routeName = "periksa_kebuntingan";
+  final String id;
+
+  const PeriksaKebuntinganScreen({Key? key, required this.id})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -28,9 +32,8 @@ class PeriksaKebuntinganScreen extends StatelessWidget {
         create: (context) =>
             PeriksaKebuntinganBloc(PeriksaKebuntinganRepositoryImpl()),
         child: Container(
-            padding: EdgeInsets.all(16), child: PeriksaKebuntinganBody()),
+            padding: EdgeInsets.all(8), child: PeriksaKebuntinganBody(id: id)),
       ),
-      
     );
   }
 }

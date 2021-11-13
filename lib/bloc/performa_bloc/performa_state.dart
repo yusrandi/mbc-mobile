@@ -14,22 +14,21 @@ class PerformaLoadingState extends PerformaState {
 
 class PerformaSuccessState extends PerformaState {
   final String msg;
-  final List<Performa> datas;
-
-  PerformaSuccessState(this.msg, this.datas);
+  PerformaSuccessState(this.msg);
 
   @override
   List<Object> get props => [];
 }
+
 class PerformaErrorState extends PerformaState {
   final String msg;
-  final List<Performa> datas;
 
-  PerformaErrorState(this.msg, this.datas);
+  PerformaErrorState(this.msg);
 
   @override
   List<Object> get props => [];
 }
+
 class PerformaLoadedState extends PerformaState {
   final List<Performa> datas;
   PerformaLoadedState(this.datas);

@@ -9,13 +9,15 @@ import 'package:mbc_mobile/utils/constants.dart';
 
 class PerlakuanScreen extends StatelessWidget {
   static String routeName = "perlakuan";
+  final String userId;
+
+  const PerlakuanScreen({Key? key, required this.userId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Data Perlakuan",
-            style: TextStyle(color: Colors.white)),
+        title: Text("Data Perlakuan", style: TextStyle(color: Colors.white)),
         flexibleSpace: Container(
           decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -25,12 +27,10 @@ class PerlakuanScreen extends StatelessWidget {
         ),
       ),
       body: BlocProvider(
-        create: (context) =>
-            PerlakuanBloc(PerlakuanRepositoryImpl()),
+        create: (context) => PerlakuanBloc(PerlakuanRepositoryImpl()),
         child: Container(
-            padding: EdgeInsets.all(16), child: PerlakuanBody()),
+            padding: EdgeInsets.all(8), child: PerlakuanBody(userId: userId)),
       ),
-      
     );
   }
 }

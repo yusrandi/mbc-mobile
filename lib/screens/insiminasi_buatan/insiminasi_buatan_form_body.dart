@@ -1,6 +1,12 @@
+import 'dart:io';
+
+import 'package:art_sweetalert/art_sweetalert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:mbc_mobile/bloc/insiminasi_buatan_bloc/insiminasi_buatan_bloc.dart';
 import 'package:mbc_mobile/bloc/sapi_bloc/sapi_bloc.dart';
@@ -11,13 +17,16 @@ import 'package:mbc_mobile/models/insiminasi_buatan_model.dart';
 import 'package:mbc_mobile/models/sapi_model.dart';
 import 'package:mbc_mobile/models/strow_model.dart';
 import 'package:mbc_mobile/utils/constants.dart';
+import 'package:mbc_mobile/utils/images.dart';
 import 'package:mbc_mobile/utils/size_config.dart';
 import 'package:mbc_mobile/utils/theme.dart';
 
 class InsiminasiBuatanFormBody extends StatefulWidget {
-  final InsiminasiBuatan insiminasiBuatan;
+  final String userId;
+  final String notifId;
+  final Sapi? sapi;
 
-  const InsiminasiBuatanFormBody({Key? key, required this.insiminasiBuatan})
+  const InsiminasiBuatanFormBody(Key? key, this.userId, this.notifId, this.sapi)
       : super(key: key);
 
   @override
@@ -32,18 +41,16 @@ class _InsiminasiBuatanFormBodyState extends State<InsiminasiBuatanFormBody> {
   late StrowBloc strowBloc;
   late InsiminasiBuatanBloc insiminasiBuatanBloc;
 
-  List<Sapi> listSapi = [];
-  List<Strow> listStrow = [];
-
-  int sapiDropdownValue = 0;
-  int strowDropdownValue = 0;
-
   int resSapiId = 0;
+  String resSapi = "Pilih Eartag Sapi";
   int resStrowId = 0;
+  String resStrow = "Pilih Straw";
   int resId = 0;
   String resTgl = "";
 
-  final _resDosis = new TextEditingController();
+  late File? _imageFile = null;
+  final ImagePicker _picker = ImagePicker();
+  late File? resFile = null;
 
   @override
   void initState() {
@@ -53,19 +60,13 @@ class _InsiminasiBuatanFormBodyState extends State<InsiminasiBuatanFormBody> {
     strowBloc = BlocProvider.of<StrowBloc>(context);
     insiminasiBuatanBloc = BlocProvider.of<InsiminasiBuatanBloc>(context);
 
-    sapiBloc.add(SapiFetchDataEvent());
+    sapiBloc.add(SapiFetchDataEvent(widget.userId));
     strowBloc.add(StrowFetchDataEvent());
 
-    if (widget.insiminasiBuatan.id != 0) {
-      resId = widget.insiminasiBuatan.id;
-
-      resSapiId = widget.insiminasiBuatan.sapiId;
-      resStrowId = widget.insiminasiBuatan.strowId;
-      resTgl = widget.insiminasiBuatan.waktuIb;
-      sapiDropdownValue = resSapiId;
-      strowDropdownValue = resStrowId;
-
-      _resDosis.text = widget.insiminasiBuatan.dosisIb.toString();
+    if (widget.sapi != null) {
+      print(widget.sapi!.eartag);
+      resSapi = widget.sapi!.eartag;
+      resSapiId = widget.sapi!.id;
     }
   }
 
@@ -94,36 +95,35 @@ class _InsiminasiBuatanFormBodyState extends State<InsiminasiBuatanFormBody> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Pilih Sapi"),
-                loadSapi(),
-                SizedBox(height: getProportionateScreenHeight(16)),
-                Text("Pilih Strow"),
-                loadStrow(),
-                SizedBox(height: getProportionateScreenHeight(16)),
-                Text("Pilih Tanggal"),
                 GestureDetector(
                   onTap: () {
-                    pickDate(context);
+                    showModalBottomSheet(
+                        context: context,
+                        builder: ((builder) => _bottomSheet()));
                   },
                   child: Container(
-                    width: double.infinity,
-                    height: getProportionateScreenHeight(50),
+                    height: 200,
+                    width: SizeConfig.screenWidth,
                     decoration: BoxDecoration(
-                        border: Border.all(color: kSecondaryColor, width: 1),
-                        borderRadius: BorderRadius.circular(10)),
-                    padding: EdgeInsets.symmetric(horizontal: 8),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        resTgl == "" ? "Silahkan Pilih Tanggal " : resTgl,
-                        style: TextStyle(fontSize: 16),
-                      ),
+                      color: kHintTextColor,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: _imageFile == null
+                          ? Image.asset(Images.plaeholderImage,
+                              fit: BoxFit.cover)
+                          : Image.file(File(_imageFile!.path)),
                     ),
                   ),
                 ),
                 SizedBox(height: getProportionateScreenHeight(16)),
-                Text("Dosis IB "),
-                buildFormField('Input Kode Batch', _resDosis),
+                Divider(),
+                loadSapi(),
+                SizedBox(height: getProportionateScreenHeight(8)),
+                loadStrow(),
+                SizedBox(height: getProportionateScreenHeight(8)),
+                Divider(),
                 SizedBox(height: getProportionateScreenHeight(36)),
                 GestureDetector(
                   onTap: () {
@@ -131,24 +131,28 @@ class _InsiminasiBuatanFormBodyState extends State<InsiminasiBuatanFormBody> {
                       _formKey.currentState!.save();
                       // if all are valid then go to success screen
                       KeyboardUtil.hideKeyboard(context);
-                      if (resSapiId != 0) {
-                        InsiminasiBuatan insiminasiBuatan = InsiminasiBuatan(
-                            id: resId,
-                            waktuIb: resTgl,
-                            sapiId: resSapiId,
-                            strowId: resStrowId,
-                            dosisIb: int.parse(_resDosis.text.trim()));
+                      if (resFile != null) {
+                        if (resSapiId != 0) {
+                          InsiminasiBuatan insiminasiBuatan = InsiminasiBuatan(
+                              id: resId,
+                              waktuIb: resTgl,
+                              sapiId: resSapiId,
+                              strowId: resStrowId,
+                              peternakId: 0,
+                              pendampingId: 0,
+                              tsrId: 0,
+                              foto: "",
+                              dosisIb: 0);
 
-                        resId == 0
-                            ? insiminasiBuatanBloc.add(
-                                InsiminasiBuatanStoreEvent(
-                                    insiminasiBuatan: insiminasiBuatan))
-                            : insiminasiBuatanBloc.add(
-                                InsiminasiBuatanUpdateEvent(
-                                    insiminasiBuatan: insiminasiBuatan));
+                          alertConfirm(insiminasiBuatan);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Pilih sapi dulu')));
+                        }
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Pilih sapi dulu')));
+                            const SnackBar(
+                                content: Text('Pilih Foto Dokumentasi')));
                       }
                     }
                   },
@@ -169,100 +173,189 @@ class _InsiminasiBuatanFormBodyState extends State<InsiminasiBuatanFormBody> {
       if (state is SapiInitialState || state is SapiLoadingState) {
         return buildLoading();
       } else if (state is SapiLoadedState) {
-        listSapi = [];
-        listSapi.add(Sapi(
-            id: 0,
-            jenisSapiId: 0,
-            peternakId: 0,
-            ertag: "ertag",
-            ertagInduk: "ertagInduk",
-            namaSapi: "Nama Sapi",
-            tanggalLahir: "tglLahir",
-            kelamin: "kelamin",
-            kondisiLahir: "kondisiLahir",
-            anakKe: "anakKe",
-            fotoDepan: "photoDepan",
-            fotoBelakang: "photoBelakang",
-            fotoKanan: "photoKanan",
-            fotoKiri: "photoKiri"));
-
-        listSapi.addAll(state.datas);
-        return buildSapi(listSapi);
+        return GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute<bool>(
+                builder: (BuildContext context) {
+                  return Scaffold(
+                    appBar: AppBar(
+                      title: Text("Pilih Eartag Sapi"),
+                    ),
+                    body: WillPopScope(
+                      onWillPop: () async {
+                        Navigator.pop(context, false);
+                        return false;
+                      },
+                      child: listSapiNew(state.datas),
+                    ),
+                  );
+                },
+              ));
+            },
+            child: sapiField());
       } else {
         return buildError(state.toString());
       }
     });
   }
 
-  Container buildSapi(List<Sapi> list) {
+  Container listSapiNew(List<Sapi> list) {
     return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-          border: Border.all(color: kSecondaryColor, width: 1),
-          borderRadius: BorderRadius.circular(10)),
-      padding: EdgeInsets.symmetric(horizontal: 8),
-      child: DropdownButton<int>(
-        value: sapiDropdownValue,
-        hint: Text("Pilih Sapi"),
-        items: list.map((Sapi value) {
-          return DropdownMenuItem<int>(
-            value: value.id,
-            child: new Text(value.namaSapi),
-          );
-        }).toList(),
-        onChanged: (newValue) {
-          print(newValue);
+      child: ListView.builder(
+          itemCount: list.length,
+          itemBuilder: (context, index) {
+            var data = list[index];
+            return Container(
+              decoration: BoxDecoration(),
+              padding: EdgeInsets.only(left: 16, right: 16, top: 16),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    resSapiId = data.id;
+                    resSapi = data.eartag;
+                  });
+                  Navigator.pop(context, false);
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      data.eartag,
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    Divider(),
+                  ],
+                ),
+              ),
+            );
+          }),
+    );
+  }
 
-          setState(() {
-            sapiDropdownValue = newValue!;
-            resSapiId = newValue;
-          });
-        },
+  Container sapiField() {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: kHintTextColor, width: 1),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            FontAwesomeIcons.list,
+            color: kHintTextColor,
+            size: 16,
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+              child: Text(
+            '$resSapi',
+            style: const TextStyle(fontSize: 16),
+          )),
+          const Icon(
+            Icons.arrow_forward_ios,
+            color: kHintTextColor,
+            size: 16,
+          ),
+        ],
       ),
     );
   }
 
   Widget loadStrow() {
     return BlocBuilder<StrowBloc, StrowState>(builder: (context, state) {
+      print('strow $state');
+
       if (state is StrowInitialState || state is StrowLoadingState) {
         return buildLoading();
       } else if (state is StrowLoadedState) {
-        listStrow = [];
-        listStrow.add(
-            Strow(id: 0, sapiId: 0, kodeBatch: "Pilih Strow", batch: "batch"));
-
-        listStrow.addAll(state.datas);
-        return buildStrow(listStrow);
+        return GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute<bool>(
+                builder: (BuildContext context) {
+                  return Scaffold(
+                    appBar: AppBar(
+                      title: Text("Pilih Straw"),
+                    ),
+                    body: WillPopScope(
+                      onWillPop: () async {
+                        Navigator.pop(context, false);
+                        return false;
+                      },
+                      child: listStrawNew(state.datas),
+                    ),
+                  );
+                },
+              ));
+            },
+            child: strawField());
       } else {
         return buildError(state.toString());
       }
     });
   }
 
-  Container buildStrow(List<Strow> list) {
+  Container listStrawNew(List<Strow> list) {
     return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-          border: Border.all(color: kSecondaryColor, width: 1),
-          borderRadius: BorderRadius.circular(10)),
-      padding: EdgeInsets.symmetric(horizontal: 8),
-      child: DropdownButton<int>(
-        value: strowDropdownValue,
-        hint: Text("Pilih Strow"),
-        items: list.map((Strow value) {
-          return DropdownMenuItem<int>(
-            value: value.id,
-            child: new Text(value.kodeBatch),
-          );
-        }).toList(),
-        onChanged: (newValue) {
-          print(newValue);
+      child: ListView.builder(
+          itemCount: list.length,
+          itemBuilder: (context, index) {
+            var data = list[index];
+            return Container(
+              decoration: BoxDecoration(),
+              padding: EdgeInsets.only(left: 16, right: 16, top: 16),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    resStrowId = data.id;
+                    resStrow = data.kodeBatch;
+                  });
+                  Navigator.pop(context, false);
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      data.kodeBatch,
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    Divider(),
+                  ],
+                ),
+              ),
+            );
+          }),
+    );
+  }
 
-          setState(() {
-            strowDropdownValue = newValue!;
-            resStrowId = newValue;
-          });
-        },
+  Container strawField() {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: kHintTextColor, width: 1),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            FontAwesomeIcons.list,
+            color: kHintTextColor,
+            size: 16,
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+              child: Text(
+            '$resStrow',
+            style: const TextStyle(fontSize: 16),
+          )),
+          const Icon(
+            Icons.arrow_forward_ios,
+            color: kHintTextColor,
+            size: 16,
+          ),
+        ],
       ),
     );
   }
@@ -280,21 +373,6 @@ class _InsiminasiBuatanFormBodyState extends State<InsiminasiBuatanFormBody> {
         decoration: inputForm(hint, hint));
   }
 
-  Future pickDate(BuildContext context) async {
-    final initialDate = DateTime.now();
-    final newDate = await showDatePicker(
-        context: context,
-        initialDate: initialDate,
-        firstDate: DateTime(DateTime.now().year - 5),
-        lastDate: DateTime(DateTime.now().year + 5));
-
-    if (newDate == null) return;
-
-    setState(() {
-      resTgl = DateFormat('yyyy/MM/dd').format(newDate);
-    });
-  }
-
   Widget buildLoading() {
     return Center(
       child: CircularProgressIndicator(),
@@ -306,5 +384,76 @@ class _InsiminasiBuatanFormBodyState extends State<InsiminasiBuatanFormBody> {
       child: Text(msg,
           style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
     );
+  }
+
+  Widget _bottomSheet() {
+    return Container(
+      height: 100,
+      margin: EdgeInsets.all(16),
+      child: Column(
+        children: [
+          Text("Choose Profile Photo"),
+          SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              FlatButton.icon(
+                  onPressed: () {
+                    _takePhotos(ImageSource.camera);
+                  },
+                  icon: Icon(Icons.camera),
+                  label: Text("Camera")),
+              FlatButton.icon(
+                  onPressed: () {
+                    _takePhotos(ImageSource.gallery);
+                  },
+                  icon: Icon(Icons.image),
+                  label: Text("Galery")),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _takePhotos(ImageSource source) async {
+    final pickedFile = await _picker.getImage(source: source);
+    if (pickedFile != null) {
+      File? cropped = await ImageCropper.cropImage(
+          sourcePath: pickedFile.path,
+          aspectRatio: CropAspectRatio(ratioX: 2, ratioY: 1),
+          compressQuality: 70,
+          compressFormat: ImageCompressFormat.jpg);
+
+      setState(() {
+        _imageFile = cropped!;
+        resFile = _imageFile!;
+      });
+    }
+  }
+
+  void alertConfirm(InsiminasiBuatan insiminasiBuatan) async {
+    ArtDialogResponse response = await ArtSweetAlert.show(
+        barrierDismissible: false,
+        context: context,
+        artDialogArgs: ArtDialogArgs(
+            denyButtonText: "Cancel",
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            confirmButtonText: "Yes, submit it",
+            type: ArtSweetAlertType.warning));
+
+    // ignore: unnecessary_null_comparison
+    if (response == null) {
+      return;
+    }
+
+    if (response.isTapConfirmButton) {
+      insiminasiBuatanBloc.add(InsiminasiBuatanStoreEvent(
+          file: resFile,
+          insiminasiBuatan: insiminasiBuatan,
+          notifId: widget.notifId));
+      return;
+    }
   }
 }

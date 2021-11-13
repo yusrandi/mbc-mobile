@@ -5,20 +5,18 @@ import 'package:mbc_mobile/config/api.dart';
 import 'package:mbc_mobile/models/peternak_model.dart';
 
 abstract class PeternakRepository {
-  Future<PeternakModel> peternakFetchData(int id);
+  Future<PeternakModel> peternakFetchData(String id);
   Future<PeternakModel> peternakStore(Peternak peternak);
   Future<PeternakModel> peternakUpdate(Peternak peternak);
-  Future<PeternakModel> peternakDelete(Peternak peternak);
-  
 }
 
 class PeternakRepositoryImpl implements PeternakRepository {
-
   static const String TAG = "PeternakRepositoryImpl";
 
   @override
-  Future<PeternakModel> peternakFetchData(int id) async{
-    var _response = await http.get(Uri.parse(Api.instance.peternakURL+"/"+id.toString()));
+  Future<PeternakModel> peternakFetchData(String id) async {
+    var _response = await http
+        .get(Uri.parse(Api.instance.peternakURL + "/" + id.toString()));
     print("$TAG, PeternakFetchData ${_response.statusCode}");
     if (_response.statusCode == 201) {
       var data = json.decode(_response.body);
@@ -34,15 +32,14 @@ class PeternakRepositoryImpl implements PeternakRepository {
   Future<PeternakModel> peternakStore(Peternak peternak) async {
     var _response = await http.post(Uri.parse(Api.instance.peternakURL), body: {
       "desa_id": peternak.desaId.toString(),
-      "user_id": peternak.userId.toString(),
-      "kode_peternak" : peternak.kodePeternak,
-      "nama_peternak" : peternak.namaPeternak,
-      "no_hp" : peternak.noHp,
-      "tgl_lahir" : peternak.jumlahAnggota,
-      "jumlah_anggota" : peternak.jumlahAnggota,
-      "luas_lahan" : peternak.luasLahan,
-      "kelompok" : peternak.kelompok,
-      });
+      "kode_peternak": peternak.kodePeternak,
+      "nama_peternak": peternak.namaPeternak,
+      "no_hp": peternak.noHp,
+      "tgl_lahir": peternak.jumlahAnggota,
+      "jumlah_anggota": peternak.jumlahAnggota,
+      "luas_lahan": peternak.luasLahan,
+      "kelompok": peternak.kelompokId,
+    });
     print("$TAG, PeternakStore ${_response.statusCode}");
     if (_response.statusCode == 201) {
       var data = json.decode(_response.body);
@@ -56,18 +53,17 @@ class PeternakRepositoryImpl implements PeternakRepository {
 
   @override
   Future<PeternakModel> peternakUpdate(Peternak peternak) async {
-    var url = Api.instance.peternakURL+"/"+peternak.id.toString();
+    var url = Api.instance.peternakURL + "/" + peternak.id.toString();
 
     var _response = await http.put(Uri.parse(url), body: {
       "desa_id": peternak.desaId.toString(),
-      "user_id": peternak.userId.toString(),
-      "kode_peternak" : peternak.kodePeternak,
-      "nama_peternak" : peternak.namaPeternak,
-      "no_hp" : peternak.noHp,
-      "tgl_lahir" : peternak.jumlahAnggota,
-      "jumlah_anggota" : peternak.jumlahAnggota,
-      "luas_lahan" : peternak.luasLahan,
-      "kelompok" : peternak.kelompok,
+      "kode_peternak": peternak.kodePeternak,
+      "nama_peternak": peternak.namaPeternak,
+      "no_hp": peternak.noHp,
+      "tgl_lahir": peternak.jumlahAnggota,
+      "jumlah_anggota": peternak.jumlahAnggota,
+      "luas_lahan": peternak.luasLahan,
+      "kelompok": peternak.kelompokId,
     });
     print("$TAG, peternakUpdate ${_response.statusCode}");
     if (_response.statusCode == 201) {
@@ -79,19 +75,4 @@ class PeternakRepositoryImpl implements PeternakRepository {
       throw Exception();
     }
   }
-
-  @override
-  Future<PeternakModel> peternakDelete(Peternak peternak) async{
-    var _response = await http.delete(Uri.parse(Api.instance.peternakURL+"/"+peternak.id.toString()+"/"+peternak.userId.toString()));
-    print("$TAG, peternakDelete ${_response.statusCode}");
-    if (_response.statusCode == 201) {
-      var data = json.decode(_response.body);
-      print("Data $data");
-      PeternakModel model = PeternakModel.fromJson(data);
-      return model;
-    } else {
-      throw Exception();
-    }
-  }
-  
 }

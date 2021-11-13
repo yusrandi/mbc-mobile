@@ -16,45 +16,31 @@ class PeternakBloc extends Bloc<PeternakEvent, PeternakState> {
         await Future.delayed(const Duration(milliseconds: 30));
         final data = await repository.peternakFetchData(event.userId);
         yield PeternakLoadedState(data.peternak);
-      } catch (e) {}
-    }else if (event is PeternakStoreEvent) {
+      } catch (e) {
+        yield PeternakErrorState(e.toString());
+      }
+    } else if (event is PeternakStoreEvent) {
       try {
         yield PeternakLoadingState();
         await Future.delayed(const Duration(milliseconds: 30));
         final data = await repository.peternakStore(event.peternak);
         if (data.responsecode == "1") {
-          yield PeternakSuccessState(data.responsemsg, data.peternak);
+          yield PeternakSuccessState(data.responsemsg);
         } else {
-          yield PeternakErrorState(data.responsemsg, data.peternak);
+          yield PeternakErrorState(data.responsemsg);
         }
       } catch (e) {}
-    }else if (event is PeternakUpdateEvent) {
+    } else if (event is PeternakUpdateEvent) {
       try {
         yield PeternakLoadingState();
         await Future.delayed(const Duration(milliseconds: 30));
         final data = await repository.peternakUpdate(event.peternak);
         if (data.responsecode == "1") {
-          yield PeternakSuccessState(data.responsemsg, data.peternak);
+          yield PeternakSuccessState(data.responsemsg);
         } else {
-          yield PeternakErrorState(data.responsemsg, data.peternak);
-        }
-      } catch (e) {}
-    }else if (event is PeternakDeleteEvent) {
-      try {
-        yield PeternakLoadingState();
-        await Future.delayed(const Duration(milliseconds: 30));
-        final data = await repository.peternakDelete(event.peternak);
-        if (data.responsecode == "1") {
-          yield PeternakSuccessState(data.responsemsg, data.peternak);
-        } else {
-          yield PeternakErrorState(data.responsemsg, data.peternak);
+          yield PeternakErrorState(data.responsemsg);
         }
       } catch (e) {}
     }
-
-
-
-
-
   }
 }

@@ -2,20 +2,23 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mbc_mobile/bloc/auth_bloc/authentication_bloc.dart';
 import 'package:mbc_mobile/components/custom_surfix_icon.dart';
 import 'package:mbc_mobile/components/default_button.dart';
 import 'package:mbc_mobile/components/form_error.dart';
 import 'package:mbc_mobile/config/shared_info.dart';
 import 'package:mbc_mobile/helper/keyboard.dart';
-import 'package:mbc_mobile/screens/home/home_screen.dart';
+import 'package:mbc_mobile/screens/new_home_page/home_page.dart';
+import 'package:mbc_mobile/screens/new_home_page/screen/home_screen.dart';
 import 'package:mbc_mobile/utils/constants.dart';
 import 'package:mbc_mobile/utils/size_config.dart';
 
 class SignForm extends StatefulWidget {
   final AuthenticationBloc authenticationBloc;
 
-  const SignForm({Key? key, required this.authenticationBloc}) : super(key: key);
+  const SignForm({Key? key, required this.authenticationBloc})
+      : super(key: key);
 
   @override
   _SignFormState createState() => _SignFormState();
@@ -23,28 +26,36 @@ class SignForm extends StatefulWidget {
 
 class _SignFormState extends State<SignForm> {
   final _formKey = GlobalKey<FormState>();
-  late String email;
-  late String password;
+  final _userEmail = TextEditingController();
+  final _userPass = TextEditingController();
+
   bool remember = false;
-  final List<String> errors = [];
-
-  void addError({required String error}) {
-    if (!errors.contains(error))
-      setState(() {
-        errors.add(error);
-      });
-  }
-
-  void removeError({required String error}) {
-    if (errors.contains(error))
-      setState(() {
-        errors.remove(error);
-      });
-  }
 
   late SharedInfo _sharedInfo;
 
   String resToken = "";
+
+  bool _passwordVisible = false;
+
+  String? validatePass(value) {
+    if (value.isEmpty) {
+      return kPassNullError;
+    } else if (value.length < 8) {
+      return kShortPassError;
+    } else {
+      return null;
+    }
+  }
+
+  String? validateEmail(value) {
+    if (value.isEmpty) {
+      return kEmailNullError;
+    } else if (!emailValidatorRegExp.hasMatch(value)) {
+      return kInvalidEmailError;
+    } else {
+      return null;
+    }
+  }
 
   @override
   void initState() {
@@ -70,32 +81,41 @@ class _SignFormState extends State<SignForm> {
           // ignore: unrelated_type_equality_checks
           if (state.user.responsecode == "1") {
             EasyLoading.showSuccess("Welcome");
-            _sharedInfo.sharedLoginInfo(
-                state.user.user!.id, state.user.user!.email, state.user.user!.name);
-            gotoAnotherPage(HomeScreen(authenticationBloc: widget.authenticationBloc, email: state.user.user!.name, id: state.user.user!.id));
+            _sharedInfo.sharedLoginInfo(state.user.user!.id,
+                state.user.user!.email, state.user.user!.name);
+            gotoAnotherPage(HomePage(userId: state.user.user!.id.toString()));
           } else {
             EasyLoading.showError(state.user.responsemsg);
           }
         } else if (state is AuthLoadingState ||
             state is AuthenticationInitialState) {
           EasyLoading.show(status: 'wait a second');
-        } else if (state is AuthLoggedInState) gotoAnotherPage(HomeScreen(authenticationBloc: widget.authenticationBloc, email: state.userEmail, id: state.userId));
+        } else if (state is AuthLoggedInState)
+          gotoAnotherPage(HomePage(userId: state.userId.toString()));
       },
       child: Form(
         key: _formKey,
         child: Column(
           children: [
-            buildEmailFormField(),
+            TextFormField(
+              controller: _userEmail,
+              validator: validateEmail,
+              cursorColor: kSecondaryColor,
+              decoration:
+                  buildInputDecoration("assets/icons/User.svg", "Email"),
+            ),
             SizedBox(height: getProportionateScreenHeight(16)),
-            buildPasswordFormField(),
-            SizedBox(height: getProportionateScreenHeight(30)),
-            FormError(errors: errors),
+            passwordField(),
             SizedBox(height: getProportionateScreenHeight(20)),
             GestureDetector(
               onTap: () {
                 if (_formKey.currentState!.validate()) {
                   _formKey.currentState!.save();
                   // if all are valid then go to success screen
+
+                  var email = _userEmail.text.trim();
+                  var password = _userPass.text.trim();
+
                   KeyboardUtil.hideKeyboard(context);
 
                   print("Email $email, Password $password, token $resToken");
@@ -121,78 +141,59 @@ class _SignFormState extends State<SignForm> {
     );
   }
 
-  TextFormField buildPasswordFormField() {
+  TextFormField passwordField() {
     return TextFormField(
-      obscureText: true,
-      onSaved: (newValue) => password = newValue!,
-      onChanged: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kPassNullError);
-        } else if (value.length >= 8) {
-          removeError(error: kShortPassError);
-        }
-        return null;
-      },
-      validator: (value) {
-        if (value!.isEmpty) {
-          addError(error: kPassNullError);
-          return "";
-        } else if (value.length < 8) {
-          addError(error: kShortPassError);
-          return "";
-        }
-        return null;
-      },
+      controller: _userPass,
+      validator: validatePass,
+      cursorColor: kSecondaryColor,
+      keyboardType: TextInputType.text,
+      obscureText: !_passwordVisible, //This will obscure text dynamically
       decoration: InputDecoration(
-        labelText: "Password",
-        hintText: "Enter your password",
-        // If  you are using latest version of flutter then lable text and hint text shown like this
-        // if you r using flutter less then 1.20.* then maybe this is not working properly
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Lock.svg"),
+        labelText: 'Password',
+        labelStyle: const TextStyle(color: Colors.black),
+
+        hintText: 'Enter your password',
+        // Here is key idea
+        suffixIcon: IconButton(
+          icon: Icon(
+            // Based on passwordVisible state choose the icon
+            _passwordVisible ? Icons.visibility : Icons.visibility_off,
+            color: kSecondaryColor,
+          ),
+          onPressed: () {
+            // Update the state i.e. toogle the state of passwordVisible variable
+            setState(() {
+              _passwordVisible = !_passwordVisible;
+            });
+          },
+        ),
+
+        prefixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Lock.svg"),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: Colors.green, width: 1),
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(
+            color: kSecondaryColor,
+            width: 1,
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(
+            color: kHintTextColor,
+            width: 1,
+          ),
+        ),
       ),
     );
   }
-
-  TextFormField buildEmailFormField() {
-    return TextFormField(
-      keyboardType: TextInputType.emailAddress,
-      onSaved: (newValue) => email = newValue!,
-      onChanged: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kEmailNullError);
-        } else if (emailValidatorRegExp.hasMatch(value)) {
-          removeError(error: kInvalidEmailError);
-        }
-        return null;
-      },
-      validator: (value) {
-        if (value!.isEmpty) {
-          addError(error: kEmailNullError);
-          return "";
-        } else if (!emailValidatorRegExp.hasMatch(value)) {
-          addError(error: kInvalidEmailError);
-          return "";
-        }
-        return null;
-      },
-      decoration: InputDecoration(
-        labelText: "Email",
-        hintText: "Enter your email",
-        // If  you are using latest version of flutter then lable text and hint text shown like this
-        // if you r using flutter less then 1.20.* then maybe this is not working properly
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/User.svg"),
-      ),
-    );
-  }
-
-
 
   void gotoAnotherPage(Widget widget) {
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
       return widget;
     }));
   }
-
 }

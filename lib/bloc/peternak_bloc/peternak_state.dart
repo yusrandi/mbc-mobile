@@ -15,20 +15,20 @@ class PeternakLoadingState extends PeternakState {
 
 class PeternakSuccessState extends PeternakState {
   final String msg;
-  final List<Peternak> datas;
-  PeternakSuccessState(this.msg, this.datas);
+  PeternakSuccessState(this.msg);
 
   @override
   List<Object> get props => [];
 }
+
 class PeternakErrorState extends PeternakState {
   final String msg;
-  final List<Peternak> datas;
-  PeternakErrorState(this.msg, this.datas);
+  PeternakErrorState(this.msg);
 
   @override
   List<Object> get props => [];
 }
+
 // ignore: must_be_immutable
 class PeternakLoadedState extends PeternakState {
   List<Peternak> datas;

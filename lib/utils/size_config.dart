@@ -7,6 +7,11 @@ class SizeConfig {
   static double defaultSize = 0;
   static Orientation orientation = Orientation.portrait;
 
+  static LinearGradient linearBlackTop = LinearGradient(
+      colors: [Colors.black.withOpacity(0.5), Colors.transparent],
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter);
+
   void init(BuildContext context) {
     _mediaQueryData = MediaQuery.of(context);
     screenWidth = _mediaQueryData.size.width;

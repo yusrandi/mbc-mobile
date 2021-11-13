@@ -2,12 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:mbc_mobile/utils/constants.dart';
 import 'package:mbc_mobile/utils/size_config.dart';
 
-
 class DefaultButton extends StatelessWidget {
-  const DefaultButton({
-    required this.text
-
-  });
+  const DefaultButton({required this.text});
   final String text;
 
   @override
@@ -17,13 +13,12 @@ class DefaultButton extends StatelessWidget {
       height: getProportionateScreenHeight(56),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [kSecondaryColor, kPrimaryColor],
-          )
-        ),
+            borderRadius: BorderRadius.circular(8),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [kSecondaryColor, kPrimaryColor],
+            )),
         child: Center(
           child: Text(
             text,

@@ -8,6 +8,9 @@ import 'package:mbc_mobile/screens/strow/strow_form_screen.dart';
 import 'package:mbc_mobile/utils/constants.dart';
 
 class StrowBody extends StatefulWidget {
+  final String userId;
+
+  const StrowBody({Key? key, required this.userId}) : super(key: key);
   @override
   _StrowBodyState createState() => _StrowBodyState();
 }
@@ -21,10 +24,9 @@ class _StrowBodyState extends State<StrowBody> {
 
     strowBloc = BlocProvider.of<StrowBloc>(context);
   }
-  
+
   @override
   Widget build(BuildContext context) {
-
     strowBloc.add(StrowFetchDataEvent());
 
     print("StrowBody");
@@ -89,12 +91,13 @@ class _StrowBodyState extends State<StrowBody> {
                             GestureDetector(
                                 onTap: () {
                                   Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              StrowFormScreen(strow: e))).then((value) => setState(() {}));
-
-                                              
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  StrowFormScreen(
+                                                      strow: e,
+                                                      userId: widget.userId)))
+                                      .then((value) => setState(() {}));
                                 },
                                 child:
                                     Icon(Icons.edit, color: kSecondaryColor)),

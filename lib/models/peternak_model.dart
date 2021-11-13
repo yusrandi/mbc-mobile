@@ -1,16 +1,18 @@
-import 'package:mbc_mobile/models/user_model.dart';
-
 class PeternakModel {
   String responsecode = "";
   String responsemsg = "";
   List<Peternak> peternak = [];
 
-  PeternakModel({required this.responsecode, required this.responsemsg, required this.peternak});
+  PeternakModel(
+      {required this.responsecode,
+      required this.responsemsg,
+      required this.peternak});
 
   PeternakModel.fromJson(Map<String, dynamic> json) {
     responsecode = json['responsecode'];
     responsemsg = json['responsemsg'];
     if (json['peternak'] != null) {
+      peternak = <Peternak>[];
       json['peternak'].forEach((v) {
         peternak.add(new Peternak.fromJson(v));
       });
@@ -36,25 +38,25 @@ class Peternak {
   String tglLahir = "";
   String jumlahAnggota = "";
   String luasLahan = "";
-  String kelompok = "";
+  int kelompokId = 0;
   int desaId = 0;
-  int userId = 0;
+  int pendampingId = 0;
   Desa? desa;
-  User? user;
+  Kelompok? kelompok;
 
   Peternak(
       {required this.id,
-        required this.kodePeternak,
-        required this.namaPeternak,
-        required this.noHp,
-        required this.tglLahir,
-        required this.jumlahAnggota,
-        required this.luasLahan,
-        required this.kelompok,
-        required this.desaId,
-        required this.userId,
-        this.desa,
-        this.user});
+      required this.kodePeternak,
+      required this.namaPeternak,
+      required this.noHp,
+      required this.tglLahir,
+      required this.jumlahAnggota,
+      required this.luasLahan,
+      required this.kelompokId,
+      required this.desaId,
+      required this.pendampingId,
+      this.desa,
+      this.kelompok});
 
   Peternak.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -64,11 +66,13 @@ class Peternak {
     tglLahir = json['tgl_lahir'];
     jumlahAnggota = json['jumlah_anggota'];
     luasLahan = json['luas_lahan'];
-    kelompok = json['kelompok'];
+    kelompokId = json['kelompok_id'];
     desaId = json['desa_id'];
-    userId = json['user_id'];
+    pendampingId = json['pendamping_id'];
     desa = json['desa'] != null ? new Desa.fromJson(json['desa']) : null;
-    user = json['user'] != null ? new User.fromJson(json['user']) : null;
+    kelompok = json['kelompok'] != null
+        ? new Kelompok.fromJson(json['kelompok'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -80,14 +84,14 @@ class Peternak {
     data['tgl_lahir'] = this.tglLahir;
     data['jumlah_anggota'] = this.jumlahAnggota;
     data['luas_lahan'] = this.luasLahan;
-    data['kelompok'] = this.kelompok;
+    data['kelompok_id'] = this.kelompokId;
     data['desa_id'] = this.desaId;
-    data['user_id'] = this.userId;
+    data['pendamping_id'] = this.pendampingId;
     if (this.desa != null) {
       data['desa'] = this.desa!.toJson();
     }
-    if (this.user != null) {
-      data['user'] = this.user!.toJson();
+    if (this.kelompok != null) {
+      data['kelompok'] = this.kelompok!.toJson();
     }
     return data;
   }
@@ -101,9 +105,9 @@ class Desa {
 
   Desa(
       {required this.id,
-        required this.kecamatanId,
-        required this.name,
-        this.kecamatan});
+      required this.kecamatanId,
+      required this.name,
+      this.kecamatan});
 
   Desa.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -134,9 +138,9 @@ class Kecamatan {
 
   Kecamatan(
       {required this.id,
-        required this.kabupatenId,
-        required this.name,
-        this.kabupaten});
+      required this.kabupatenId,
+      required this.name,
+      this.kabupaten});
 
   Kecamatan.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -178,4 +182,21 @@ class Kabupaten {
   }
 }
 
+class Kelompok {
+  int id = 0;
+  String name = "";
 
+  Kelompok({required this.id, required this.name});
+
+  Kelompok.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    name = json['name'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['name'] = this.name;
+    return data;
+  }
+}

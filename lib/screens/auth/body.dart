@@ -4,7 +4,6 @@ import 'package:mbc_mobile/screens/auth/sign_form.dart';
 import 'package:mbc_mobile/utils/size_config.dart';
 
 class Body extends StatefulWidget {
-
   final AuthenticationBloc authenticationBloc;
 
   const Body({Key? key, required this.authenticationBloc}) : super(key: key);
@@ -21,7 +20,7 @@ class _BodyState extends State<Body> {
         width: double.infinity,
         child: Padding(
           padding:
-          EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(20)),
+              EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(20)),
           child: SingleChildScrollView(
             child: Column(
               children: [
@@ -35,7 +34,7 @@ class _BodyState extends State<Body> {
                   ),
                 ),
                 Text(
-                  "Sign in with your email and password  \nor continue with social media",
+                  "Sign in with your email and password  \nto continue",
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: SizeConfig.screenHeight * 0.08),

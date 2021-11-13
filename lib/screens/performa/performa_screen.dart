@@ -10,13 +10,15 @@ import 'package:mbc_mobile/utils/constants.dart';
 
 class PerformaScreen extends StatelessWidget {
   static String routeName = "performa";
+  final String userId;
+
+  const PerformaScreen({Key? key, required this.userId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Data Performa",
-            style: TextStyle(color: Colors.white)),
+        title: Text("Data Performa", style: TextStyle(color: Colors.white)),
         flexibleSpace: Container(
           decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -26,12 +28,10 @@ class PerformaScreen extends StatelessWidget {
         ),
       ),
       body: BlocProvider(
-        create: (context) =>
-            PerformaBloc(PerformaRepositoryImpl()),
+        create: (context) => PerformaBloc(PerformaRepositoryImpl()),
         child: Container(
-            padding: EdgeInsets.all(16), child: PerformaBody()),
+            padding: EdgeInsets.all(8), child: PerformaBody(userId: userId)),
       ),
-      
     );
   }
 }

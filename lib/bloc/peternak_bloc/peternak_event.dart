@@ -4,7 +4,7 @@ import 'package:mbc_mobile/models/peternak_model.dart';
 abstract class PeternakEvent extends Equatable {}
 
 class PeternakFetchDataEvent extends PeternakEvent {
-  final int userId;
+  final String userId;
 
   PeternakFetchDataEvent({required this.userId});
 

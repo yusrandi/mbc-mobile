@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mbc_mobile/bloc/auth_bloc/authentication_bloc.dart';
+import 'package:mbc_mobile/firebase/fcm/notification_helper.dart';
+import 'package:mbc_mobile/firebase/services/local_notification_services.dart';
 import 'package:mbc_mobile/screens/auth/auth_screen.dart';
-import 'package:mbc_mobile/screens/home/home_screen.dart';
+import 'package:mbc_mobile/screens/new_home_page/home_page.dart';
 import 'package:mbc_mobile/utils/images.dart';
 import 'package:mbc_mobile/utils/size_config.dart';
 
@@ -20,6 +22,9 @@ class _BodyState extends State<Body> {
   void initState() {
     super.initState();
 
+    LocalNotificationServices.initialize(context);
+    NotificationHelper.init(context);
+
     _bloc = BlocProvider.of<AuthenticationBloc>(context);
     _bloc.add(CheckLoginEvent());
   }
@@ -28,7 +33,6 @@ class _BodyState extends State<Body> {
   Widget build(BuildContext context) {
     return BlocListener<AuthenticationBloc, AuthenticationState>(
       listener: (context, state) {
-
         loginAction(state);
       },
       child: Container(
@@ -86,9 +90,15 @@ class _BodyState extends State<Body> {
     await new Future.delayed(const Duration(seconds: 2));
 
     if (state is AuthLoggedOutState) {
-      gotoAnotherPage(AuthScreen(authenticationBloc: _bloc,));
+      gotoAnotherPage(AuthScreen(
+        authenticationBloc: _bloc,
+      ));
     } else if (state is AuthLoggedInState) {
-      gotoAnotherPage(HomeScreen(authenticationBloc: _bloc, email: state.userEmail.toString(), id: state.userId));
+      // gotoAnotherPage(HomeScreen(
+      //     authenticationBloc: _bloc,
+      //     email: state.userEmail.toString(),
+      //     id: state.userId));
+      gotoAnotherPage(HomePage(userId: state.userId.toString()));
     }
   }
 

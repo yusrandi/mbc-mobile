@@ -3,18 +3,25 @@ part of 'insiminasi_buatan_bloc.dart';
 abstract class InsiminasiBuatanEvent extends Equatable {}
 
 class InsiminasiBuatanFetchDataEvent extends InsiminasiBuatanEvent {
+  final String userId;
+  InsiminasiBuatanFetchDataEvent({required this.userId});
+
   @override
   List<Object> get props => [];
 }
 
 class InsiminasiBuatanStoreEvent extends InsiminasiBuatanEvent {
+  final File? file;
   final InsiminasiBuatan insiminasiBuatan;
+  final String notifId;
 
-  InsiminasiBuatanStoreEvent({required this.insiminasiBuatan});
+  InsiminasiBuatanStoreEvent(
+      {this.file, required this.insiminasiBuatan, required this.notifId});
 
   @override
   List<Object> get props => [];
 }
+
 class InsiminasiBuatanUpdateEvent extends InsiminasiBuatanEvent {
   final InsiminasiBuatan insiminasiBuatan;
 
@@ -23,6 +30,7 @@ class InsiminasiBuatanUpdateEvent extends InsiminasiBuatanEvent {
   @override
   List<Object> get props => [];
 }
+
 class InsiminasiBuatanDeleteEvent extends InsiminasiBuatanEvent {
   final InsiminasiBuatan insiminasiBuatan;
 

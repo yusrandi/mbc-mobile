@@ -10,8 +10,10 @@ import 'package:mbc_mobile/utils/constants.dart';
 
 class StrowFormScreen extends StatelessWidget {
   final Strow strow;
+  final String userId;
 
-  const StrowFormScreen({Key? key, required this.strow}) : super(key: key);
+  const StrowFormScreen({Key? key, required this.strow, required this.userId})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +32,7 @@ class StrowFormScreen extends StatelessWidget {
         create: (context) => StrowBloc(StrowRepositoryImpl()),
         child: BlocProvider(
             create: (context) => SapiBloc(SapiRepositoryImpl()),
-            child: StrowFormBody(strow: strow)),
+            child: StrowFormBody(strow: strow, userId: userId)),
       ),
     );
   }

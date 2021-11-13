@@ -14,22 +14,22 @@ class PeriksaKebuntinganLoadingState extends PeriksaKebuntinganState {
 
 class PeriksaKebuntinganSuccessState extends PeriksaKebuntinganState {
   final String msg;
-  final List<PeriksaKebuntingan> datas;
 
-  PeriksaKebuntinganSuccessState(this.msg, this.datas);
+  PeriksaKebuntinganSuccessState(this.msg);
 
   @override
   List<Object> get props => [];
 }
+
 class PeriksaKebuntinganErrorState extends PeriksaKebuntinganState {
   final String msg;
-  final List<PeriksaKebuntingan> datas;
 
-  PeriksaKebuntinganErrorState(this.msg, this.datas);
+  PeriksaKebuntinganErrorState(this.msg);
 
   @override
   List<Object> get props => [];
 }
+
 class PeriksaKebuntinganLoadedState extends PeriksaKebuntinganState {
   final List<PeriksaKebuntingan> datas;
   PeriksaKebuntinganLoadedState(this.datas);

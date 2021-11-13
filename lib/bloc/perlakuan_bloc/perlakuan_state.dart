@@ -14,22 +14,22 @@ class PerlakuanLoadingState extends PerlakuanState {
 
 class PerlakuanSuccessState extends PerlakuanState {
   final String msg;
-  final List<Perlakuan> datas;
 
-  PerlakuanSuccessState(this.msg, this.datas);
+  PerlakuanSuccessState(this.msg);
 
   @override
   List<Object> get props => [];
 }
+
 class PerlakuanErrorState extends PerlakuanState {
   final String msg;
-  final List<Perlakuan> datas;
 
-  PerlakuanErrorState(this.msg, this.datas);
+  PerlakuanErrorState(this.msg);
 
   @override
   List<Object> get props => [];
 }
+
 class PerlakuanLoadedState extends PerlakuanState {
   final List<Perlakuan> datas;
   PerlakuanLoadedState(this.datas);
