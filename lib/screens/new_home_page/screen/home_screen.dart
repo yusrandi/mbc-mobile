@@ -178,8 +178,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
               state.datas.notifikasi.forEach((e) {
                 print("tanggal ${e.tanggal}, now $dateNow");
-                if (e.tanggal == dateNow && e.status == "no") {
-                  listNotif.add(e);
+                if (e.status == "no") {
+                  var date1 =
+                      DateTime.parse(e.tanggal).millisecondsSinceEpoch.toInt();
+                  var date2 =
+                      DateTime.parse(dateNow).millisecondsSinceEpoch.toInt();
+
+                  if (e.role == "0" && date1 <= date2) {
+                    listNotif.add(e);
+                  } else {
+                    if (e.tanggal == dateNow) {
+                      listNotif.add(e);
+                    }
+                  }
                 }
               });
               return Column(

@@ -238,19 +238,19 @@ class _SapiFormBodyState extends State<SapiFormBody> {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
                                         const SnackBar(
-                                            content: Text('Pilih Foto Depan')),
+                                            content: Text('Pilih Foto Rumah')),
                                       );
                                     }
                                   } else {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
-                                          content: Text('Pilih Foto Depan')),
+                                          content: Text('Pilih Foto Peternak')),
                                     );
                                   }
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
-                                        content: Text('Pilih Foto Depan')),
+                                        content: Text('Pilih Foto Samping')),
                                   );
                                 }
                               } else {
@@ -262,7 +262,7 @@ class _SapiFormBodyState extends State<SapiFormBody> {
                             }
                           },
                           child: DefaultButton(
-                            text: "Submit",
+                            text: "Next",
                           ),
                         ),
                       ],

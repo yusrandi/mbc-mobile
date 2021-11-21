@@ -2,7 +2,7 @@ class Api {
   //* Creating instance constructor;
   static Api instance = Api();
   //* Base API URL
-  static const domain = "http://192.168.1.3/mbc-laravel";
+  static const domain = "http://192.168.1.2/mbc-laravel";
   // static const domain = "http://mbc.lp2muniprima.ac.id";
   static const baseURL = domain + "/public/api";
   // static const baseURL = domain + "/api";

@@ -24,6 +24,8 @@ import 'package:mbc_mobile/utils/theme.dart';
 
 import 'dart:io';
 
+import 'package:toggle_switch/toggle_switch.dart';
+
 class PeriksaKebuntinganFormBody extends StatefulWidget {
   final String userId;
   final String notifId;
@@ -67,6 +69,8 @@ class _PeriksaKebuntinganFormBodyState
   late File? _imageFile = null;
   final ImagePicker _picker = ImagePicker();
   late File? resFile = null;
+
+  bool isResult = true;
 
   @override
   void initState() {
@@ -145,6 +149,12 @@ class _PeriksaKebuntinganFormBodyState
                   SizedBox(height: getProportionateScreenHeight(8)),
                   loadHasil(),
                   SizedBox(height: getProportionateScreenHeight(16)),
+                  Text("Status IB / Kawin Alam ? ",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                  SizedBox(height: getProportionateScreenHeight(16)),
+                  switchTogle(),
+                  SizedBox(height: getProportionateScreenHeight(16)),
                   GestureDetector(
                     onTap: () {
                       KeyboardUtil.hideKeyboard(context);
@@ -161,6 +171,7 @@ class _PeriksaKebuntinganFormBodyState
                                     pendampingId: 0,
                                     tsrId: 0,
                                     waktuPk: "",
+                                    status: isResult ? "1" : "0",
                                     metodeId: resMetodeId,
                                     hasilId: resHasilId,
                                     foto: resFoto);
@@ -201,6 +212,35 @@ class _PeriksaKebuntinganFormBodyState
               )),
         ),
       ),
+    );
+  }
+
+  ToggleSwitch switchTogle() {
+    return ToggleSwitch(
+      minWidth: SizeConfig.screenWidth,
+      minHeight: 60,
+      cornerRadius: 8.0,
+      activeBgColors: [
+        [Colors.green[800]!],
+        [Colors.red[800]!]
+      ],
+      activeFgColor: Colors.white,
+      inactiveBgColor: Colors.grey,
+      inactiveFgColor: Colors.white,
+      initialLabelIndex: isResult ? 0 : 1,
+      totalSwitches: 2,
+      labels: const ['IB', 'Kawin Alam'],
+      radiusStyle: true,
+      onToggle: (index) {
+        print('switched to: $index');
+        setState(() {
+          if (index == 0) {
+            isResult = false;
+          } else {
+            isResult = true;
+          }
+        });
+      },
     );
   }
 
@@ -253,15 +293,19 @@ class _PeriksaKebuntinganFormBodyState
                   });
                   Navigator.pop(context, false);
                 },
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      data.metode,
-                      style: TextStyle(fontSize: 18),
-                    ),
-                    Divider(),
-                  ],
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        data.metode,
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      Divider(),
+                    ],
+                  ),
                 ),
               ),
             );
@@ -349,15 +393,19 @@ class _PeriksaKebuntinganFormBodyState
                   });
                   Navigator.pop(context, false);
                 },
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      data.hasil,
-                      style: TextStyle(fontSize: 18),
-                    ),
-                    Divider(),
-                  ],
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        data.hasil,
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      Divider(),
+                    ],
+                  ),
                 ),
               ),
             );
@@ -444,15 +492,19 @@ class _PeriksaKebuntinganFormBodyState
                   });
                   Navigator.pop(context, false);
                 },
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      data.eartag,
-                      style: TextStyle(fontSize: 18),
-                    ),
-                    Divider(),
-                  ],
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        data.eartag,
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      Divider(),
+                    ],
+                  ),
                 ),
               ),
             );

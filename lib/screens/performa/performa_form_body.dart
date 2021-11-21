@@ -182,6 +182,10 @@ class _PerformaFormBodyState extends State<PerformaFormBody> {
                 SizedBox(height: getProportionateScreenHeight(32)),
                 GestureDetector(
                   onTap: () {
+                    var berat = _resBerat.text.trim();
+                    if (berat == "") {
+                      berat = "0";
+                    }
                     if (_formKey.currentState!.validate()) {
                       _formKey.currentState!.save();
                       // if all are valid then go to success screen
@@ -196,7 +200,7 @@ class _PerformaFormBodyState extends State<PerformaFormBody> {
                               tsrId: 0,
                               tanggalPerforma: resTgl,
                               tinggiBadan: int.parse(_resTinggi.text.trim()),
-                              beratBadan: int.parse(_resBerat.text.trim()),
+                              beratBadan: int.parse(berat),
                               panjangBadan: int.parse(_resPanjang.text.trim()),
                               lingkarDada: int.parse(_resLingkar.text.trim()),
                               bsc: int.parse(resBSC),
@@ -320,7 +324,7 @@ class _PerformaFormBodyState extends State<PerformaFormBody> {
           itemCount: 5,
           itemBuilder: (context, index) {
             return Container(
-              padding: EdgeInsets.only(left: 16, right: 16, top: 16),
+              padding: EdgeInsets.only(left: 16, right: 16, top: 8),
               child: GestureDetector(
                 onTap: () {
                   setState(() {
@@ -328,15 +332,19 @@ class _PerformaFormBodyState extends State<PerformaFormBody> {
                   });
                   Navigator.pop(context, false);
                 },
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      (index + 1).toString(),
-                      style: TextStyle(fontSize: 18),
-                    ),
-                    Divider(),
-                  ],
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        (index + 1).toString(),
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      Divider(),
+                    ],
+                  ),
                 ),
               ),
             );
@@ -440,8 +448,10 @@ class _PerformaFormBodyState extends State<PerformaFormBody> {
         keyboardType: TextInputType.number,
         controller: controller,
         validator: (value) {
-          if (value!.isEmpty) {
-            return "gak boleh kosong bro";
+          if (controller != _resBerat) {
+            if (value!.isEmpty) {
+              return "gak boleh kosong bro";
+            }
           }
           return null;
         },
