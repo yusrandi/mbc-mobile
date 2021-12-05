@@ -16,7 +16,8 @@ class BirahiBloc extends Bloc<BirahiEvent, BirahiState> {
       try {
         yield BirahiLoadingState();
         await Future.delayed(const Duration(milliseconds: 30));
-        final data = await repository.birahiStore(event.notifId, event.result);
+        final data = await repository.birahiStore(
+            event.notifId, event.result, event.tanggal);
         if (data.responsecode == "1") {
           yield BirahiSuccessState(data.responsemsg);
         } else {

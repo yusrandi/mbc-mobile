@@ -38,6 +38,7 @@ class HomeCardPeternakBody extends StatefulWidget {
 }
 
 class _HomeCardPeternakBodyState extends State<HomeCardPeternakBody> {
+  var TAG = "HomeCardPeternak";
   late PeternakBloc peternakBloc;
 
   @override
@@ -53,7 +54,7 @@ class _HomeCardPeternakBodyState extends State<HomeCardPeternakBody> {
 
     return BlocBuilder<PeternakBloc, PeternakState>(
       builder: (context, state) {
-        print(state);
+        print("$TAG $state");
         if (state is PeternakLoadedState) {
           return buildList(state.datas, size);
         } else if (state is PeternakErrorState) {

@@ -42,7 +42,8 @@ class PeriksaKebuntingan {
   int pendampingId = 0;
   int tsrId = 0;
   String waktuPk = "";
-  String status = "";
+  int status = 0;
+  int reproduksi = 0;
   int metodeId = 0;
   int hasilId = 0;
   String foto = "";
@@ -58,6 +59,7 @@ class PeriksaKebuntingan {
       required this.tsrId,
       required this.waktuPk,
       required this.status,
+      required this.reproduksi,
       required this.metodeId,
       required this.hasilId,
       required this.foto,
@@ -73,6 +75,7 @@ class PeriksaKebuntingan {
     tsrId = json['tsr_id'];
     waktuPk = json['waktu_pk'];
     status = json['status'];
+    reproduksi = json['reproduksi'];
     metodeId = json['metode_id'];
     hasilId = json['hasil_id'];
     foto = json['foto'];
@@ -91,6 +94,7 @@ class PeriksaKebuntingan {
     data['tsr_id'] = this.tsrId;
     data['waktu_pk'] = this.waktuPk;
     data['status'] = this.status;
+    data['reproduksi'] = this.reproduksi;
     data['metode_id'] = this.metodeId;
     data['hasil_id'] = this.hasilId;
     data['foto'] = this.foto;

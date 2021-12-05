@@ -4,13 +4,11 @@ class MasterSapiModel {
   String responsecode = "";
   String responsemsg = "";
   List<JenisSapi> jenisSapi = [];
-  List<StatusSapi> statusSapi = [];
 
   MasterSapiModel(
       {required this.responsecode,
       required this.responsemsg,
-      required this.jenisSapi,
-      required this.statusSapi});
+      required this.jenisSapi});
 
   MasterSapiModel.fromJson(Map<String, dynamic> json) {
     responsecode = json['responsecode'];
@@ -19,12 +17,6 @@ class MasterSapiModel {
       jenisSapi = <JenisSapi>[];
       json['jenis_sapi'].forEach((v) {
         jenisSapi.add(new JenisSapi.fromJson(v));
-      });
-    }
-    if (json['status_sapi'] != null) {
-      statusSapi = <StatusSapi>[];
-      json['status_sapi'].forEach((v) {
-        statusSapi.add(new StatusSapi.fromJson(v));
       });
     }
   }
@@ -36,9 +28,7 @@ class MasterSapiModel {
     if (this.jenisSapi != null) {
       data['jenis_sapi'] = this.jenisSapi.map((v) => v.toJson()).toList();
     }
-    if (this.statusSapi != null) {
-      data['status_sapi'] = this.statusSapi.map((v) => v.toJson()).toList();
-    }
+
     return data;
   }
 }

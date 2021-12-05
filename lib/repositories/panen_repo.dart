@@ -37,8 +37,7 @@ class PanenRepositoryImpl implements PanenRepository {
     var request =
         new http.MultipartRequest("POST", Uri.parse(Api.instance.panenURL));
 
-    request.fields['frek_panen'] = panen.frekPanen.toString();
-    request.fields['ket_panen'] = panen.ketPanen.toString();
+    request.fields['status'] = panen.status.toString();
     request.fields['sapi_id'] = panen.sapiId.toString();
     request.fields['foto'] = panen.foto;
     request.fields['id'] = panen.id.toString();

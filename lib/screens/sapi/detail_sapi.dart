@@ -60,7 +60,8 @@ class _DetailSapiScreenState extends State<DetailSapiScreen> {
                           color: Colors.white, width: 16),
                     ),
                     SizedBox(width: getProportionateScreenWidth(16)),
-                    Text(widget.sapi.eartag,
+                    Text(
+                        'MBC-${widget.sapi.generasi}.${widget.sapi.anakKe}-${widget.sapi.eartagInduk}-${widget.sapi.eartag}',
                         style: TextStyle(
                             fontSize: 18,
                             color: Colors.white,
@@ -82,7 +83,8 @@ class _DetailSapiScreenState extends State<DetailSapiScreen> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(widget.sapi.eartag,
+                    Text(
+                        'MBC-${widget.sapi.generasi}.${widget.sapi.anakKe}-${widget.sapi.eartagInduk}-${widget.sapi.eartag}',
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.w600)),
                     Row(
@@ -129,14 +131,6 @@ class _DetailSapiScreenState extends State<DetailSapiScreen> {
                         children: [
                           Text("Jenis Sapi", style: TextStyle(fontSize: 16)),
                           Text(widget.sapi.jenisSapi!.jenis,
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.black)),
-                        ]),
-                    Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text("Status Sapi", style: TextStyle(fontSize: 16)),
-                          Text(widget.sapi.statusSapi!.status,
                               style:
                                   TextStyle(fontSize: 16, color: Colors.black)),
                         ]),

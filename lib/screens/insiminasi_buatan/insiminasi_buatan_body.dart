@@ -138,7 +138,7 @@ class _InsiminasiBuatanBodyState extends State<InsiminasiBuatanBody> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                data.sapi!.eartag,
+                                'MBC-${data.sapi!.generasi}.${data.sapi!.anakKe}-${data.sapi!.eartagInduk}-${data.sapi!.eartag}',
                                 style: TextStyle(
                                     fontSize: 18, color: kSecondaryColor),
                               ),

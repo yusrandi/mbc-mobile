@@ -24,7 +24,9 @@ class PeriksaKebuntinganBloc
         await Future.delayed(const Duration(milliseconds: 30));
         final data = await repository.periksaKebuntinganFetchData(event.id);
         yield PeriksaKebuntinganLoadedState(data.periksaKebuntingan);
-      } catch (e) {}
+      } catch (e) {
+        yield PeriksaKebuntinganErrorState(e.toString());
+      }
     } else if (event is PeriksaKebuntinganStoreEvent) {
       try {
         yield PeriksaKebuntinganLoadingState();

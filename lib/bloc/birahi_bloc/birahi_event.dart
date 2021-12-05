@@ -10,6 +10,7 @@ abstract class BirahiEvent extends Equatable {
 class BirahiStoreEvent extends BirahiEvent {
   final String result;
   final String notifId;
+  final String tanggal;
 
-  BirahiStoreEvent(this.result, this.notifId);
+  BirahiStoreEvent(this.result, this.notifId, this.tanggal);
 }

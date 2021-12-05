@@ -8,6 +8,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:mbc_mobile/bloc/auth_bloc/authentication_bloc.dart';
 import 'package:mbc_mobile/bloc/performa_bloc/performa_bloc.dart';
 import 'package:mbc_mobile/bloc/sapi_bloc/sapi_bloc.dart';
 import 'package:mbc_mobile/components/default_button.dart';
@@ -39,7 +40,6 @@ class _PerformaFormBodyState extends State<PerformaFormBody> {
   late PerformaBloc performaBloc;
 
   List<Sapi> listSapi = [];
-  int sapiDropdownValue = 0;
 
   int resSapiId = 0;
   String resSapi = "Pilih Eartag Sapi";
@@ -73,7 +73,8 @@ class _PerformaFormBodyState extends State<PerformaFormBody> {
     }
     if (widget.sapi != null) {
       print(widget.sapi!.eartag);
-      resSapi = widget.sapi!.eartag;
+      resSapi =
+          'MBC-${widget.sapi!.generasi}.${widget.sapi!.anakKe}-${widget.sapi!.eartagInduk}-${widget.sapi!.eartag}';
       resSapiId = widget.sapi!.id;
     }
   }
@@ -92,7 +93,8 @@ class _PerformaFormBodyState extends State<PerformaFormBody> {
           EasyLoading.showSuccess(state.msg);
           EasyLoading.dismiss();
 
-          Navigator.pop(context);
+          // Navigator.pop(context);
+          gotoHomePage(widget.userId);
         }
       },
       child: Container(
@@ -240,10 +242,11 @@ class _PerformaFormBodyState extends State<PerformaFormBody> {
           EasyLoading.showSuccess(state.msg);
           EasyLoading.dismiss();
 
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => HomePage(userId: widget.userId)));
+          Navigator.pop(context);
+          // Navigator.pushReplacement(
+          //     context,
+          //     MaterialPageRoute(
+          //         builder: (context) => HomePage(userId: widget.userId)));
         } else {
           EasyLoading.dismiss();
         }
@@ -298,7 +301,9 @@ class _PerformaFormBodyState extends State<PerformaFormBody> {
                 onTap: () {
                   setState(() {
                     resSapiId = data.id;
-                    resSapi = data.eartag;
+                    resSapi =
+                        'MBC-${data.generasi}.${data.anakKe}-${data.eartagInduk}-${data.eartag}';
+                    ;
                   });
                   Navigator.pop(context, false);
                 },
@@ -306,7 +311,7 @@ class _PerformaFormBodyState extends State<PerformaFormBody> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      data.eartag,
+                      'MBC-${data.generasi}.${data.anakKe}-${data.eartagInduk}-${data.eartag}',
                       style: TextStyle(fontSize: 18),
                     ),
                     Divider(),
@@ -411,34 +416,6 @@ class _PerformaFormBodyState extends State<PerformaFormBody> {
             size: 16,
           ),
         ],
-      ),
-    );
-  }
-
-  Container buildSapi(List<Sapi> list) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-          border: Border.all(color: kSecondaryColor, width: 1),
-          borderRadius: BorderRadius.circular(10)),
-      padding: EdgeInsets.symmetric(horizontal: 8),
-      child: DropdownButton<int>(
-        value: sapiDropdownValue,
-        hint: Text("Pilih Sapi"),
-        items: list.map((Sapi value) {
-          return DropdownMenuItem<int>(
-            value: value.id,
-            child: new Text(value.eartag),
-          );
-        }).toList(),
-        onChanged: (newValue) {
-          print(newValue);
-
-          setState(() {
-            sapiDropdownValue = newValue!;
-            resSapiId = newValue;
-          });
-        },
       ),
     );
   }
@@ -567,5 +544,16 @@ class _PerformaFormBodyState extends State<PerformaFormBody> {
 
       return;
     }
+  }
+
+  void gotoHomePage(String userId) {
+    AuthenticationBloc authenticationBloc =
+        BlocProvider.of<AuthenticationBloc>(context);
+
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+            builder: (context) =>
+                HomePage(userId: userId, bloc: authenticationBloc)),
+        (Route<dynamic> route) => false);
   }
 }

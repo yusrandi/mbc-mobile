@@ -6,6 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:mbc_mobile/bloc/auth_bloc/authentication_bloc.dart';
 import 'package:mbc_mobile/bloc/hasil_bloc/hasil_bloc.dart';
 import 'package:mbc_mobile/bloc/metode_bloc/metode_bloc.dart';
 import 'package:mbc_mobile/bloc/periksa_kebuntingan_bloc/periksa_kebuntingan_bloc.dart';
@@ -17,6 +18,7 @@ import 'package:mbc_mobile/models/hasil_model.dart';
 import 'package:mbc_mobile/models/metode_model.dart';
 import 'package:mbc_mobile/models/periksa_kebuntingan_model.dart';
 import 'package:mbc_mobile/models/sapi_model.dart';
+import 'package:mbc_mobile/screens/new_home_page/home_page.dart';
 import 'package:mbc_mobile/utils/constants.dart';
 import 'package:mbc_mobile/utils/images.dart';
 import 'package:mbc_mobile/utils/size_config.dart';
@@ -48,6 +50,7 @@ class _PeriksaKebuntinganFormBodyState
   late PeriksaKebuntinganBloc periksaKebuntinganBloc;
   late MetodeBloc metodeBloc;
   late HasilBloc hasilBloc;
+  late AuthenticationBloc authenticationBloc;
 
   String resTgl = "";
   String resFoto = "";
@@ -71,6 +74,7 @@ class _PeriksaKebuntinganFormBodyState
   late File? resFile = null;
 
   bool isResult = true;
+  bool isReproduksi = true;
 
   @override
   void initState() {
@@ -80,6 +84,7 @@ class _PeriksaKebuntinganFormBodyState
     hasilBloc = BlocProvider.of(context);
     sapiBloc = BlocProvider.of(context);
     periksaKebuntinganBloc = BlocProvider.of<PeriksaKebuntinganBloc>(context);
+    authenticationBloc = BlocProvider.of<AuthenticationBloc>(context);
 
     sapiBloc.add(SapiFetchDataEvent(widget.userId));
     metodeBloc.add(MetodeFetchDataEvent());
@@ -87,7 +92,9 @@ class _PeriksaKebuntinganFormBodyState
 
     if (widget.sapi != null) {
       print(widget.sapi!.eartag);
-      resSapi = widget.sapi!.eartag;
+      resSapi =
+          'MBC-${widget.sapi!.generasi}.${widget.sapi!.anakKe}-${widget.sapi!.eartagInduk}-${widget.sapi!.eartag}';
+
       resSapiId = widget.sapi!.id;
     }
   }
@@ -106,7 +113,8 @@ class _PeriksaKebuntinganFormBodyState
         } else if (state is PeriksaKebuntinganSuccessState) {
           EasyLoading.showSuccess(state.msg);
           EasyLoading.dismiss();
-          Navigator.pop(context);
+
+          gotoHomePage(widget.userId);
         }
 
         reinitField();
@@ -148,16 +156,30 @@ class _PeriksaKebuntinganFormBodyState
                   loadMetode(),
                   SizedBox(height: getProportionateScreenHeight(8)),
                   loadHasil(),
-                  SizedBox(height: getProportionateScreenHeight(16)),
-                  Text("Status IB / Kawin Alam ? ",
+                  Divider(),
+                  SizedBox(height: getProportionateScreenHeight(8)),
+                  Text("Reproduksi Normal / Unnormal ? ",
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                  switchTogleReproduksi(),
+                  Visibility(
+                      visible: resHasilId == 1 ? true : false,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: getProportionateScreenHeight(8)),
+                          Text("Status IB / Kawin Alam ? ",
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.w600)),
+                          switchTogle(),
+                        ],
+                      )),
                   SizedBox(height: getProportionateScreenHeight(16)),
-                  switchTogle(),
                   SizedBox(height: getProportionateScreenHeight(16)),
                   GestureDetector(
                     onTap: () {
                       KeyboardUtil.hideKeyboard(context);
+
                       if (_formKey.currentState!.validate()) {
                         _formKey.currentState!.save();
                         if (resFile != null) {
@@ -171,7 +193,8 @@ class _PeriksaKebuntinganFormBodyState
                                     pendampingId: 0,
                                     tsrId: 0,
                                     waktuPk: "",
-                                    status: isResult ? "1" : "0",
+                                    status: isResult ? 1 : 0,
+                                    reproduksi: isReproduksi ? 1 : 0,
                                     metodeId: resMetodeId,
                                     hasilId: resHasilId,
                                     foto: resFoto);
@@ -218,7 +241,7 @@ class _PeriksaKebuntinganFormBodyState
   ToggleSwitch switchTogle() {
     return ToggleSwitch(
       minWidth: SizeConfig.screenWidth,
-      minHeight: 60,
+      minHeight: 50,
       cornerRadius: 8.0,
       activeBgColors: [
         [Colors.green[800]!],
@@ -235,9 +258,38 @@ class _PeriksaKebuntinganFormBodyState
         print('switched to: $index');
         setState(() {
           if (index == 0) {
-            isResult = false;
-          } else {
             isResult = true;
+          } else {
+            isResult = false;
+          }
+        });
+      },
+    );
+  }
+
+  ToggleSwitch switchTogleReproduksi() {
+    return ToggleSwitch(
+      minWidth: SizeConfig.screenWidth,
+      minHeight: 50,
+      cornerRadius: 8.0,
+      activeBgColors: [
+        [Colors.green[800]!],
+        [Colors.red[800]!]
+      ],
+      activeFgColor: Colors.white,
+      inactiveBgColor: Colors.grey,
+      inactiveFgColor: Colors.white,
+      initialLabelIndex: isReproduksi ? 0 : 1,
+      totalSwitches: 2,
+      labels: const ['Normal', 'Unnormal'],
+      radiusStyle: true,
+      onToggle: (index) {
+        print('switched to: $index');
+        setState(() {
+          if (index == 0) {
+            isReproduksi = true;
+          } else {
+            isReproduksi = false;
           }
         });
       },
@@ -488,7 +540,8 @@ class _PeriksaKebuntinganFormBodyState
                 onTap: () {
                   setState(() {
                     resSapiId = data.id;
-                    resSapi = data.eartag;
+                    resSapi =
+                        'MBC-${data.generasi}.${data.anakKe}-${data.eartagInduk}-${data.eartag}';
                   });
                   Navigator.pop(context, false);
                 },
@@ -499,7 +552,7 @@ class _PeriksaKebuntinganFormBodyState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        data.eartag,
+                        'MBC-${data.generasi}.${data.anakKe}-${data.eartagInduk}-${data.eartag}',
                         style: TextStyle(fontSize: 18),
                       ),
                       Divider(),
@@ -682,5 +735,16 @@ class _PeriksaKebuntinganFormBodyState
           notifId: widget.notifId));
       return;
     }
+  }
+
+  void gotoHomePage(String userId) {
+    AuthenticationBloc authenticationBloc =
+        BlocProvider.of<AuthenticationBloc>(context);
+
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+            builder: (context) =>
+                HomePage(userId: userId, bloc: authenticationBloc)),
+        (Route<dynamic> route) => false);
   }
 }

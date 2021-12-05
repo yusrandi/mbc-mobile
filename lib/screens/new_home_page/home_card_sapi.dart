@@ -71,6 +71,7 @@ class _HomeCardSapiBodyState extends State<HomeCardSapiBody> {
         itemCount: list.length,
         itemBuilder: (context, index) {
           // print(Api.imageURL + '/' + list[index].fotoDepan);
+
           return GestureDetector(
             onTap: () {
               Navigator.push(
@@ -113,7 +114,7 @@ class _HomeCardSapiBodyState extends State<HomeCardSapiBody> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                list[index].eartag,
+                                'MBC-${list[index].generasi}.${list[index].anakKe}-${list[index].eartagInduk}-${list[index].eartag}',
                                 style: TextStyle(
                                     fontWeight: FontWeight.w900,
                                     color: Colors.black,

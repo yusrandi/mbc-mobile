@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'package:mbc_mobile/bloc/auth_bloc/authentication_bloc.dart';
 import 'package:mbc_mobile/bloc/laporan_bloc/laporan_bloc.dart';
 import 'package:mbc_mobile/bloc/user_bloc/user_bloc.dart';
+import 'package:mbc_mobile/screens/auth/auth_screen.dart';
 import 'package:mbc_mobile/utils/AppColor.dart';
 import 'package:mbc_mobile/utils/constants.dart';
 import 'package:mbc_mobile/utils/images.dart';
@@ -12,7 +14,10 @@ import 'package:mbc_mobile/utils/size_config.dart';
 
 class SettingScreen extends StatefulWidget {
   final String userId;
-  const SettingScreen({Key? key, required this.userId}) : super(key: key);
+  final AuthenticationBloc bloc;
+
+  const SettingScreen({Key? key, required this.userId, required this.bloc})
+      : super(key: key);
 
   @override
   _SettingScreenState createState() => _SettingScreenState();
@@ -37,147 +42,158 @@ class _SettingScreenState extends State<SettingScreen> {
     );
   }
 
-  BlocBuilder body() {
+  BlocListener body() {
     final size = MediaQuery.of(context).size;
 
-    return BlocBuilder<UserBloc, UserState>(
-      builder: (context, state) {
-        if (state is UserErrorState) {
-          return buildError(state.errorMsg);
-        } else if (state is UserSingleLoadedState) {
-          return Container(
-            child: SingleChildScrollView(
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                  Container(
-                    height: size.height * 0.30,
-                    child: Stack(
-                      children: [
-                        Positioned(
-                            right: 0,
-                            left: 0,
-                            top: 0,
-                            bottom: 0,
-                            child: Container(
-                              padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
-                              decoration: BoxDecoration(
-                                  gradient: kPrimaryGradientColor),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Expanded(
-                                      child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      RichText(
-                                          text: TextSpan(children: [
-                                        TextSpan(
-                                            text: "Hello\n",
-                                            style: TextStyle(
-                                                fontSize: 26,
-                                                fontWeight: FontWeight.bold)),
-                                        TextSpan(
-                                            text: '${state.user.name}',
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold)),
-                                      ])),
-                                      SizedBox(
-                                          height:
-                                              getProportionateScreenHeight(16)),
-                                      Row(
-                                        children: [
-                                          SvgPicture.asset(
-                                              "assets/icons/Cash.svg",
-                                              color: Colors.white),
-                                          SizedBox(width: 16),
-                                          cardKinerja()
-                                        ],
-                                      )
-                                    ],
-                                  )),
-                                  Image.asset(
-                                    Images.farmerImage,
-                                    width: 200,
-                                  ),
-                                ],
-                              ),
-                            )),
-                        Positioned(
-                            top: size.height * 0.30 - 20,
-                            right: 0,
-                            left: 0,
-                            bottom: 0,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(25),
-                                      topRight: Radius.circular(25))),
-                            )),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.all(16),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(state.user.email,
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.w600)),
-                        Text(state.user.hakAkses == "3" ? 'Pendamping' : 'TSR',
-                            style: TextStyle(fontSize: 14)),
-                        SizedBox(height: getProportionateScreenHeight(16)),
-                        Text("No Hp", style: titleDarkStyle),
-                        Container(
-                          width: size.width,
-                          padding: EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                              color: AppColor.primaryExtraSoft,
-                              borderRadius: BorderRadius.circular(16)),
-                          child: Text(state.user.noHp),
-                        ),
-                        SizedBox(height: getProportionateScreenHeight(16)),
-                        Text("Alamat Lengkap", style: titleDarkStyle),
-                        Container(
-                          width: size.width,
-                          padding: EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                              color: AppColor.primaryExtraSoft,
-                              borderRadius: BorderRadius.circular(16)),
-                          child: Text(state.user.alamat),
-                        ),
-                      ],
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      alertConfirm();
-                    },
-                    child: Container(
-                      margin: EdgeInsets.all(16),
-                      width: size.width,
-                      padding: EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(16)),
-                      child: Center(
-                          child: Text("Log Out",
-                              style: TextStyle(color: Colors.white))),
-                    ),
-                  ),
-                  SizedBox(height: getProportionateScreenHeight(80)),
-                ])),
-          );
-        } else {
-          return buildLoading();
+    return BlocListener<AuthenticationBloc, AuthenticationState>(
+      listener: (context, state) {
+        print(state);
+        if (state is AuthLoggedOutState) {
+          gotoAnotherPage(AuthScreen(authenticationBloc: widget.bloc), context);
         }
       },
+      child: BlocBuilder<UserBloc, UserState>(
+        builder: (context, state) {
+          if (state is UserErrorState) {
+            return buildError(state.errorMsg);
+          } else if (state is UserSingleLoadedState) {
+            return Container(
+              child: SingleChildScrollView(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                    Container(
+                      height: size.height * 0.30,
+                      child: Stack(
+                        children: [
+                          Positioned(
+                              right: 0,
+                              left: 0,
+                              top: 0,
+                              bottom: 0,
+                              child: Container(
+                                padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+                                decoration: BoxDecoration(
+                                    gradient: kPrimaryGradientColor),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Expanded(
+                                        child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        RichText(
+                                            text: TextSpan(children: [
+                                          TextSpan(
+                                              text: "Hello\n",
+                                              style: TextStyle(
+                                                  fontSize: 26,
+                                                  fontWeight: FontWeight.bold)),
+                                          TextSpan(
+                                              text: '${state.user.name}',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold)),
+                                        ])),
+                                        SizedBox(
+                                            height:
+                                                getProportionateScreenHeight(
+                                                    16)),
+                                        Row(
+                                          children: [
+                                            SvgPicture.asset(
+                                                "assets/icons/Cash.svg",
+                                                color: Colors.white),
+                                            SizedBox(width: 16),
+                                            cardKinerja()
+                                          ],
+                                        )
+                                      ],
+                                    )),
+                                    Image.asset(
+                                      Images.farmerImage,
+                                      width: 200,
+                                    ),
+                                  ],
+                                ),
+                              )),
+                          Positioned(
+                              top: size.height * 0.30 - 20,
+                              right: 0,
+                              left: 0,
+                              bottom: 0,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(25),
+                                        topRight: Radius.circular(25))),
+                              )),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.all(16),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(state.user.email,
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.w600)),
+                          Text(
+                              state.user.hakAkses == "3" ? 'Pendamping' : 'TSR',
+                              style: TextStyle(fontSize: 14)),
+                          SizedBox(height: getProportionateScreenHeight(16)),
+                          Text("No Hp", style: titleDarkStyle),
+                          Container(
+                            width: size.width,
+                            padding: EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                                color: AppColor.primaryExtraSoft,
+                                borderRadius: BorderRadius.circular(16)),
+                            child: Text(state.user.noHp),
+                          ),
+                          SizedBox(height: getProportionateScreenHeight(16)),
+                          Text("Alamat Lengkap", style: titleDarkStyle),
+                          Container(
+                            width: size.width,
+                            padding: EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                                color: AppColor.primaryExtraSoft,
+                                borderRadius: BorderRadius.circular(16)),
+                            child: Text(state.user.alamat),
+                          ),
+                        ],
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        alertConfirm();
+                      },
+                      child: Container(
+                        margin: EdgeInsets.all(16),
+                        width: size.width,
+                        padding: EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(16)),
+                        child: Center(
+                            child: Text("Log Out",
+                                style: TextStyle(color: Colors.white))),
+                      ),
+                    ),
+                    SizedBox(height: getProportionateScreenHeight(80)),
+                  ])),
+            );
+          } else {
+            return buildLoading();
+          }
+        },
+      ),
     );
   }
 
@@ -222,6 +238,12 @@ class _SettingScreenState extends State<SettingScreen> {
     );
   }
 
+  void gotoAnotherPage(Widget widget, BuildContext context) {
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+      return widget;
+    }));
+  }
+
   void alertConfirm() async {
     ArtDialogResponse response = await ArtSweetAlert.show(
         barrierDismissible: false,
@@ -239,6 +261,7 @@ class _SettingScreenState extends State<SettingScreen> {
     }
 
     if (response.isTapConfirmButton) {
+      widget.bloc.add(LogOutEvent());
       return;
     }
   }

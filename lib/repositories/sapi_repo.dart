@@ -55,7 +55,6 @@ class SapiRepositoryImpl implements SapiRepository {
     request.fields['kelamin'] = sapi.kelamin.toString();
     request.fields['kondisi_lahir'] = sapi.kondisiLahir.toString();
     request.fields['jenis_sapi_id'] = sapi.jenisSapiId.toString();
-    request.fields['status_sapi_id'] = sapi.statusSapiId.toString();
     request.fields['peternak_id'] = sapi.peternakId.toString();
 
     request.fields['tinggi_badan'] = performa.tinggiBadan.toString();

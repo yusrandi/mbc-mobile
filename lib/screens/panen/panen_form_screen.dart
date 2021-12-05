@@ -7,6 +7,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mbc_mobile/bloc/auth_bloc/authentication_bloc.dart';
 import 'package:mbc_mobile/bloc/panen_bloc/panen_bloc.dart';
 import 'package:mbc_mobile/bloc/sapi_bloc/sapi_bloc.dart';
 import 'package:mbc_mobile/components/default_button.dart';
@@ -15,6 +16,7 @@ import 'package:mbc_mobile/models/panen_model.dart';
 import 'package:mbc_mobile/models/sapi_model.dart';
 import 'package:mbc_mobile/repositories/panen_repo.dart';
 import 'package:mbc_mobile/repositories/sapi_repo.dart';
+import 'package:mbc_mobile/screens/new_home_page/home_page.dart';
 import 'package:mbc_mobile/utils/constants.dart';
 import 'package:mbc_mobile/utils/images.dart';
 import 'package:mbc_mobile/utils/size_config.dart';
@@ -74,13 +76,14 @@ class _PanenFormScreenBodyState extends State<PanenFormScreenBody> {
 
   int resSapiId = 0;
   String resSapi = "Pilih Eartag Sapi";
-  String resKetPanen = "Pilih Keterangan Panen";
+  String resKetPanen = "Pilih Status Panen";
 
   @override
   void initState() {
     if (widget.sapi != null) {
       print(widget.sapi!.eartag);
-      resSapi = widget.sapi!.eartag;
+      resSapi =
+          'MBC-${widget.sapi!.generasi}.${widget.sapi!.anakKe}-${widget.sapi!.eartagInduk}-${widget.sapi!.eartag}';
       resSapiId = widget.sapi!.id;
     }
 
@@ -104,7 +107,8 @@ class _PanenFormScreenBodyState extends State<PanenFormScreenBody> {
         } else if (state is PanenSuccessState) {
           EasyLoading.showSuccess(state.msg);
           EasyLoading.dismiss();
-          Navigator.pop(context);
+          // Navigator.pop(context);
+          gotoHomePage(widget.userId);
         }
       },
       child: Container(
@@ -147,7 +151,7 @@ class _PanenFormScreenBodyState extends State<PanenFormScreenBody> {
                         builder: (BuildContext context) {
                           return Scaffold(
                             appBar: AppBar(
-                              title: Text("Pilih Keterangan Panen"),
+                              title: Text("Pilih Status Panen"),
                             ),
                             body: WillPopScope(
                               onWillPop: () async {
@@ -244,7 +248,8 @@ class _PanenFormScreenBodyState extends State<PanenFormScreenBody> {
                 onTap: () {
                   setState(() {
                     resSapiId = data.id;
-                    resSapi = data.eartag;
+                    resSapi =
+                        'MBC-${data.generasi}.${data.anakKe}-${data.eartagInduk}-${data.eartag}';
                   });
                   Navigator.pop(context, false);
                 },
@@ -252,7 +257,7 @@ class _PanenFormScreenBodyState extends State<PanenFormScreenBody> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      data.eartag,
+                      'MBC-${data.generasi}.${data.anakKe}-${data.eartagInduk}-${data.eartag}',
                       style: TextStyle(fontSize: 18),
                     ),
                     Divider(),
@@ -441,12 +446,23 @@ class _PanenFormScreenBodyState extends State<PanenFormScreenBody> {
           peternakId: 0,
           pendampingId: 0,
           tsrId: 0,
-          frekPanen: "0",
-          ketPanen: resKetPanen,
-          tglPanen: "");
+          status: resKetPanen,
+          keterangan: resKetPanen,
+          tanggal: "");
       panenBloc.add(PanenStoreEvent(
           file: resFile, panen: panen, notifId: widget.notifId));
       return;
     }
+  }
+
+  void gotoHomePage(String userId) {
+    AuthenticationBloc authenticationBloc =
+        BlocProvider.of<AuthenticationBloc>(context);
+
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+            builder: (context) =>
+                HomePage(userId: userId, bloc: authenticationBloc)),
+        (Route<dynamic> route) => false);
   }
 }

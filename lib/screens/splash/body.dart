@@ -98,7 +98,10 @@ class _BodyState extends State<Body> {
       //     authenticationBloc: _bloc,
       //     email: state.userEmail.toString(),
       //     id: state.userId));
-      gotoAnotherPage(HomePage(userId: state.userId.toString()));
+      gotoAnotherPage(HomePage(
+        userId: state.userId.toString(),
+        bloc: _bloc,
+      ));
     }
   }
 

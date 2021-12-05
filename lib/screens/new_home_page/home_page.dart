@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:mbc_mobile/bloc/auth_bloc/authentication_bloc.dart';
 import 'package:mbc_mobile/bloc/laporan_bloc/laporan_bloc.dart';
 import 'package:mbc_mobile/bloc/notif_bloc/notifikasi_bloc.dart';
 import 'package:mbc_mobile/bloc/user_bloc/user_bloc.dart';
@@ -15,8 +16,10 @@ import 'package:mbc_mobile/utils/size_config.dart';
 
 class HomePage extends StatefulWidget {
   final String userId;
+  final AuthenticationBloc bloc;
 
-  const HomePage({Key? key, required this.userId}) : super(key: key);
+  const HomePage({Key? key, required this.userId, required this.bloc})
+      : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -40,7 +43,8 @@ class _HomePageState extends State<HomePage> {
                     ? HomeScreen(userId: widget.userId)
                     : _index == 1
                         ? TodoScreen(userId: widget.userId)
-                        : SettingScreen(userId: widget.userId),
+                        : SettingScreen(
+                            userId: widget.userId, bloc: widget.bloc),
                 Positioned(
                   bottom: 0,
                   left: getProportionateScreenWidth(30),

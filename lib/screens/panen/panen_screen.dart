@@ -137,11 +137,11 @@ class _PanenScreenBodyState extends State<PanenScreenBody> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                data.sapi!.eartag,
+                                'MBC-${data.sapi!.generasi}.${data.sapi!.anakKe}-${data.sapi!.eartagInduk}-${data.sapi!.eartag}',
                                 style: TextStyle(
                                     fontSize: 18, color: kSecondaryColor),
                               ),
-                              Text(data.tglPanen,
+                              Text(data.tanggal,
                                   style: TextStyle(
                                       fontSize: 14, color: kHintTextColor)),
                             ],
@@ -150,9 +150,8 @@ class _PanenScreenBodyState extends State<PanenScreenBody> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text("Panen Ke -",
-                                  style: TextStyle(fontSize: 14)),
-                              Text("${data.frekPanen}",
+                              Text("Status", style: TextStyle(fontSize: 14)),
+                              Text("${data.status}",
                                   style: TextStyle(
                                       fontSize: 14, color: Colors.red)),
                             ],
@@ -163,7 +162,7 @@ class _PanenScreenBodyState extends State<PanenScreenBody> {
                             children: [
                               Text("Keterangan Panen",
                                   style: TextStyle(fontSize: 14)),
-                              Text("${data.ketPanen}",
+                              Text("${data.keterangan}",
                                   style: TextStyle(
                                       fontSize: 14, color: Colors.red)),
                             ],

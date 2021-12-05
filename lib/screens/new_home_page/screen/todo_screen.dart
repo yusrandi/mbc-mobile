@@ -173,7 +173,9 @@ class _TodoScreenState extends State<TodoScreen> {
                                       context);
                                 } else if (data.role == "0") {
                                   gotoAnotherPage(
-                                      FormBirahiScreen(notif: data), context);
+                                      FormBirahiScreen(
+                                          notif: data, userId: widget.userId),
+                                      context);
                                 } else if (data.role == "1") {
                                   gotoAnotherPage(
                                       PeriksaKebuntinganFormScreen(
@@ -223,14 +225,15 @@ class _TodoScreenState extends State<TodoScreen> {
                                   ),
                                   Expanded(
                                       child: Container(
-                                    height: getProportionateScreenHeight(130),
+                                    // height: getProportionateScreenHeight(130),
                                     margin: EdgeInsets.only(left: 5),
                                     padding: EdgeInsets.only(left: 5),
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(data.sapi!.eartag,
+                                        Text(
+                                            'MBC-${data.sapi!.generasi}.${data.sapi!.anakKe}-${data.sapi!.eartagInduk}-${data.sapi!.eartag}',
                                             style: TextStyle(
                                                 color: Colors.black54,
                                                 fontSize: 18,

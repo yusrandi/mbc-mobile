@@ -8,6 +8,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:mbc_mobile/bloc/auth_bloc/authentication_bloc.dart';
 import 'package:mbc_mobile/bloc/insiminasi_buatan_bloc/insiminasi_buatan_bloc.dart';
 import 'package:mbc_mobile/bloc/sapi_bloc/sapi_bloc.dart';
 import 'package:mbc_mobile/bloc/strow_bloc/strow_bloc.dart';
@@ -16,6 +17,7 @@ import 'package:mbc_mobile/helper/keyboard.dart';
 import 'package:mbc_mobile/models/insiminasi_buatan_model.dart';
 import 'package:mbc_mobile/models/sapi_model.dart';
 import 'package:mbc_mobile/models/strow_model.dart';
+import 'package:mbc_mobile/screens/new_home_page/home_page.dart';
 import 'package:mbc_mobile/utils/constants.dart';
 import 'package:mbc_mobile/utils/images.dart';
 import 'package:mbc_mobile/utils/size_config.dart';
@@ -65,7 +67,8 @@ class _InsiminasiBuatanFormBodyState extends State<InsiminasiBuatanFormBody> {
 
     if (widget.sapi != null) {
       print(widget.sapi!.eartag);
-      resSapi = widget.sapi!.eartag;
+      resSapi =
+          'MBC-${widget.sapi!.generasi}.${widget.sapi!.anakKe}-${widget.sapi!.eartagInduk}-${widget.sapi!.eartag}';
       resSapiId = widget.sapi!.id;
     }
   }
@@ -84,7 +87,9 @@ class _InsiminasiBuatanFormBodyState extends State<InsiminasiBuatanFormBody> {
         } else if (state is InsiminasiBuatanSuccessState) {
           EasyLoading.showSuccess(state.msg);
           EasyLoading.dismiss();
-          Navigator.pop(context, true);
+          // Navigator.pop(context, true);
+
+          gotoHomePage(widget.userId);
         }
       },
       child: Container(
@@ -212,7 +217,8 @@ class _InsiminasiBuatanFormBodyState extends State<InsiminasiBuatanFormBody> {
                 onTap: () {
                   setState(() {
                     resSapiId = data.id;
-                    resSapi = data.eartag;
+                    resSapi =
+                        'MBC-${data.generasi}.${data.anakKe}-${data.eartagInduk}-${data.eartag}';
                   });
                   Navigator.pop(context, false);
                 },
@@ -220,7 +226,7 @@ class _InsiminasiBuatanFormBodyState extends State<InsiminasiBuatanFormBody> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      data.eartag,
+                      'MBC-${data.generasi}.${data.anakKe}-${data.eartagInduk}-${data.eartag}',
                       style: TextStyle(fontSize: 18),
                     ),
                     Divider(),
@@ -455,5 +461,16 @@ class _InsiminasiBuatanFormBodyState extends State<InsiminasiBuatanFormBody> {
           notifId: widget.notifId));
       return;
     }
+  }
+
+  void gotoHomePage(String userId) {
+    AuthenticationBloc authenticationBloc =
+        BlocProvider.of<AuthenticationBloc>(context);
+
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+            builder: (context) =>
+                HomePage(userId: userId, bloc: authenticationBloc)),
+        (Route<dynamic> route) => false);
   }
 }

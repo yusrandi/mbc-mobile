@@ -8,7 +8,9 @@ import 'package:mbc_mobile/utils/constants.dart';
 
 class FormBirahiScreen extends StatelessWidget {
   final Notifikasi notif;
-  const FormBirahiScreen({Key? key, required this.notif}) : super(key: key);
+  final String userId;
+  const FormBirahiScreen({Key? key, required this.notif, required this.userId})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +27,7 @@ class FormBirahiScreen extends StatelessWidget {
         ),
         body: BlocProvider(
           create: (context) => BirahiBloc(BirahiRepositoryImpl()),
-          child: FormBirahiBody(notif: notif),
+          child: FormBirahiBody(notif: notif, userId: userId),
         ));
   }
 }

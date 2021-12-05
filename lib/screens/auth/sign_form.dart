@@ -83,7 +83,9 @@ class _SignFormState extends State<SignForm> {
             EasyLoading.showSuccess("Welcome");
             _sharedInfo.sharedLoginInfo(state.user.user!.id,
                 state.user.user!.email, state.user.user!.name);
-            gotoAnotherPage(HomePage(userId: state.user.user!.id.toString()));
+            gotoAnotherPage(HomePage(
+                userId: state.user.user!.id.toString(),
+                bloc: widget.authenticationBloc));
           } else {
             EasyLoading.showError(state.user.responsemsg);
           }
@@ -91,7 +93,9 @@ class _SignFormState extends State<SignForm> {
             state is AuthenticationInitialState) {
           EasyLoading.show(status: 'wait a second');
         } else if (state is AuthLoggedInState)
-          gotoAnotherPage(HomePage(userId: state.userId.toString()));
+          gotoAnotherPage(HomePage(
+              userId: state.userId.toString(),
+              bloc: widget.authenticationBloc));
       },
       child: Form(
         key: _formKey,

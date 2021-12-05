@@ -1,4 +1,5 @@
 import 'package:art_sweetalert/art_sweetalert.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -9,6 +10,7 @@ import 'package:mbc_mobile/config/api.dart';
 import 'package:mbc_mobile/models/periksa_kebuntingan_model.dart';
 import 'package:mbc_mobile/screens/periksa_kebuntingan/form/periksa_kebuntingan_form_screen.dart';
 import 'package:mbc_mobile/utils/constants.dart';
+import 'package:mbc_mobile/utils/images.dart';
 import 'package:mbc_mobile/utils/size_config.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -40,6 +42,8 @@ class _PeriksaKebuntinganBodyState extends State<PeriksaKebuntinganBody> {
             builder: (context, state) {
           EasyLoading.dismiss();
 
+          print(state);
+
           if (state is PeriksaKebuntinganInitialState ||
               state is PeriksaKebuntinganLoadingState) {
             return _buildLoading();
@@ -48,7 +52,7 @@ class _PeriksaKebuntinganBodyState extends State<PeriksaKebuntinganBody> {
           } else if (state is PeriksaKebuntinganErrorState) {
             return Center(child: Text(state.msg));
           } else {
-            return _buildLoading();
+            return Center(child: Text(state.toString()));
           }
         }),
         Positioned(
@@ -127,16 +131,20 @@ class _PeriksaKebuntinganBodyState extends State<PeriksaKebuntinganBody> {
                       child: Column(
                         children: [
                           Container(
-                            height: 150,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                  fit: BoxFit.cover,
-                                  image: NetworkImage(
-                                      Api.imageURL + '/' + list[index].foto)),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10.0)),
-                            ),
-                          ),
+                              height: 150,
+                              width: double.infinity,
+                              child: FadeInImage(
+                                image: NetworkImage(list[index].foto == "images"
+                                    ? "hahaha"
+                                    : Api.imageURL + '/' + list[index].foto),
+                                placeholder: AssetImage(Images.plaeholderImage),
+                                imageErrorBuilder:
+                                    (context, error, stackTrace) {
+                                  return Image.asset(Images.plaeholderImage,
+                                      fit: BoxFit.fill);
+                                },
+                                fit: BoxFit.fill,
+                              )),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Column(
@@ -148,7 +156,7 @@ class _PeriksaKebuntinganBodyState extends State<PeriksaKebuntinganBody> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      data.sapi!.eartag,
+                                      'MBC-${data.sapi!.generasi}.${data.sapi!.anakKe}-${data.sapi!.eartagInduk}-${data.sapi!.eartag}',
                                       style: TextStyle(
                                           fontSize: 18, color: kSecondaryColor),
                                     ),

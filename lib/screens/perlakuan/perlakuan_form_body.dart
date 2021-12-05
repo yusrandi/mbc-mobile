@@ -8,6 +8,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:mbc_mobile/bloc/auth_bloc/authentication_bloc.dart';
 import 'package:mbc_mobile/bloc/hormon_bloc/hormon_bloc.dart';
 import 'package:mbc_mobile/bloc/obat_bloc/obat_bloc.dart';
 import 'package:mbc_mobile/bloc/perlakuan_bloc/perlakuan_bloc.dart';
@@ -91,7 +92,9 @@ class _PerlakuanFormBodyState extends State<PerlakuanFormBody> {
 
     if (widget.sapi != null) {
       print(widget.sapi!.eartag);
-      resSapi = widget.sapi!.eartag;
+      resSapi =
+          'MBC-${widget.sapi!.generasi}.${widget.sapi!.anakKe}-${widget.sapi!.eartagInduk}-${widget.sapi!.eartag}';
+
       resSapiId = widget.sapi!.id;
     }
   }
@@ -110,10 +113,7 @@ class _PerlakuanFormBodyState extends State<PerlakuanFormBody> {
           EasyLoading.showSuccess(state.msg);
           EasyLoading.dismiss();
 
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) {
-            return HomePage(userId: widget.userId);
-          }));
+          gotoHomePage(widget.userId);
         }
       },
       child: Container(
@@ -339,7 +339,8 @@ class _PerlakuanFormBodyState extends State<PerlakuanFormBody> {
                 onTap: () {
                   setState(() {
                     resSapiId = data.id;
-                    resSapi = data.eartag;
+                    resSapi =
+                        'MBC-${data.generasi}.${data.anakKe}-${data.eartagInduk}-${data.eartag}';
                   });
                   Navigator.pop(context, false);
                 },
@@ -347,7 +348,7 @@ class _PerlakuanFormBodyState extends State<PerlakuanFormBody> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      data.eartag,
+                      'MBC-${data.generasi}.${data.anakKe}-${data.eartagInduk}-${data.eartag}',
                       style: TextStyle(fontSize: 18),
                     ),
                     Divider(),
@@ -866,5 +867,16 @@ class _PerlakuanFormBodyState extends State<PerlakuanFormBody> {
           notifikasiId: widget.notifikasiId));
       return;
     }
+  }
+
+  void gotoHomePage(String userId) {
+    AuthenticationBloc authenticationBloc =
+        BlocProvider.of<AuthenticationBloc>(context);
+
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+            builder: (context) =>
+                HomePage(userId: userId, bloc: authenticationBloc)),
+        (Route<dynamic> route) => false);
   }
 }

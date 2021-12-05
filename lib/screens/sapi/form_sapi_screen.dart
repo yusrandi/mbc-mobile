@@ -204,7 +204,6 @@ class _SapiFormBodyState extends State<SapiFormBody> {
                                       Sapi resultSapi = Sapi(
                                           id: widget.sapi.id,
                                           jenisSapiId: resJenisSapiId,
-                                          statusSapiId: resStatusSapiId,
                                           eartag: "",
                                           eartagInduk: eartagInduk,
                                           namaSapi: namaSapi,
@@ -213,6 +212,7 @@ class _SapiFormBodyState extends State<SapiFormBody> {
                                               isJantan ? 'Jantan' : 'Betina',
                                           kondisiLahir: resKondisiLahir,
                                           anakKe: "0",
+                                          generasi: "0",
                                           fotoDepan: "",
                                           fotoSamping: "",
                                           fotoPeternak: "",
@@ -448,26 +448,6 @@ class _SapiFormBodyState extends State<SapiFormBody> {
                   },
                   child: jenisSapiField()),
               SizedBox(height: getProportionateScreenHeight(8)),
-              GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute<bool>(
-                      builder: (BuildContext context) {
-                        return Scaffold(
-                          appBar: AppBar(
-                            title: Text("Status Sapi"),
-                          ),
-                          body: WillPopScope(
-                            onWillPop: () async {
-                              Navigator.pop(context, false);
-                              return false;
-                            },
-                            child: listStatusSapi(state.model.statusSapi),
-                          ),
-                        );
-                      },
-                    ));
-                  },
-                  child: statusSapiField()),
             ],
           );
         } else {
@@ -509,37 +489,6 @@ class _SapiFormBodyState extends State<SapiFormBody> {
     );
   }
 
-  Container statusSapiField() {
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: kHintTextColor, width: 1),
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: Row(
-        children: [
-          const Icon(
-            FontAwesomeIcons.list,
-            color: kHintTextColor,
-            size: 16,
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-              child: Text(
-            '$resStatusSapi',
-            style: const TextStyle(fontSize: 16),
-          )),
-          const Icon(
-            Icons.arrow_forward_ios,
-            color: kHintTextColor,
-            size: 16,
-          ),
-        ],
-      ),
-    );
-  }
-
   Container listJenisSapi(List<JenisSapi> list) {
     return Container(
       child: ListView.builder(
@@ -561,38 +510,6 @@ class _SapiFormBodyState extends State<SapiFormBody> {
                   children: [
                     Text(
                       data.jenis,
-                      style: TextStyle(fontSize: 18),
-                    ),
-                    Divider(),
-                  ],
-                ),
-              ),
-            );
-          }),
-    );
-  }
-
-  Container listStatusSapi(List<StatusSapi> list) {
-    return Container(
-      child: ListView.builder(
-          itemCount: list.length,
-          itemBuilder: (context, index) {
-            var data = list[index];
-            return Container(
-              padding: EdgeInsets.only(left: 16, right: 16, top: 16),
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    resStatusSapiId = data.id;
-                    resStatusSapi = data.status + ' , ' + data.ketStatus;
-                  });
-                  Navigator.pop(context, false);
-                },
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      data.status + ' , ' + data.ketStatus,
                       style: TextStyle(fontSize: 18),
                     ),
                     Divider(),

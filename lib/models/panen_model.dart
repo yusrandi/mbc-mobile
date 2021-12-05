@@ -38,9 +38,9 @@ class Panen {
   int peternakId = 0;
   int pendampingId = 0;
   int tsrId = 0;
-  String frekPanen = "";
-  String ketPanen = "";
-  String tglPanen = "";
+  String status = "";
+  String keterangan = "";
+  String tanggal = "";
   String foto = "";
   Sapi? sapi;
 
@@ -50,9 +50,9 @@ class Panen {
       required this.peternakId,
       required this.pendampingId,
       required this.tsrId,
-      required this.frekPanen,
-      required this.ketPanen,
-      required this.tglPanen,
+      required this.status,
+      required this.keterangan,
+      required this.tanggal,
       required this.foto,
       this.sapi});
 
@@ -62,9 +62,9 @@ class Panen {
     peternakId = json['peternak_id'];
     pendampingId = json['pendamping_id'];
     tsrId = json['tsr_id'];
-    frekPanen = json['frek_panen'];
-    ketPanen = json['ket_panen'];
-    tglPanen = json['tgl_panen'];
+    status = json['status'];
+    keterangan = json['keterangan'];
+    tanggal = json['tanggal'];
     foto = json['foto'];
     sapi = json['sapi'] != null ? new Sapi.fromJson(json['sapi']) : null;
   }
@@ -76,9 +76,9 @@ class Panen {
     data['peternak_id'] = this.peternakId;
     data['pendamping_id'] = this.pendampingId;
     data['tsr_id'] = this.tsrId;
-    data['frek_panen'] = this.frekPanen;
-    data['ket_panen'] = this.ketPanen;
-    data['tgl_panen'] = this.tglPanen;
+    data['status'] = this.status;
+    data['keterangan'] = this.keterangan;
+    data['tanggal'] = this.tanggal;
     data['foto'] = this.foto;
     if (this.sapi != null) {
       data['sapi'] = this.sapi!.toJson();

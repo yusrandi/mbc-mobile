@@ -50,14 +50,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
     userBloc.add(UserFetchSingleData(id: widget.userId));
 
+    laporanBloc.add(LaporanFetchDataEvent(widget.userId));
+    notifikasiBloc.add(NotifFetchByUserId(id: int.parse(widget.userId)));
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    laporanBloc.add(LaporanFetchDataEvent(widget.userId));
-    notifikasiBloc.add(NotifFetchByUserId(id: int.parse(widget.userId)));
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: body(),
@@ -172,12 +172,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
         BlocBuilder<NotifikasiBloc, NotifikasiState>(
           builder: (context, state) {
-            print("NotifikasiBloc $state");
             if (state is NotifikasiSuccessState) {
               listNotif = [];
 
               state.datas.notifikasi.forEach((e) {
-                print("tanggal ${e.tanggal}, now $dateNow");
                 if (e.status == "no") {
                   var date1 =
                       DateTime.parse(e.tanggal).millisecondsSinceEpoch.toInt();
@@ -341,7 +339,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   null, widget.userId, data.sapi, data.id.toString()),
               context);
         } else if (data.role == "0") {
-          gotoAnotherPage(FormBirahiScreen(notif: data), context);
+          gotoAnotherPage(
+              FormBirahiScreen(notif: data, userId: widget.userId), context);
         } else if (data.role == "3") {
           gotoAnotherPage(
               InsiminasiBuatanFormScreen(
@@ -360,14 +359,15 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        padding: EdgeInsets.symmetric(horizontal: 8),
+        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         height: 40,
         decoration: BoxDecoration(
             color: kSecondaryColor, borderRadius: BorderRadius.circular(8)),
         child: Row(
           children: [
             Expanded(
-              child: Text("${data.pesan} ke sapi ${data.sapi!.eartag}",
+              child: Text(
+                  "${data.pesan} ke sapi MBC-${data.sapi!.generasi}.${data.sapi!.anakKe}-${data.sapi!.eartagInduk}-${data.sapi!.eartag}",
                   style: TextStyle(
                       fontSize: 16,
                       color: Colors.white,

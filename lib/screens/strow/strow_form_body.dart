@@ -136,7 +136,6 @@ class _StrowFormBodyState extends State<StrowFormBody> {
         listSapi.add(Sapi(
           id: 0,
           jenisSapiId: 0,
-          statusSapiId: 0,
           eartag: "ertag",
           eartagInduk: "ertagInduk",
           namaSapi: "Nama Sapi",
@@ -144,6 +143,7 @@ class _StrowFormBodyState extends State<StrowFormBody> {
           kelamin: "kelamin",
           kondisiLahir: "kondisiLahir",
           anakKe: "anakKe",
+          generasi: "generasi",
           fotoDepan: "photoDepan",
           fotoSamping: "photoBelakang",
           fotoPeternak: "photoKanan",

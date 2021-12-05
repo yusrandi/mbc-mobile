@@ -46,6 +46,7 @@ class PeriksaKebuntinganRepositoryImpl implements PeriksaKebuntinganRepository {
     request.fields['sapi_id'] = periksaKebuntingan.sapiId.toString();
     request.fields['foto'] = periksaKebuntingan.foto;
     request.fields['status'] = periksaKebuntingan.status.toString();
+    request.fields['reproduksi'] = periksaKebuntingan.reproduksi.toString();
     request.fields['id'] = periksaKebuntingan.id.toString();
     request.fields['notifikasi_id'] = notifId;
 

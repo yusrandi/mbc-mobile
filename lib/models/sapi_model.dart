@@ -40,14 +40,13 @@ class Sapi {
   String kelamin = "";
   String kondisiLahir = "";
   String anakKe = "";
+  String generasi = "";
   String fotoDepan = "";
   String fotoSamping = "";
   String fotoPeternak = "";
   String fotoRumah = "";
-  int statusSapiId = 0;
   int peternakId = 0;
   JenisSapi? jenisSapi;
-  StatusSapi? statusSapi;
   Peternak? peternak;
 
   Sapi(
@@ -60,14 +59,13 @@ class Sapi {
       required this.kelamin,
       required this.kondisiLahir,
       required this.anakKe,
+      required this.generasi,
       required this.fotoDepan,
       required this.fotoSamping,
       required this.fotoPeternak,
       required this.fotoRumah,
-      required this.statusSapiId,
       required this.peternakId,
       this.jenisSapi,
-      this.statusSapi,
       this.peternak});
 
   Sapi.fromJson(Map<String, dynamic> json) {
@@ -80,18 +78,16 @@ class Sapi {
     kelamin = json['kelamin'];
     kondisiLahir = json['kondisi_lahir'];
     anakKe = json['anak_ke'];
+    generasi = json['generasi'];
     fotoDepan = json['foto_depan'];
     fotoSamping = json['foto_samping'];
     fotoPeternak = json['foto_peternak'];
     fotoRumah = json['foto_rumah'];
-    statusSapiId = json['status_sapi_id'];
     peternakId = json['peternak_id'];
     jenisSapi = json['jenis_sapi'] != null
         ? new JenisSapi.fromJson(json['jenis_sapi'])
         : null;
-    statusSapi = json['status_sapi'] != null
-        ? new StatusSapi.fromJson(json['status_sapi'])
-        : null;
+
     peternak = json['peternak'] != null
         ? new Peternak.fromJson(json['peternak'])
         : null;
@@ -108,18 +104,16 @@ class Sapi {
     data['kelamin'] = this.kelamin;
     data['kondisi_lahir'] = this.kondisiLahir;
     data['anak_ke'] = this.anakKe;
+    data['generasi'] = this.generasi;
     data['foto_depan'] = this.fotoDepan;
     data['foto_samping'] = this.fotoSamping;
     data['foto_peternak'] = this.fotoPeternak;
     data['foto_rumah'] = this.fotoRumah;
-    data['status_sapi_id'] = this.statusSapiId;
     data['peternak_id'] = this.peternakId;
     if (this.jenisSapi != null) {
       data['jenis_sapi'] = this.jenisSapi!.toJson();
     }
-    if (this.statusSapi != null) {
-      data['status_sapi'] = this.statusSapi!.toJson();
-    }
+
     if (this.peternak != null) {
       data['peternak'] = this.peternak!.toJson();
     }
@@ -145,28 +139,6 @@ class JenisSapi {
     data['id'] = this.id;
     data['jenis'] = this.jenis;
     data['ket_jenis'] = this.ketJenis;
-    return data;
-  }
-}
-
-class StatusSapi {
-  int id = 0;
-  String status = "";
-  String ketStatus = "";
-
-  StatusSapi({required this.id, required this.status, required this.ketStatus});
-
-  StatusSapi.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    status = json['status'];
-    ketStatus = json['ket_status'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['status'] = this.status;
-    data['ket_status'] = this.ketStatus;
     return data;
   }
 }
