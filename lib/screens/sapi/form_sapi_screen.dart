@@ -22,7 +22,13 @@ import 'package:toggle_switch/toggle_switch.dart';
 class SapiFormScreen extends StatelessWidget {
   final Sapi sapi;
   final String userId;
-  const SapiFormScreen({Key? key, required this.sapi, required this.userId})
+  final String hakAkses;
+
+  const SapiFormScreen(
+      {Key? key,
+      required this.sapi,
+      required this.userId,
+      required this.hakAkses})
       : super(key: key);
 
   @override
@@ -42,7 +48,7 @@ class SapiFormScreen extends StatelessWidget {
           create: (context) => SapiBloc(SapiRepositoryImpl()),
           child: BlocProvider(
             create: (context) => SapiMasterBloc(SapiMasterRepositoryImpl()),
-            child: SapiFormBody(sapi: sapi, userId: userId),
+            child: SapiFormBody(sapi: sapi, userId: userId, hakAkses: hakAkses),
           ),
         ));
   }
@@ -51,8 +57,13 @@ class SapiFormScreen extends StatelessWidget {
 class SapiFormBody extends StatefulWidget {
   final Sapi sapi;
   final String userId;
+  final String hakAkses;
 
-  const SapiFormBody({Key? key, required this.sapi, required this.userId})
+  const SapiFormBody(
+      {Key? key,
+      required this.sapi,
+      required this.userId,
+      required this.hakAkses})
       : super(key: key);
 
   @override
@@ -233,7 +244,8 @@ class _SapiFormBodyState extends State<SapiFormBody> {
                                                       null,
                                                       widget.userId,
                                                       dataResulSapi,
-                                                      null)));
+                                                      null,
+                                                      widget.hakAkses)));
                                     } else {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(

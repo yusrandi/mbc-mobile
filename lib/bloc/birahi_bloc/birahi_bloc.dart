@@ -21,7 +21,7 @@ class BirahiBloc extends Bloc<BirahiEvent, BirahiState> {
         if (data.responsecode == "1") {
           yield BirahiSuccessState(data.responsemsg);
         } else {
-          yield BirahiErrorState(data.responsemsg);
+          yield BirahiErrorState("Something Error");
         }
       } catch (e) {
         yield BirahiErrorState(e.toString());

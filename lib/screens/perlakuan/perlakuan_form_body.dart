@@ -33,8 +33,10 @@ class PerlakuanFormBody extends StatefulWidget {
   final String userId;
   final String notifikasiId;
   final Sapi? sapi;
+  final String hakAkses;
 
-  const PerlakuanFormBody(Key? key, this.userId, this.notifikasiId, this.sapi)
+  const PerlakuanFormBody(
+      Key? key, this.userId, this.notifikasiId, this.sapi, this.hakAkses)
       : super(key: key);
 
   @override
@@ -875,8 +877,10 @@ class _PerlakuanFormBodyState extends State<PerlakuanFormBody> {
 
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
-            builder: (context) =>
-                HomePage(userId: userId, bloc: authenticationBloc)),
+            builder: (context) => HomePage(
+                userId: userId,
+                bloc: authenticationBloc,
+                hakAkses: widget.hakAkses)),
         (Route<dynamic> route) => false);
   }
 }

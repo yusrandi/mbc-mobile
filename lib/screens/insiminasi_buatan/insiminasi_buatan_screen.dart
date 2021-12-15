@@ -8,7 +8,10 @@ import 'package:mbc_mobile/utils/constants.dart';
 class InsiminasiBuatanScreen extends StatelessWidget {
   static String routeName = "insiminasi_buatan";
   final String userId;
-  const InsiminasiBuatanScreen({Key? key, required this.userId})
+  final String hakAkses;
+
+  const InsiminasiBuatanScreen(
+      {Key? key, required this.userId, required this.hakAkses})
       : super(key: key);
 
   @override
@@ -30,7 +33,7 @@ class InsiminasiBuatanScreen extends StatelessWidget {
             InsiminasiBuatanBloc(InsiminasiBuatanRepositoryImpl()),
         child: Container(
             padding: EdgeInsets.all(16),
-            child: InsiminasiBuatanBody(userId: userId)),
+            child: InsiminasiBuatanBody(userId: userId, hakAkses: hakAkses)),
       ),
     );
   }

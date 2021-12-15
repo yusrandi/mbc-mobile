@@ -36,10 +36,13 @@ class AuthenticationBloc
       sharedpref = await SharedPreferences.getInstance();
       var data = sharedpref.get("name");
       var userId = sharedpref.get("id");
+      var hakAkses = sharedpref.get("hak_akses");
       print("data $data");
       if (data != null)
         yield AuthLoggedInState(
-            userId: int.parse(userId.toString()), userEmail: data.toString());
+            userId: int.parse(userId.toString()),
+            userEmail: data.toString(),
+            hakAkses: hakAkses.toString());
       else
         yield AuthLoggedOutState();
     } else if (event is LogOutEvent) {

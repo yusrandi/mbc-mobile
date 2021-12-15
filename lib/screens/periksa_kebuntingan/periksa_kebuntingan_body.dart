@@ -16,8 +16,11 @@ import 'package:url_launcher/url_launcher.dart';
 
 class PeriksaKebuntinganBody extends StatefulWidget {
   final String id;
+  final String hakAkses;
 
-  const PeriksaKebuntinganBody({Key? key, required this.id}) : super(key: key);
+  const PeriksaKebuntinganBody(
+      {Key? key, required this.id, required this.hakAkses})
+      : super(key: key);
   @override
   _PeriksaKebuntinganBodyState createState() => _PeriksaKebuntinganBodyState();
 }
@@ -55,21 +58,28 @@ class _PeriksaKebuntinganBodyState extends State<PeriksaKebuntinganBody> {
             return Center(child: Text(state.toString()));
           }
         }),
-        Positioned(
-            right: 0,
-            bottom: 0,
-            child: FloatingActionButton(
-              onPressed: () {
-                Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => PeriksaKebuntinganFormScreen(
-                                null, widget.id, null, "0")))
-                    .then((value) => setState(() {}));
-              },
-              backgroundColor: kSecondaryColor,
-              child: Icon(Icons.add),
-            )),
+        Visibility(
+          visible: widget.hakAkses == "3" ? true : false,
+          child: Positioned(
+              right: 0,
+              bottom: 0,
+              child: FloatingActionButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => PeriksaKebuntinganFormScreen(
+                              null,
+                              widget.id,
+                              null,
+                              "0",
+                              widget
+                                  .hakAkses))).then((value) => setState(() {}));
+                },
+                backgroundColor: kSecondaryColor,
+                child: Icon(Icons.add),
+              )),
+        ),
       ],
     );
   }

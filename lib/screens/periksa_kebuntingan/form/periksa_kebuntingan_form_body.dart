@@ -10,7 +10,6 @@ import 'package:mbc_mobile/bloc/auth_bloc/authentication_bloc.dart';
 import 'package:mbc_mobile/bloc/hasil_bloc/hasil_bloc.dart';
 import 'package:mbc_mobile/bloc/metode_bloc/metode_bloc.dart';
 import 'package:mbc_mobile/bloc/periksa_kebuntingan_bloc/periksa_kebuntingan_bloc.dart';
-import 'package:mbc_mobile/bloc/peternak_sapi_bloc/peternaksapi_bloc.dart';
 import 'package:mbc_mobile/bloc/sapi_bloc/sapi_bloc.dart';
 import 'package:mbc_mobile/components/default_button.dart';
 import 'package:mbc_mobile/helper/keyboard.dart';
@@ -32,9 +31,10 @@ class PeriksaKebuntinganFormBody extends StatefulWidget {
   final String userId;
   final String notifId;
   final Sapi? sapi;
+  final String hakAkses;
 
   const PeriksaKebuntinganFormBody(
-      Key? key, this.userId, this.sapi, this.notifId)
+      Key? key, this.userId, this.sapi, this.notifId, this.hakAkses)
       : super(key: key);
 
   @override
@@ -743,8 +743,10 @@ class _PeriksaKebuntinganFormBodyState
 
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
-            builder: (context) =>
-                HomePage(userId: userId, bloc: authenticationBloc)),
+            builder: (context) => HomePage(
+                userId: userId,
+                bloc: authenticationBloc,
+                hakAkses: widget.hakAkses)),
         (Route<dynamic> route) => false);
   }
 }

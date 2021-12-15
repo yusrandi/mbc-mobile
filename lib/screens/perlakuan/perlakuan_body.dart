@@ -9,13 +9,14 @@ import 'package:mbc_mobile/config/api.dart';
 import 'package:mbc_mobile/models/perlakuan_model.dart';
 import 'package:mbc_mobile/screens/perlakuan/perlakuan_form_screen.dart';
 import 'package:mbc_mobile/utils/constants.dart';
-import 'package:mbc_mobile/utils/size_config.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PerlakuanBody extends StatefulWidget {
   final String userId;
+  final String hakAkses;
 
-  const PerlakuanBody({Key? key, required this.userId}) : super(key: key);
+  const PerlakuanBody({Key? key, required this.userId, required this.hakAkses})
+      : super(key: key);
   @override
   _PerlakuanBodyState createState() => _PerlakuanBodyState();
 }
@@ -62,20 +63,25 @@ class _PerlakuanBodyState extends State<PerlakuanBody> {
             }
           }),
         ),
-        Positioned(
-          right: 0,
-          bottom: 0,
-          child: FloatingActionButton(
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => PerlakuanFormScreen(
-                          userId: widget.userId,
-                          notifikasiId: "0"))).then((value) => setState(() {}));
-            },
-            backgroundColor: kSecondaryColor,
-            child: Icon(Icons.add),
+        Visibility(
+          visible: widget.hakAkses == "3" ? true : false,
+          child: Positioned(
+            right: 0,
+            bottom: 0,
+            child: FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => PerlakuanFormScreen(
+                              userId: widget.userId,
+                              notifikasiId: "0",
+                              hakAkses: '',
+                            ))).then((value) => setState(() {}));
+              },
+              backgroundColor: kSecondaryColor,
+              child: Icon(Icons.add),
+            ),
           ),
         ),
       ],

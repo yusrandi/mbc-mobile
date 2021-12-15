@@ -14,8 +14,10 @@ import 'package:url_launcher/url_launcher.dart';
 
 class InsiminasiBuatanBody extends StatefulWidget {
   final String userId;
+  final String hakAkses;
 
-  const InsiminasiBuatanBody({Key? key, required this.userId})
+  const InsiminasiBuatanBody(
+      {Key? key, required this.userId, required this.hakAkses})
       : super(key: key);
 
   @override
@@ -66,20 +68,26 @@ class _InsiminasiBuatanBodyState extends State<InsiminasiBuatanBody> {
             }
           }),
         ),
-        Positioned(
-          right: 0,
-          bottom: 0,
-          child: FloatingActionButton(
-            onPressed: () {
-              Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => InsiminasiBuatanFormScreen(
-                              null, widget.userId, "", null)))
-                  .then((value) => setState(() {}));
-            },
-            backgroundColor: kSecondaryColor,
-            child: Icon(Icons.add),
+        Visibility(
+          visible: widget.hakAkses == "3" ? true : false,
+          child: Positioned(
+            right: 0,
+            bottom: 0,
+            child: FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => InsiminasiBuatanFormScreen(
+                            null,
+                            widget.userId,
+                            "",
+                            null,
+                            widget.hakAkses))).then((value) => setState(() {}));
+              },
+              backgroundColor: kSecondaryColor,
+              child: Icon(Icons.add),
+            ),
           ),
         ),
       ],

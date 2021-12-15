@@ -25,7 +25,10 @@ class PanenFormScreen extends StatelessWidget {
   final String userId;
   final String notifId;
   final Sapi? sapi;
-  const PanenFormScreen(Key? key, this.userId, this.sapi, this.notifId)
+  final String hakAkses;
+
+  const PanenFormScreen(
+      Key? key, this.userId, this.sapi, this.notifId, this.hakAkses)
       : super(key: key);
 
   @override
@@ -47,7 +50,7 @@ class PanenFormScreen extends StatelessWidget {
             create: (context) => SapiBloc(SapiRepositoryImpl()),
             child: Container(
               padding: EdgeInsets.all(8),
-              child: PanenFormScreenBody(null, userId, sapi, notifId),
+              child: PanenFormScreenBody(null, userId, sapi, notifId, hakAkses),
             ),
           )),
     );
@@ -58,7 +61,10 @@ class PanenFormScreenBody extends StatefulWidget {
   final String userId;
   final String notifId;
   final Sapi? sapi;
-  const PanenFormScreenBody(Key? key, this.userId, this.sapi, this.notifId)
+  final String hakAkses;
+
+  const PanenFormScreenBody(
+      Key? key, this.userId, this.sapi, this.notifId, this.hakAkses)
       : super(key: key);
 
   @override
@@ -108,7 +114,7 @@ class _PanenFormScreenBodyState extends State<PanenFormScreenBody> {
           EasyLoading.showSuccess(state.msg);
           EasyLoading.dismiss();
           // Navigator.pop(context);
-          gotoHomePage(widget.userId);
+          gotoHomePage(widget.userId, widget.hakAkses);
         }
       },
       child: Container(
@@ -455,14 +461,14 @@ class _PanenFormScreenBodyState extends State<PanenFormScreenBody> {
     }
   }
 
-  void gotoHomePage(String userId) {
+  void gotoHomePage(String userId, String hakAkses) {
     AuthenticationBloc authenticationBloc =
         BlocProvider.of<AuthenticationBloc>(context);
 
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
-            builder: (context) =>
-                HomePage(userId: userId, bloc: authenticationBloc)),
+            builder: (context) => HomePage(
+                userId: userId, bloc: authenticationBloc, hakAkses: hakAkses)),
         (Route<dynamic> route) => false);
   }
 }

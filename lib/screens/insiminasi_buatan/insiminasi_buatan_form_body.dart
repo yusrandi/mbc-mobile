@@ -27,8 +27,10 @@ class InsiminasiBuatanFormBody extends StatefulWidget {
   final String userId;
   final String notifId;
   final Sapi? sapi;
+  final String hakAkses;
 
-  const InsiminasiBuatanFormBody(Key? key, this.userId, this.notifId, this.sapi)
+  const InsiminasiBuatanFormBody(
+      Key? key, this.userId, this.notifId, this.sapi, this.hakAkses)
       : super(key: key);
 
   @override
@@ -469,8 +471,10 @@ class _InsiminasiBuatanFormBodyState extends State<InsiminasiBuatanFormBody> {
 
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
-            builder: (context) =>
-                HomePage(userId: userId, bloc: authenticationBloc)),
+            builder: (context) => HomePage(
+                userId: userId,
+                bloc: authenticationBloc,
+                hakAkses: widget.hakAkses)),
         (Route<dynamic> route) => false);
   }
 }

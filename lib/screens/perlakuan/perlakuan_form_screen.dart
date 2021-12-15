@@ -18,9 +18,14 @@ class PerlakuanFormScreen extends StatelessWidget {
   final String userId;
   final String notifikasiId;
   final Sapi? sapi;
+  final String hakAkses;
 
   const PerlakuanFormScreen(
-      {Key? key, required this.userId, required this.notifikasiId, this.sapi})
+      {Key? key,
+      required this.userId,
+      required this.notifikasiId,
+      this.sapi,
+      required this.hakAkses})
       : super(key: key);
 
   @override
@@ -49,7 +54,8 @@ class PerlakuanFormScreen extends StatelessWidget {
                 create: (context) => PerlakuanBloc(PerlakuanRepositoryImpl()),
                 child: BlocProvider(
                     create: (context) => SapiBloc(SapiRepositoryImpl()),
-                    child: PerlakuanFormBody(null, userId, notifikasiId, sapi)),
+                    child: PerlakuanFormBody(
+                        null, userId, notifikasiId, sapi, hakAkses)),
               ),
             ),
           ),

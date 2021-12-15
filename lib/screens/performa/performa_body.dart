@@ -7,7 +7,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mbc_mobile/bloc/performa_bloc/performa_bloc.dart';
 import 'package:mbc_mobile/config/api.dart';
 import 'package:mbc_mobile/models/performa_model.dart';
-import 'package:mbc_mobile/screens/performa/performa_form_body.dart';
 import 'package:mbc_mobile/screens/performa/performa_form_screen.dart';
 import 'package:mbc_mobile/utils/constants.dart';
 import 'package:mbc_mobile/utils/size_config.dart';
@@ -15,8 +14,10 @@ import 'package:url_launcher/url_launcher.dart';
 
 class PerformaBody extends StatefulWidget {
   final String userId;
+  final String hakAkses;
 
-  const PerformaBody({Key? key, required this.userId}) : super(key: key);
+  const PerformaBody({Key? key, required this.userId, required this.hakAkses})
+      : super(key: key);
 
   @override
   _PerformaBodyState createState() => _PerformaBodyState();
@@ -66,21 +67,24 @@ class _PerformaBodyState extends State<PerformaBody> {
             }
           }),
         ),
-        Positioned(
-            right: 0,
-            bottom: 0,
-            child: FloatingActionButton(
-              onPressed: () {
-                Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => PerformaFormScreen(
-                                null, widget.userId, null, null)))
-                    .then((value) => setState(() {}));
-              },
-              backgroundColor: kSecondaryColor,
-              child: Icon(Icons.add),
-            )),
+        Visibility(
+          visible: widget.hakAkses == "3" ? true : false,
+          child: Positioned(
+              right: 0,
+              bottom: 0,
+              child: FloatingActionButton(
+                onPressed: () {
+                  Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PerformaFormScreen(null,
+                                  widget.userId, null, null, widget.hakAkses)))
+                      .then((value) => setState(() {}));
+                },
+                backgroundColor: kSecondaryColor,
+                child: Icon(Icons.add),
+              )),
+        ),
       ],
     );
   }

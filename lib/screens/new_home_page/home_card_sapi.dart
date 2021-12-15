@@ -12,7 +12,10 @@ import 'package:mbc_mobile/utils/size_config.dart';
 
 class HomeCardSapi extends StatefulWidget {
   final String userId;
-  const HomeCardSapi({Key? key, required this.userId}) : super(key: key);
+  final String hakAkses;
+
+  const HomeCardSapi({Key? key, required this.userId, required this.hakAkses})
+      : super(key: key);
 
   @override
   State<HomeCardSapi> createState() => _HomeCardSapiState();
@@ -23,21 +26,25 @@ class _HomeCardSapiState extends State<HomeCardSapi> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => SapiBloc(SapiRepositoryImpl()),
-      child: HomeCardSapiBody(userId: widget.userId),
+      child: HomeCardSapiBody(userId: widget.userId, hakAkses: widget.hakAkses),
     );
   }
 }
 
 class HomeCardSapiBody extends StatefulWidget {
   final String userId;
+  final String hakAkses;
 
-  const HomeCardSapiBody({Key? key, required this.userId}) : super(key: key);
+  const HomeCardSapiBody(
+      {Key? key, required this.userId, required this.hakAkses})
+      : super(key: key);
 
   @override
   _HomeCardSapiBodyState createState() => _HomeCardSapiBodyState();
 }
 
 class _HomeCardSapiBodyState extends State<HomeCardSapiBody> {
+  static const TAG = "_HomeCardSapiBodyState";
   late SapiBloc sapiBloc;
 
   @override
@@ -46,6 +53,8 @@ class _HomeCardSapiBodyState extends State<HomeCardSapiBody> {
 
     sapiBloc.add(SapiFetchDataEvent(widget.userId));
     super.initState();
+
+    print("$TAG, Role ${widget.hakAkses}");
   }
 
   @override
@@ -130,7 +139,7 @@ class _HomeCardSapiBodyState extends State<HomeCardSapiBody> {
                         ),
                         Visibility(
                           visible:
-                              list[index].kelamin == "Betina" ? true : false,
+                              visible(widget.hakAkses, list[index].kelamin),
                           child: GestureDetector(
                             onTap: () {
                               Navigator.push(
@@ -138,7 +147,8 @@ class _HomeCardSapiBodyState extends State<HomeCardSapiBody> {
                                       MaterialPageRoute(
                                           builder: (context) => SapiFormScreen(
                                               sapi: list[index],
-                                              userId: widget.userId)))
+                                              userId: widget.userId,
+                                              hakAkses: widget.hakAkses)))
                                   .then((value) => setState(() {}));
                             },
                             child: Container(
@@ -176,5 +186,17 @@ class _HomeCardSapiBodyState extends State<HomeCardSapiBody> {
       child: Text(msg,
           style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
     );
+  }
+
+  visible(String role, String kelamin) {
+    if (role == "3") {
+      if (kelamin == "Betina") {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
   }
 }

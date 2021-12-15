@@ -15,9 +15,10 @@ class InsiminasiBuatanFormScreen extends StatelessWidget {
   final String userId;
   final String notifId;
   final Sapi? sapi;
+  final String hakAkses;
 
   const InsiminasiBuatanFormScreen(
-      Key? key, this.userId, this.notifId, this.sapi)
+      Key? key, this.userId, this.notifId, this.sapi, this.hakAkses)
       : super(key: key);
 
   @override
@@ -41,7 +42,8 @@ class InsiminasiBuatanFormScreen extends StatelessWidget {
             create: (context) => SapiBloc(SapiRepositoryImpl()),
             child: BlocProvider(
                 create: (context) => StrowBloc(StrowRepositoryImpl()),
-                child: InsiminasiBuatanFormBody(null, userId, notifId, sapi))),
+                child: InsiminasiBuatanFormBody(
+                    null, userId, notifId, sapi, hakAkses))),
       ),
     );
   }

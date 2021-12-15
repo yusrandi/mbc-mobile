@@ -26,8 +26,10 @@ import 'package:mbc_mobile/utils/size_config.dart';
 
 class HomeScreen extends StatefulWidget {
   final String userId;
+  final String hakAkses;
 
-  const HomeScreen({Key? key, required this.userId}) : super(key: key);
+  const HomeScreen({Key? key, required this.userId, required this.hakAkses})
+      : super(key: key);
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -169,12 +171,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-
         BlocBuilder<NotifikasiBloc, NotifikasiState>(
           builder: (context, state) {
             if (state is NotifikasiSuccessState) {
               listNotif = [];
-
               state.datas.notifikasi.forEach((e) {
                 if (e.status == "no") {
                   var date1 =
@@ -191,19 +191,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
                 }
               });
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  ListView.builder(
-                      physics: NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      scrollDirection: Axis.vertical,
-                      itemCount: listNotif.length,
-                      itemBuilder: (context, index) {
-                        var data = listNotif[index];
-                        return notifCard(data);
-                      }),
-                ],
+
+              return MediaQuery.removePadding(
+                context: context,
+                removeTop: true,
+                child: ListView.builder(
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    scrollDirection: Axis.vertical,
+                    itemCount: listNotif.length,
+                    itemBuilder: (context, index) {
+                      var data = listNotif[index];
+                      return notifCard(data);
+                    }),
               );
 
               //
@@ -214,43 +214,8 @@ class _HomeScreenState extends State<HomeScreen> {
             }
           },
         ),
-
-        SizedBox(height: 16),
-        Padding(
-          padding: EdgeInsets.only(left: 16),
-          child: Text("Ongoing Promo",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-        ),
-        SizedBox(height: getProportionateScreenHeight(8)),
-        Container(
-          margin: EdgeInsets.symmetric(horizontal: 8),
-          width: SizeConfig.screenWidth,
-          height: 150,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(25),
-            gradient: LinearGradient(colors: [
-              Colors.green.shade100,
-              kPrimaryColor,
-            ]),
-          ),
-          child: Row(
-            children: [
-              Expanded(child: Image.asset(Images.farmImage)),
-              Expanded(
-                flex: 1,
-                child: Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Text("Have u done your progress today ?",
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white)),
-                ),
-              ),
-            ],
-          ),
-        ),
         SizedBox(height: getProportionateScreenHeight(16)),
+
         Padding(
           padding: EdgeInsets.only(left: 16, bottom: 16),
           child: Text("Featured Service",
@@ -258,12 +223,58 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         // HomeMenuCard(),
         menuList(),
+
+        Visibility(
+          visible: false,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(left: 16),
+                child: Text("Ongoing Promo",
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+              ),
+              SizedBox(height: getProportionateScreenHeight(8)),
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 8),
+                width: SizeConfig.screenWidth,
+                height: 150,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(25),
+                  gradient: LinearGradient(colors: [
+                    Colors.green.shade100,
+                    kPrimaryColor,
+                  ]),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(child: Image.asset(Images.farmImage)),
+                    Expanded(
+                      flex: 1,
+                      child: Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Text("Have u done your progress today ?",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white)),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+
         Padding(
           padding: EdgeInsets.only(left: 16),
           child: Text("Cattle",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
         ),
-        HomeCardSapi(userId: widget.userId.toString()),
+        HomeCardSapi(
+            userId: widget.userId.toString(), hakAkses: widget.hakAkses),
 
         SizedBox(height: getProportionateScreenHeight(16)),
         Padding(
@@ -322,43 +333,47 @@ class _HomeScreenState extends State<HomeScreen> {
   GestureDetector notifCard(Notifikasi data) {
     return GestureDetector(
       onTap: () {
-        if (data.role == "4") {
-          gotoAnotherPage(
-              PerlakuanFormScreen(
-                  userId: widget.userId,
-                  notifikasiId: data.id.toString(),
-                  sapi: data.sapi),
-              context);
-        } else if (data.role == "2") {
-          gotoAnotherPage(
-              PerformaFormScreen(null, widget.userId, null, data.sapi),
-              context);
-        } else if (data.role == "1") {
-          gotoAnotherPage(
-              PeriksaKebuntinganFormScreen(
-                  null, widget.userId, data.sapi, data.id.toString()),
-              context);
-        } else if (data.role == "0") {
-          gotoAnotherPage(
-              FormBirahiScreen(notif: data, userId: widget.userId), context);
-        } else if (data.role == "3") {
-          gotoAnotherPage(
-              InsiminasiBuatanFormScreen(
-                  null, widget.userId, data.id.toString(), data.sapi),
-              context);
-        } else if (data.role == "5") {
-          gotoAnotherPage(
-              PanenFormScreen(
-                null,
-                widget.userId,
-                data.sapi,
-                data.id.toString(),
-              ),
-              context);
+        if (widget.hakAkses == "3") {
+          if (data.role == "4") {
+            gotoAnotherPage(
+                PerlakuanFormScreen(
+                    userId: widget.userId,
+                    notifikasiId: data.id.toString(),
+                    sapi: data.sapi,
+                    hakAkses: widget.hakAkses),
+                context);
+          } else if (data.role == "2") {
+            gotoAnotherPage(
+                PerformaFormScreen(
+                    null, widget.userId, null, data.sapi, widget.hakAkses),
+                context);
+          } else if (data.role == "1") {
+            gotoAnotherPage(
+                PeriksaKebuntinganFormScreen(null, widget.userId, data.sapi,
+                    data.id.toString(), widget.hakAkses),
+                context);
+          } else if (data.role == "0") {
+            gotoAnotherPage(
+                FormBirahiScreen(
+                    notif: data,
+                    userId: widget.userId,
+                    hakAkses: widget.hakAkses),
+                context);
+          } else if (data.role == "3") {
+            gotoAnotherPage(
+                InsiminasiBuatanFormScreen(null, widget.userId,
+                    data.id.toString(), data.sapi, widget.hakAkses),
+                context);
+          } else if (data.role == "5") {
+            gotoAnotherPage(
+                PanenFormScreen(null, widget.userId, data.sapi,
+                    data.id.toString(), widget.hakAkses),
+                context);
+          }
         }
       },
       child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        margin: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         height: 40,
         decoration: BoxDecoration(
@@ -393,26 +408,33 @@ class _HomeScreenState extends State<HomeScreen> {
             Expanded(
                 child: GestureDetector(
                     onTap: () => gotoAnotherPage(
-                        PerformaScreen(userId: widget.userId.toString()),
+                        PerformaScreen(
+                            userId: widget.userId.toString(),
+                            hakAkses: widget.hakAkses),
                         context),
                     child: homeMenu(Icons.insert_chart, "Performa"))),
             Expanded(
                 child: GestureDetector(
                     onTap: () => gotoAnotherPage(
-                        PerlakuanScreen(userId: widget.userId.toString()),
+                        PerlakuanScreen(
+                            userId: widget.userId.toString(),
+                            hakAkses: widget.hakAkses),
                         context),
                     child: homeMenu(FontAwesomeIcons.bookReader, "Perlakuan"))),
             Expanded(
                 child: GestureDetector(
                     onTap: () => gotoAnotherPage(
-                        PeriksaKebuntinganScreen(id: widget.userId.toString()),
+                        PeriksaKebuntinganScreen(
+                            id: widget.userId.toString(),
+                            hakAkses: widget.hakAkses),
                         context),
                     child: homeMenu(FontAwesomeIcons.box, "PKB"))),
             Expanded(
                 child: GestureDetector(
                     onTap: () => gotoAnotherPage(
                         InsiminasiBuatanScreen(
-                            userId: widget.userId.toString()),
+                            userId: widget.userId.toString(),
+                            hakAkses: widget.hakAkses),
                         context),
                     child: homeMenu(Icons.archive, "IB"))),
           ],
@@ -424,7 +446,9 @@ class _HomeScreenState extends State<HomeScreen> {
             Expanded(
                 child: GestureDetector(
                     onTap: () => gotoAnotherPage(
-                        PanenScreen(null, widget.userId.toString()), context),
+                        PanenScreen(
+                            null, widget.userId.toString(), widget.hakAkses),
+                        context),
                     child:
                         homeMenu(Icons.home_repair_service_rounded, "Panen"))),
             Expanded(child: Container()),

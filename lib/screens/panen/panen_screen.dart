@@ -13,8 +13,9 @@ import 'package:url_launcher/url_launcher.dart';
 
 class PanenScreen extends StatelessWidget {
   final String userId;
+  final String hakAkses;
 
-  const PanenScreen(Key? key, this.userId) : super(key: key);
+  const PanenScreen(Key? key, this.userId, this.hakAkses) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -35,16 +36,19 @@ class PanenScreen extends StatelessWidget {
             padding: EdgeInsets.all(8),
             child: PanenScreenBody(null, userId),
           )),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) =>
-                      PanenFormScreen(null, userId, null, "")));
-        },
-        backgroundColor: kSecondaryColor,
-        child: Icon(Icons.add_alert_rounded),
+      floatingActionButton: Visibility(
+        visible: hakAkses == "3" ? true : false,
+        child: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        PanenFormScreen(null, userId, null, "", hakAkses)));
+          },
+          backgroundColor: kSecondaryColor,
+          child: Icon(Icons.add_alert_rounded),
+        ),
       ),
     );
   }

@@ -19,10 +19,11 @@ class AuthGetSuccess extends AuthenticationState {
 
 class AuthLoggedInState extends AuthenticationState {
   final String userEmail;
+  final String hakAkses;
   final int userId;
 
-  AuthLoggedInState({required this.userId,required this.userEmail});
-  
+  AuthLoggedInState(
+      {required this.userId, required this.userEmail, required this.hakAkses});
 }
 
 class AuthLoggedOutState extends AuthenticationState {}

@@ -81,11 +81,15 @@ class _SignFormState extends State<SignForm> {
           // ignore: unrelated_type_equality_checks
           if (state.user.responsecode == "1") {
             EasyLoading.showSuccess("Welcome");
-            _sharedInfo.sharedLoginInfo(state.user.user!.id,
-                state.user.user!.email, state.user.user!.name);
+            _sharedInfo.sharedLoginInfo(
+                state.user.user!.id,
+                state.user.user!.email,
+                state.user.user!.name,
+                state.user.user!.hakAkses);
             gotoAnotherPage(HomePage(
                 userId: state.user.user!.id.toString(),
-                bloc: widget.authenticationBloc));
+                bloc: widget.authenticationBloc,
+                hakAkses: state.user.user!.hakAkses));
           } else {
             EasyLoading.showError(state.user.responsemsg);
           }
@@ -95,7 +99,8 @@ class _SignFormState extends State<SignForm> {
         } else if (state is AuthLoggedInState)
           gotoAnotherPage(HomePage(
               userId: state.userId.toString(),
-              bloc: widget.authenticationBloc));
+              bloc: widget.authenticationBloc,
+              hakAkses: state.hakAkses));
       },
       child: Form(
         key: _formKey,

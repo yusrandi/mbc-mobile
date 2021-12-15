@@ -101,6 +101,7 @@ class _BodyState extends State<Body> {
       gotoAnotherPage(HomePage(
         userId: state.userId.toString(),
         bloc: _bloc,
+        hakAkses: state.hakAkses,
       ));
     }
   }

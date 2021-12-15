@@ -15,7 +15,13 @@ import 'package:toggle_switch/toggle_switch.dart';
 class FormBirahiBody extends StatefulWidget {
   final Notifikasi notif;
   final String userId;
-  const FormBirahiBody({Key? key, required this.notif, required this.userId})
+  final String hakAkses;
+
+  const FormBirahiBody(
+      {Key? key,
+      required this.notif,
+      required this.userId,
+      required this.hakAkses})
       : super(key: key);
 
   @override
@@ -53,11 +59,12 @@ class _FormBirahiBodyState extends State<FormBirahiBody> {
             gotoAnotherPage(HomePage(
               userId: widget.userId.toString(),
               bloc: authenticationBloc,
+              hakAkses: widget.hakAkses,
             ));
             // Navigator.pop(context);
-          } else {
+          } else if (state is BirahiErrorState) {
             EasyLoading.dismiss();
-            // Navigator.pop(context);
+            EasyLoading.showError(state.msg);
           }
         },
         child: Column(

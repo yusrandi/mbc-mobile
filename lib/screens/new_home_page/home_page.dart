@@ -8,6 +8,7 @@ import 'package:mbc_mobile/bloc/user_bloc/user_bloc.dart';
 import 'package:mbc_mobile/repositories/laporan_repo.dart';
 import 'package:mbc_mobile/repositories/notifikasi_repo.dart';
 import 'package:mbc_mobile/repositories/user_repo.dart';
+import 'package:mbc_mobile/screens/new_home_page/screen/guide_screen.dart';
 import 'package:mbc_mobile/screens/new_home_page/screen/home_screen.dart';
 import 'package:mbc_mobile/screens/new_home_page/screen/setting_screen.dart';
 import 'package:mbc_mobile/screens/new_home_page/screen/todo_screen.dart';
@@ -16,9 +17,14 @@ import 'package:mbc_mobile/utils/size_config.dart';
 
 class HomePage extends StatefulWidget {
   final String userId;
+  final String hakAkses;
   final AuthenticationBloc bloc;
 
-  const HomePage({Key? key, required this.userId, required this.bloc})
+  const HomePage(
+      {Key? key,
+      required this.userId,
+      required this.bloc,
+      required this.hakAkses})
       : super(key: key);
 
   @override
@@ -40,11 +46,15 @@ class _HomePageState extends State<HomePage> {
             body: Stack(
               children: [
                 _index == 0
-                    ? HomeScreen(userId: widget.userId)
+                    ? HomeScreen(
+                        userId: widget.userId, hakAkses: widget.hakAkses)
                     : _index == 1
-                        ? TodoScreen(userId: widget.userId)
-                        : SettingScreen(
-                            userId: widget.userId, bloc: widget.bloc),
+                        ? TodoScreen(
+                            userId: widget.userId, hakAkses: widget.hakAkses)
+                        : _index == 2
+                            ? GuideScreen(userId: widget.userId)
+                            : SettingScreen(
+                                userId: widget.userId, bloc: widget.bloc),
                 Positioned(
                   bottom: 0,
                   left: getProportionateScreenWidth(30),
@@ -70,7 +80,11 @@ class _HomePageState extends State<HomePage> {
                                   "assets/icons/bookmark-filled.svg", 1)),
                           Expanded(
                               flex: 1,
-                              child: _listMenu("assets/icons/Settings.svg", 2)),
+                              child: _listMenu(
+                                  "assets/icons/Question mark.svg", 2)),
+                          Expanded(
+                              flex: 1,
+                              child: _listMenu("assets/icons/Settings.svg", 3)),
                         ],
                       ),
                     ),

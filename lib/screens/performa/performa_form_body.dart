@@ -24,10 +24,13 @@ import 'package:mbc_mobile/utils/theme.dart';
 
 class PerformaFormBody extends StatefulWidget {
   final String userId;
+  final String hakAkses;
+
   final DataResultSapi? resultSapi;
   final Sapi? sapi;
 
-  const PerformaFormBody(Key? key, this.userId, this.resultSapi, this.sapi)
+  const PerformaFormBody(
+      Key? key, this.userId, this.resultSapi, this.sapi, this.hakAkses)
       : super(key: key);
 
   @override
@@ -242,11 +245,13 @@ class _PerformaFormBodyState extends State<PerformaFormBody> {
           EasyLoading.showSuccess(state.msg);
           EasyLoading.dismiss();
 
-          Navigator.pop(context);
+          // Navigator.pop(context);
           // Navigator.pushReplacement(
           //     context,
           //     MaterialPageRoute(
           //         builder: (context) => HomePage(userId: widget.userId)));
+
+          gotoHomePage(widget.userId);
         } else {
           EasyLoading.dismiss();
         }
@@ -552,8 +557,10 @@ class _PerformaFormBodyState extends State<PerformaFormBody> {
 
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
-            builder: (context) =>
-                HomePage(userId: userId, bloc: authenticationBloc)),
+            builder: (context) => HomePage(
+                userId: userId,
+                bloc: authenticationBloc,
+                hakAkses: widget.hakAkses)),
         (Route<dynamic> route) => false);
   }
 }

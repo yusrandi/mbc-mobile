@@ -18,7 +18,9 @@ import 'package:mbc_mobile/utils/size_config.dart';
 
 class TodoScreen extends StatefulWidget {
   final String userId;
-  const TodoScreen({Key? key, required this.userId}) : super(key: key);
+  final String hakAkses;
+  const TodoScreen({Key? key, required this.userId, required this.hakAkses})
+      : super(key: key);
 
   @override
   _TodoScreenState createState() => _TodoScreenState();
@@ -145,36 +147,46 @@ class _TodoScreenState extends State<TodoScreen> {
             if (state is NotifikasiSuccessState) {
               return Container(
                 padding: EdgeInsets.symmetric(horizontal: 8),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    ListView.builder(
-                        physics: NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        scrollDirection: Axis.vertical,
-                        itemCount: state.datas.notifikasi.length,
-                        itemBuilder: (context, index) {
-                          var data = state.datas.notifikasi[index];
-                          return GestureDetector(
-                            onTap: () {
-                              if (data.tanggal == dateNow &&
-                                  data.status == "no") {
+                child: MediaQuery.removePadding(
+                  context: context,
+                  removeTop: true,
+                  child: ListView.builder(
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      scrollDirection: Axis.vertical,
+                      itemCount: state.datas.notifikasi.length,
+                      itemBuilder: (context, index) {
+                        var data = state.datas.notifikasi[index];
+                        return GestureDetector(
+                          onTap: () {
+                            if (data.status == "no" && widget.hakAkses == "3") {
+                              var date1 = DateTime.parse(data.tanggal)
+                                  .millisecondsSinceEpoch
+                                  .toInt();
+                              var date2 = DateTime.parse(dateNow)
+                                  .millisecondsSinceEpoch
+                                  .toInt();
+
+                              if (date1 <= date2) {
                                 if (data.role == "4") {
                                   gotoAnotherPage(
                                       PerlakuanFormScreen(
                                           userId: widget.userId,
                                           notifikasiId: data.id.toString(),
-                                          sapi: data.sapi),
+                                          sapi: data.sapi,
+                                          hakAkses: widget.hakAkses),
                                       context);
                                 } else if (data.role == "2") {
                                   gotoAnotherPage(
-                                      PerformaFormScreen(
-                                          null, widget.userId, null, data.sapi),
+                                      PerformaFormScreen(null, widget.userId,
+                                          null, data.sapi, widget.hakAkses),
                                       context);
                                 } else if (data.role == "0") {
                                   gotoAnotherPage(
                                       FormBirahiScreen(
-                                          notif: data, userId: widget.userId),
+                                          notif: data,
+                                          userId: widget.userId,
+                                          hakAkses: widget.hakAkses),
                                       context);
                                 } else if (data.role == "1") {
                                   gotoAnotherPage(
@@ -182,7 +194,8 @@ class _TodoScreenState extends State<TodoScreen> {
                                           null,
                                           widget.userId,
                                           data.sapi,
-                                          data.id.toString()),
+                                          data.id.toString(),
+                                          widget.hakAkses),
                                       context);
                                 } else if (data.role == "3") {
                                   gotoAnotherPage(
@@ -190,96 +203,96 @@ class _TodoScreenState extends State<TodoScreen> {
                                           null,
                                           widget.userId,
                                           data.id.toString(),
-                                          data.sapi),
+                                          data.sapi,
+                                          widget.hakAkses),
                                       context);
                                 } else if (data.role == "5") {
                                   gotoAnotherPage(
                                       PanenFormScreen(
-                                        null,
-                                        widget.userId,
-                                        data.sapi,
-                                        data.id.toString(),
-                                      ),
+                                          null,
+                                          widget.userId,
+                                          data.sapi,
+                                          data.id.toString(),
+                                          widget.hakAkses),
                                       context);
                                 }
                               }
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(),
-                              width: size.width,
-                              child: Row(
-                                children: [
-                                  Column(
+                            }
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(),
+                            width: size.width,
+                            child: Row(
+                              children: [
+                                Column(
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.all(5),
+                                      child: Icon(FontAwesomeIcons.circle,
+                                          color: kPrimaryColor),
+                                    ),
+                                    Container(
+                                      width: 3,
+                                      height: 100,
+                                      color: Colors.grey,
+                                    ),
+                                  ],
+                                ),
+                                Expanded(
+                                    child: Container(
+                                  // height: getProportionateScreenHeight(130),
+                                  margin: EdgeInsets.only(left: 5),
+                                  padding: EdgeInsets.only(left: 5),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
+                                      Text(
+                                          'MBC-${data.sapi!.generasi}.${data.sapi!.anakKe}-${data.sapi!.eartagInduk}-${data.sapi!.eartag}',
+                                          style: TextStyle(
+                                              color: Colors.black54,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold)),
+                                      SizedBox(
+                                          height:
+                                              getProportionateScreenHeight(16)),
+                                      Text(data.tanggal,
+                                          style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold)),
+                                      Text(data.pesan,
+                                          style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold)),
                                       Container(
-                                        padding: EdgeInsets.all(5),
-                                        child: Icon(FontAwesomeIcons.circle,
-                                            color: kPrimaryColor),
-                                      ),
-                                      Container(
-                                        width: 3,
-                                        height: 100,
-                                        color: Colors.grey,
+                                        margin: EdgeInsets.only(top: 8),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 26, vertical: 8),
+                                        decoration: BoxDecoration(
+                                            color: data.status != 'no'
+                                                ? kSecondaryColor
+                                                : Colors.red,
+                                            borderRadius:
+                                                BorderRadius.circular(16)),
+                                        child: Text(
+                                            data.status == 'no'
+                                                ? "Belum"
+                                                : "Sudah",
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold)),
                                       ),
                                     ],
                                   ),
-                                  Expanded(
-                                      child: Container(
-                                    // height: getProportionateScreenHeight(130),
-                                    margin: EdgeInsets.only(left: 5),
-                                    padding: EdgeInsets.only(left: 5),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                            'MBC-${data.sapi!.generasi}.${data.sapi!.anakKe}-${data.sapi!.eartagInduk}-${data.sapi!.eartag}',
-                                            style: TextStyle(
-                                                color: Colors.black54,
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold)),
-                                        SizedBox(
-                                            height:
-                                                getProportionateScreenHeight(
-                                                    16)),
-                                        Text(data.tanggal,
-                                            style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold)),
-                                        Text(data.pesan,
-                                            style: TextStyle(
-                                                color: Colors.grey,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold)),
-                                        Container(
-                                          margin: EdgeInsets.only(top: 8),
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 26, vertical: 8),
-                                          decoration: BoxDecoration(
-                                              color: data.status != 'no'
-                                                  ? kSecondaryColor
-                                                  : Colors.red,
-                                              borderRadius:
-                                                  BorderRadius.circular(16)),
-                                          child: Text(
-                                              data.status == 'no'
-                                                  ? "Belum"
-                                                  : "Sudah",
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.bold)),
-                                        ),
-                                      ],
-                                    ),
-                                  )),
-                                ],
-                              ),
+                                )),
+                              ],
                             ),
-                          );
-                        }),
-                  ],
+                          ),
+                        );
+                      }),
                 ),
               );
 

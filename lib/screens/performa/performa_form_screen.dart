@@ -12,10 +12,12 @@ import 'package:mbc_mobile/utils/constants.dart';
 
 class PerformaFormScreen extends StatelessWidget {
   final String userId;
+  final String hakAkses;
   final DataResultSapi? resultSapi;
   final Sapi? sapi;
 
-  const PerformaFormScreen(Key? key, this.userId, this.resultSapi, this.sapi)
+  const PerformaFormScreen(
+      Key? key, this.userId, this.resultSapi, this.sapi, this.hakAkses)
       : super(key: key);
 
   @override
@@ -35,7 +37,7 @@ class PerformaFormScreen extends StatelessWidget {
         create: (context) => PerformaBloc(PerformaRepositoryImpl()),
         child: BlocProvider(
             create: (context) => SapiBloc(SapiRepositoryImpl()),
-            child: PerformaFormBody(null, userId, resultSapi, sapi)),
+            child: PerformaFormBody(null, userId, resultSapi, sapi, hakAkses)),
       ),
     );
   }

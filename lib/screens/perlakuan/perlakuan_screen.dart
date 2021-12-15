@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mbc_mobile/bloc/perlakuan_bloc/perlakuan_bloc.dart';
-import 'package:mbc_mobile/models/perlakuan_model.dart';
 import 'package:mbc_mobile/repositories/perlakuan_repo.dart';
 import 'package:mbc_mobile/screens/perlakuan/perlakuan_body.dart';
-import 'package:mbc_mobile/screens/perlakuan/perlakuan_form_screen.dart';
 import 'package:mbc_mobile/utils/constants.dart';
 
 class PerlakuanScreen extends StatelessWidget {
   static String routeName = "perlakuan";
   final String userId;
+  final String hakAkses;
 
-  const PerlakuanScreen({Key? key, required this.userId}) : super(key: key);
+  const PerlakuanScreen(
+      {Key? key, required this.userId, required this.hakAkses})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +30,8 @@ class PerlakuanScreen extends StatelessWidget {
       body: BlocProvider(
         create: (context) => PerlakuanBloc(PerlakuanRepositoryImpl()),
         child: Container(
-            padding: EdgeInsets.all(8), child: PerlakuanBody(userId: userId)),
+            padding: EdgeInsets.all(8),
+            child: PerlakuanBody(userId: userId, hakAkses: hakAkses)),
       ),
     );
   }
