@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:mbc_mobile/bloc/laporan_bloc/laporan_bloc.dart';
 import 'package:mbc_mobile/bloc/user_bloc/user_bloc.dart';
 import 'package:mbc_mobile/screens/new_home_page/guide_screens/guide_cek_birahi.dart';
-import 'package:mbc_mobile/screens/new_home_page/screen/todo_screen.dart';
+import 'package:mbc_mobile/screens/new_home_page/guide_screens/guide_ib.dart';
+import 'package:mbc_mobile/screens/new_home_page/guide_screens/guide_menu_home.dart';
+import 'package:mbc_mobile/screens/new_home_page/guide_screens/guide_menu_utama.dart';
+import 'package:mbc_mobile/screens/new_home_page/guide_screens/guide_panen.dart';
+import 'package:mbc_mobile/screens/new_home_page/guide_screens/guide_performa.dart';
+import 'package:mbc_mobile/screens/new_home_page/guide_screens/guide_perlakuan.dart';
+import 'package:mbc_mobile/screens/new_home_page/guide_screens/guide_pkb.dart';
 import 'package:mbc_mobile/utils/constants.dart';
 import 'package:mbc_mobile/utils/images.dart';
 import 'package:mbc_mobile/utils/size_config.dart';
@@ -26,7 +31,14 @@ class _GuideScreenState extends State<GuideScreen> {
     final size = MediaQuery.of(context).size;
 
     final listItem = [
+      Item('Menu Utama', GuideMenuUtama()),
+      Item('Menu Home', GuideMenuHome()),
       Item('Cek Birahi', GuideCekBirahi()),
+      Item('Insiminasi Buatan', GuideIB()),
+      Item('Periksa Kebuntingan', GuidePKB()),
+      Item('Performa/Recording', GuidePerforma()),
+      Item('Perlakuan Kesehatan', GuidePerlakuan()),
+      Item('Panen', GuidePanen()),
     ];
 
     return Container(

@@ -31,8 +31,6 @@ InputDecorationTheme inputDecorationTheme() {
   );
 }
 
-
-
 TextTheme textTheme() {
   return TextTheme(
     bodyText1: TextStyle(color: kTextColor),
@@ -52,7 +50,7 @@ AppBarTheme appBarTheme() {
   );
 }
 
-InputDecoration inputForm(String label, String hint){
+InputDecoration inputForm(String label, String hint) {
   return InputDecoration(
     border: UnderlineInputBorder(
       borderSide: BorderSide(color: Colors.teal),
@@ -60,8 +58,8 @@ InputDecoration inputForm(String label, String hint){
     focusedBorder: UnderlineInputBorder(
       borderSide: BorderSide(color: kSecondaryColor),
     ),
-    enabledBorder: UnderlineInputBorder(
-        borderSide: BorderSide(color: kHintTextColor)),
+    enabledBorder:
+        UnderlineInputBorder(borderSide: BorderSide(color: kHintTextColor)),
     errorBorder: UnderlineInputBorder(
       borderSide: BorderSide(color: Colors.teal),
     ),
@@ -76,7 +74,6 @@ InputDecoration inputForm(String label, String hint){
 // If  you are using latest version of flutter then lable text and hint text shown like this
 // if you r using flutter less then 1.20.* then maybe this is not working properly
     floatingLabelBehavior: FloatingLabelBehavior.never,
-    contentPadding:
-    EdgeInsets.only(left: 15, bottom: 11, right: 15),
+    contentPadding: EdgeInsets.only(left: 15, bottom: 11, right: 15),
   );
 }

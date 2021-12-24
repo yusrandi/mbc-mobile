@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:mbc_mobile/utils/constants.dart';
 import 'package:mbc_mobile/utils/images.dart';
 
-class GuideCekBirahi extends StatelessWidget {
-  const GuideCekBirahi({Key? key}) : super(key: key);
+class GuideIB extends StatelessWidget {
+  const GuideIB({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Petunjuk Cek Birahi",
+          title: Text("Petunjuk Insiminasi Buatan",
               style: TextStyle(color: Colors.white)),
           flexibleSpace: Container(
             decoration: BoxDecoration(
@@ -36,14 +36,14 @@ class GuideCekBirahi extends StatelessWidget {
                         SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                              "Pastikan Terdapat Notif untuk mlakukan Cek Birahi, Notif ini bisa anda dapatkan dalam menu dashboard ataupun menu Notif Timeline",
+                              "Pastikan Terdapat Notif untuk melakukan Insiminasi Buatan, Notif ini bisa anda dapatkan dalam menu dashboard ataupun menu Notif Timeline",
                               style: TextStyle(
                                   fontSize: 18, fontWeight: FontWeight.w600)),
                         ),
                       ],
                     ),
                     SizedBox(height: 8),
-                    Image.asset(Images.birahiNotifImage, height: 500),
+                    Image.asset(Images.ibNotifImage, height: 500),
                   ],
                 ),
                 SizedBox(height: 16),
@@ -59,14 +59,47 @@ class GuideCekBirahi extends StatelessWidget {
                         SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                              "Silahkan inputkan hasil cek birahi yang sesuai, apabila terdapat perbedaan hari pastikan anda memilih tanggal yang sesuai dengan hari anda melakukan cek birahi.",
+                              "Silahkan Foto dokumentasi dari perlakuan.",
                               style: TextStyle(
                                   fontSize: 18, fontWeight: FontWeight.w600)),
                         ),
                       ],
                     ),
                     SizedBox(height: 8),
-                    Image.asset(Images.birahiFormImage, height: 500),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("3. ",
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.w600)),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                              "Silahkan Memilih EARTAG sapi dan pastikan sesuai dengan notifikasi.",
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.w600)),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("4. ",
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.w600)),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text("Silahkan Memilih STRAW.",
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.w600)),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8),
+                    Image.asset(Images.ibFormImage, height: 500),
                   ],
                 ),
               ],

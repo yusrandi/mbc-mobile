@@ -145,7 +145,11 @@ class _SettingScreenState extends State<SettingScreen> {
                               style: TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.w600)),
                           Text(
-                              state.user.hakAkses == "3" ? 'Pendamping' : 'TSR',
+                              state.user.hakAkses == "3"
+                                  ? 'Pendamping'
+                                  : state.user.hakAkses == "4"
+                                      ? 'Dokter'
+                                      : 'TSR',
                               style: TextStyle(fontSize: 14)),
                           SizedBox(height: getProportionateScreenHeight(16)),
                           Text("No Hp", style: titleDarkStyle),

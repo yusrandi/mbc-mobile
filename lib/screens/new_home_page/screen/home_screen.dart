@@ -218,7 +218,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
         Padding(
           padding: EdgeInsets.only(left: 16, bottom: 16),
-          child: Text("Featured Service",
+          child: Text("Menu Perlakuan",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
         ),
         // HomeMenuCard(),
@@ -270,7 +270,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
         Padding(
           padding: EdgeInsets.only(left: 16),
-          child: Text("Cattle",
+          child: Text("Sapi Ternak",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
         ),
         HomeCardSapi(
@@ -279,7 +279,7 @@ class _HomeScreenState extends State<HomeScreen> {
         SizedBox(height: getProportionateScreenHeight(16)),
         Padding(
           padding: EdgeInsets.only(left: 16),
-          child: Text("Cattle Farmer",
+          child: Text("Peternak",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
         ),
         HomeCardPeternak(userId: widget.userId.toString()),
