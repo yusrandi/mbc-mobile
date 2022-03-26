@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mbc_mobile/bloc/insiminasi_buatan_bloc/insiminasi_buatan_bloc.dart';
 import 'package:mbc_mobile/bloc/sapi_bloc/sapi_bloc.dart';
 import 'package:mbc_mobile/bloc/strow_bloc/strow_bloc.dart';
-import 'package:mbc_mobile/models/insiminasi_buatan_model.dart';
 import 'package:mbc_mobile/models/sapi_model.dart';
 import 'package:mbc_mobile/repositories/insiminasi_buatan_repo.dart';
 import 'package:mbc_mobile/repositories/sapi_repo.dart';

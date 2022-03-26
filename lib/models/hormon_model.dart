@@ -23,9 +23,7 @@ class HormonModel {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['responsecode'] = this.responsecode;
     data['responsemsg'] = this.responsemsg;
-    if (this.hormon != null) {
-      data['hormon'] = this.hormon.map((v) => v.toJson()).toList();
-    }
+    data['hormon'] = this.hormon.map((v) => v.toJson()).toList();
     return data;
   }
 }

@@ -25,9 +25,7 @@ class PerformaModel {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['responsecode'] = this.responsecode;
     data['responsemsg'] = this.responsemsg;
-    if (this.performa != null) {
-      data['performa'] = this.performa.map((v) => v.toJson()).toList();
-    }
+    data['performa'] = this.performa.map((v) => v.toJson()).toList();
     return data;
   }
 }

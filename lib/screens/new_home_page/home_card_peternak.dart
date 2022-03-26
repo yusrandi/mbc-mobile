@@ -38,7 +38,7 @@ class HomeCardPeternakBody extends StatefulWidget {
 }
 
 class _HomeCardPeternakBodyState extends State<HomeCardPeternakBody> {
-  var TAG = "HomeCardPeternak";
+  static const TAG = "HomeCardPeternak";
   late PeternakBloc peternakBloc;
 
   @override

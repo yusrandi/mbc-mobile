@@ -26,10 +26,8 @@ class InsiminasiBuatanModel {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['responsecode'] = this.responsecode;
     data['responsemsg'] = this.responsemsg;
-    if (this.insiminasiBuatan != null) {
-      data['insiminasi_buatan'] =
-          this.insiminasiBuatan.map((v) => v.toJson()).toList();
-    }
+    data['insiminasi_buatan'] =
+        this.insiminasiBuatan.map((v) => v.toJson()).toList();
     return data;
   }
 }

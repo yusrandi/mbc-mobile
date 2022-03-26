@@ -25,9 +25,7 @@ class NotifikasiModel {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['responsecode'] = this.responsecode;
     data['responsemsg'] = this.responsemsg;
-    if (this.notifikasi != null) {
-      data['notifikasi'] = this.notifikasi.map((v) => v.toJson()).toList();
-    }
+    data['notifikasi'] = this.notifikasi.map((v) => v.toJson()).toList();
     return data;
   }
 }

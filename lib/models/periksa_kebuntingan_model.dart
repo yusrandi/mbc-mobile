@@ -27,10 +27,8 @@ class PeriksaKebuntinganModel {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['responsecode'] = this.responsecode;
     data['responsemsg'] = this.responsemsg;
-    if (this.periksaKebuntingan != null) {
-      data['periksa_kebuntingan'] =
-          this.periksaKebuntingan.map((v) => v.toJson()).toList();
-    }
+    data['periksa_kebuntingan'] =
+        this.periksaKebuntingan.map((v) => v.toJson()).toList();
     return data;
   }
 }

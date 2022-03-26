@@ -71,7 +71,7 @@ class _PeriksaKebuntinganFormBodyState
 
   late File? _imageFile = null;
   final ImagePicker _picker = ImagePicker();
-  late File? resFile = null;
+  late File? resFile;
 
   bool isResult = true;
   bool isReproduksi = true;

@@ -22,7 +22,7 @@ class UserRepositoryImpl implements UserRepository {
       },
     );
 
-    print("UserRepositoryImpl ${email}");
+    print("UserRepositoryImpl $email");
     if (_response.statusCode == 201) {
       var data = json.decode(_response.body);
       print("Data $data");

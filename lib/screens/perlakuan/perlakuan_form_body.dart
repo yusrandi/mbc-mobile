@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:art_sweetalert/art_sweetalert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,7 +6,6 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 import 'package:mbc_mobile/bloc/auth_bloc/authentication_bloc.dart';
 import 'package:mbc_mobile/bloc/hormon_bloc/hormon_bloc.dart';
 import 'package:mbc_mobile/bloc/obat_bloc/obat_bloc.dart';
@@ -73,7 +71,7 @@ class _PerlakuanFormBodyState extends State<PerlakuanFormBody> {
 
   late File? _imageFile = null;
   final ImagePicker _picker = ImagePicker();
-  late File? resFile = null;
+  late File? resFile;
 
   @override
   void initState() {

@@ -1,3 +1,4 @@
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mbc_mobile/bloc/auth_bloc/authentication_bloc.dart';
@@ -23,10 +24,32 @@ class _BodyState extends State<Body> {
     super.initState();
 
     LocalNotificationServices.initialize(context);
+    LocalNotificationServices.requestPermissions();
     NotificationHelper.init(context);
 
     _bloc = BlocProvider.of<AuthenticationBloc>(context);
-    _bloc.add(CheckLoginEvent());
+    // _bloc.add(CheckLoginEvent());
+    internetAvailable();
+  }
+
+  internetAvailable() async {
+    if (await checkConnection()) {
+      _bloc.add(CheckLoginEvent());
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Pastikan anda terhubung ke Internet')));
+    }
+  }
+
+  Future<bool> checkConnection() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    print(connectivityResult);
+    if (connectivityResult == ConnectivityResult.mobile ||
+        connectivityResult == ConnectivityResult.wifi) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   @override

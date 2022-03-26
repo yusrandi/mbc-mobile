@@ -60,7 +60,7 @@ class _PerformaFormBodyState extends State<PerformaFormBody> {
 
   late File? _imageFile = null;
   final ImagePicker _picker = ImagePicker();
-  late File? resFile = null;
+  late File? resFile;
 
   @override
   void initState() {
@@ -308,7 +308,6 @@ class _PerformaFormBodyState extends State<PerformaFormBody> {
                     resSapiId = data.id;
                     resSapi =
                         'MBC-${data.generasi}.${data.anakKe}-${data.eartagInduk}-${data.eartag}';
-                    ;
                   });
                   Navigator.pop(context, false);
                 },

@@ -25,9 +25,7 @@ class MasterSapiModel {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['responsecode'] = this.responsecode;
     data['responsemsg'] = this.responsemsg;
-    if (this.jenisSapi != null) {
-      data['jenis_sapi'] = this.jenisSapi.map((v) => v.toJson()).toList();
-    }
+    data['jenis_sapi'] = this.jenisSapi.map((v) => v.toJson()).toList();
 
     return data;
   }

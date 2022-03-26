@@ -23,9 +23,7 @@ class VitaminModel {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['responsecode'] = this.responsecode;
     data['responsemsg'] = this.responsemsg;
-    if (this.vitamin != null) {
-      data['vitamin'] = this.vitamin.map((v) => v.toJson()).toList();
-    }
+    data['vitamin'] = this.vitamin.map((v) => v.toJson()).toList();
     return data;
   }
 }

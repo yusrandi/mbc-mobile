@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:mbc_mobile/components/custom_surfix_icon.dart';
 import 'package:mbc_mobile/utils/size_config.dart';
 

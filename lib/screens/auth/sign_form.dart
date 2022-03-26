@@ -2,15 +2,12 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mbc_mobile/bloc/auth_bloc/authentication_bloc.dart';
 import 'package:mbc_mobile/components/custom_surfix_icon.dart';
 import 'package:mbc_mobile/components/default_button.dart';
-import 'package:mbc_mobile/components/form_error.dart';
 import 'package:mbc_mobile/config/shared_info.dart';
 import 'package:mbc_mobile/helper/keyboard.dart';
 import 'package:mbc_mobile/screens/new_home_page/home_page.dart';
-import 'package:mbc_mobile/screens/new_home_page/screen/home_screen.dart';
 import 'package:mbc_mobile/utils/constants.dart';
 import 'package:mbc_mobile/utils/size_config.dart';
 
@@ -63,7 +60,35 @@ class _SignFormState extends State<SignForm> {
     _sharedInfo = SharedInfo();
 
     FirebaseMessaging.instance.getInitialMessage();
-    FirebaseMessaging.instance.getToken().then((value) => resToken = value!);
+    getMessagingToken();
+    // FirebaseMessaging.instance.getToken().then((value) => resToken = value!);
+  }
+
+  Future<String> getMessagingToken() async {
+    String token = "";
+
+    await FirebaseMessaging.instance
+        .requestPermission()
+        .timeout(Duration(seconds: 5))
+        .then((value) {
+      print(
+          'SignForm.getMessagingToken() requestPermission result is ${value.authorizationStatus}');
+    }).catchError((e) {
+      print(
+          'SignForm.getMessagingToken() requestPermission error: ${e.toString()}');
+      EasyLoading.showError(e.toString());
+    });
+
+    await FirebaseMessaging.instance.getToken().then((value) {
+      print(' SignForm.getMessagingToken() token is $value');
+      token = value!;
+      resToken = token;
+    }).catchError((e) {
+      print('SignForm.getMessagingToken() getToken error: $e');
+      EasyLoading.showError(e.toString());
+    });
+
+    return token;
   }
 
   @override

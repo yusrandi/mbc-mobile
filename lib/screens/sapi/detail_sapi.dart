@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:intl/intl.dart';
 import 'package:mbc_mobile/config/api.dart';
 import 'package:mbc_mobile/models/sapi_model.dart';
 import 'package:mbc_mobile/utils/AppColor.dart';

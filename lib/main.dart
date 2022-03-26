@@ -4,10 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:mbc_mobile/bloc/auth_bloc/authentication_bloc.dart';
+import 'package:mbc_mobile/repositories/laporan_repo.dart';
+import 'package:mbc_mobile/repositories/notifikasi_repo.dart';
 import 'package:mbc_mobile/repositories/user_repo.dart';
 import 'package:mbc_mobile/screens/splash/splash_screen.dart';
 import 'package:mbc_mobile/utils/routes.dart';
 import 'package:mbc_mobile/utils/theme.dart';
+
+import 'bloc/laporan_bloc/laporan_bloc.dart';
+import 'bloc/notif_bloc/notifikasi_bloc.dart';
+import 'bloc/user_bloc/user_bloc.dart';
 
 // receive msg when app in background
 Future<void> backGroundHandler(RemoteMessage msg) async {
@@ -57,15 +63,24 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (BuildContext context) =>
-          AuthenticationBloc(UserRepositoryImpl()),
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
-        theme: theme(),
-        initialRoute: SplashScreen.routeName,
-        routes: routes,
-        builder: EasyLoading.init(),
+      create: (context) => UserBloc(UserRepositoryImpl()),
+      child: BlocProvider(
+        create: (context) => LaporanBloc(LaporanRepositoryImpl()),
+        child: BlocProvider(
+          create: (context) => NotifikasiBloc(NotifikasiRepositoryImpl()),
+          child: BlocProvider(
+            create: (BuildContext context) =>
+                AuthenticationBloc(UserRepositoryImpl()),
+            child: MaterialApp(
+              debugShowCheckedModeBanner: false,
+              title: 'Flutter Demo',
+              theme: theme(),
+              initialRoute: SplashScreen.routeName,
+              routes: routes,
+              builder: EasyLoading.init(),
+            ),
+          ),
+        ),
       ),
     );
   }

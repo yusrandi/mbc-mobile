@@ -23,9 +23,7 @@ class ObatModel {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['responsecode'] = this.responsecode;
     data['responsemsg'] = this.responsemsg;
-    if (this.obat != null) {
-      data['obat'] = this.obat.map((v) => v.toJson()).toList();
-    }
+    data['obat'] = this.obat.map((v) => v.toJson()).toList();
     return data;
   }
 }

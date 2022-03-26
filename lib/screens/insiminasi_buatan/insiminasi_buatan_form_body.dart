@@ -7,7 +7,6 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 import 'package:mbc_mobile/bloc/auth_bloc/authentication_bloc.dart';
 import 'package:mbc_mobile/bloc/insiminasi_buatan_bloc/insiminasi_buatan_bloc.dart';
 import 'package:mbc_mobile/bloc/sapi_bloc/sapi_bloc.dart';
@@ -54,7 +53,7 @@ class _InsiminasiBuatanFormBodyState extends State<InsiminasiBuatanFormBody> {
 
   late File? _imageFile = null;
   final ImagePicker _picker = ImagePicker();
-  late File? resFile = null;
+  late File? resFile;
 
   @override
   void initState() {

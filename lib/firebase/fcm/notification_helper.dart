@@ -1,7 +1,6 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:mbc_mobile/firebase/services/local_notification_services.dart';
-import 'package:mbc_mobile/screens/splash/splash_screen.dart';
 
 class NotificationHelper {
   static const TAG = "NotificationHelper";

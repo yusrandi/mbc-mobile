@@ -23,9 +23,7 @@ class PeternakModel {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['responsecode'] = this.responsecode;
     data['responsemsg'] = this.responsemsg;
-    if (this.peternak != null) {
-      data['peternak'] = this.peternak.map((v) => v.toJson()).toList();
-    }
+    data['peternak'] = this.peternak.map((v) => v.toJson()).toList();
     return data;
   }
 }

@@ -26,9 +26,7 @@ class PeternakSapiModel {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['responsecode'] = this.responsecode;
     data['responsemsg'] = this.responsemsg;
-    if (this.peternakSapi != null) {
-      data['peternak_sapi'] = this.peternakSapi.map((v) => v.toJson()).toList();
-    }
+    data['peternak_sapi'] = this.peternakSapi.map((v) => v.toJson()).toList();
     return data;
   }
 }

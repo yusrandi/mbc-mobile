@@ -30,9 +30,7 @@ class PerlakuanModel {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['responsecode'] = this.responsecode;
     data['responsemsg'] = this.responsemsg;
-    if (this.perlakuan != null) {
-      data['perlakuan'] = this.perlakuan.map((v) => v.toJson()).toList();
-    }
+    data['perlakuan'] = this.perlakuan.map((v) => v.toJson()).toList();
     return data;
   }
 }

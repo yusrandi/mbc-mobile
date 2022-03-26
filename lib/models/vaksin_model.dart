@@ -23,9 +23,7 @@ class VaksinModel {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['responsecode'] = this.responsecode;
     data['responsemsg'] = this.responsemsg;
-    if (this.vaksin != null) {
-      data['vaksin'] = this.vaksin.map((v) => v.toJson()).toList();
-    }
+    data['vaksin'] = this.vaksin.map((v) => v.toJson()).toList();
     return data;
   }
 }

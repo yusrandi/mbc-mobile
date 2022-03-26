@@ -6,7 +6,6 @@ import 'package:mbc_mobile/bloc/perlakuan_bloc/perlakuan_bloc.dart';
 import 'package:mbc_mobile/bloc/sapi_bloc/sapi_bloc.dart';
 import 'package:mbc_mobile/bloc/vaksin_bloc/vaksin_bloc.dart';
 import 'package:mbc_mobile/bloc/vitamin_bloc/vitamin_bloc.dart';
-import 'package:mbc_mobile/models/perlakuan_model.dart';
 import 'package:mbc_mobile/models/sapi_model.dart';
 import 'package:mbc_mobile/repositories/perlakuan_master_repo.dart';
 import 'package:mbc_mobile/repositories/perlakuan_repo.dart';
