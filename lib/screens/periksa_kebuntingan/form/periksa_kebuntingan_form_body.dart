@@ -655,7 +655,7 @@ class _PeriksaKebuntinganFormBodyState
   void _takePhotos(ImageSource source) async {
     final pickedFile = await _picker.getImage(source: source);
     if (pickedFile != null) {
-      File? cropped = await ImageCropper.cropImage(
+      File? cropped = await ImageCropper().cropImage(
           sourcePath: pickedFile.path,
           aspectRatio: CropAspectRatio(ratioX: 2, ratioY: 1),
           compressQuality: 70,
